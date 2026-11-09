@@ -40,7 +40,7 @@ Beta. Most of the code is ported from Half-Life: VR Mod onto the latest SDK. For
 # Installation
 
 - Make sure you have [Half-Life: Blue Shift](https://store.steampowered.com/app/130/HalfLife_Blue_Shift/) and [Half-Life: VR Mod](https://store.steampowered.com/app/1908720/HalfLife_VR_Mod/) installed on Steam.
-- Download latest version of installer `bsvr-install.exe` from this repository [Releases](https://github.com/DmitryShaburov/Blue-Shift-VR/releases) page.
+- Download latest version of installer `bsvr-install.exe` from this repository [Releases](https://github.com/inf-ee/Blue-Shift-VR/releases) page.
 - Launch the installer. It will look for Steam installations and install the mod.
 - Restart the Steam client (via tray icon right click → Exit Steam or Steam → Exit top menu).
 - Mod will appear in your Steam library as Half-Life: VR Mod - Blue Shift.

@@ -231,6 +231,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClCompile Include="..\..\pm_shared\pm_shared.cpp" />
     <ClCompile Include="..\..\public\interface.cpp" />
     <ClCompile Include="..\..\dlls\vr\hlmv_mathlib.cpp" />
+    <ClCompile Include="..\..\dlls\vr\VRClientCommands.cpp" />
     <ClCompile Include="..\..\dlls\vr\VRCommons.cpp" />
     <ClCompile Include="..\..\dlls\vr\VRController.cpp" />
     <ClCompile Include="..\..\dlls\vr\VRControllerInteractionManager.cpp" />
@@ -256,6 +257,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClInclude Include="..\..\dlls\vr\hlmv_mathlib.h" />
     <ClInclude Include="..\..\dlls\vr\VRAnimation.h" />
     <ClInclude Include="..\..\dlls\vr\VRCommons.h" />
+    <ClInclude Include="..\..\dlls\vr\VREHandle.h" />
     <ClInclude Include="..\..\dlls\vr\VRController.h" />
     <ClInclude Include="..\..\dlls\vr\VRControllerInteractionManager.h" />
     <ClInclude Include="..\..\dlls\vr\VRControllerModel.h" />

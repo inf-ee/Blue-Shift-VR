@@ -10,7 +10,6 @@ namespace
 {
 // Copy of the engine's event API table; gEngfuncs.pEventAPI points to the engine's own table, which must not be changed
 event_api_t s_eventAPI;
-}
 
 void InterCept_EV_WeaponAnimation(int sequence, int body)
 {
@@ -24,6 +23,7 @@ void InterCept_EV_WeaponAnimation(int sequence, int body)
 
 	// gEngfuncs.pEventAPI->EV_WeaponAnimation(sequence, body);
 }
+} // namespace
 
 // Every gEngfuncs.pEventAPI->EV_WeaponAnimation in the client (ev_hldm.cpp events) goes through the copy
 void VRSwapWeaponAnimFuncs()

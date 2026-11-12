@@ -69,30 +69,24 @@ inline enginefuncs_t g_engfuncs;
 #define RANDOM_FLOAT (*g_engfuncs.pfnRandomFloat)
 #define GETPLAYERAUTHID (*g_engfuncs.pfnGetPlayerAuthId)
 
-// BSVR start moved down
-// inline void MESSAGE_BEGIN(int msg_dest, int msg_type, const float* pOrigin = NULL, edict_t* ed = NULL)
-// {
-// 	(*g_engfuncs.pfnMessageBegin)(msg_dest, msg_type, pOrigin, ed);
-// }
-// #define MESSAGE_END (*g_engfuncs.pfnMessageEnd)
-// #define WRITE_BYTE (*g_engfuncs.pfnWriteByte)
-// #define WRITE_CHAR (*g_engfuncs.pfnWriteChar)
-// #define WRITE_SHORT (*g_engfuncs.pfnWriteShort)
-// #define WRITE_LONG (*g_engfuncs.pfnWriteLong)
-// #define WRITE_ANGLE (*g_engfuncs.pfnWriteAngle)
-// #define WRITE_COORD (*g_engfuncs.pfnWriteCoord)
-// #define WRITE_STRING (*g_engfuncs.pfnWriteString)
-// #define WRITE_ENTITY (*g_engfuncs.pfnWriteEntity)
+inline void MESSAGE_BEGIN(int msg_dest, int msg_type, const float* pOrigin = NULL, edict_t* ed = NULL)
+{
+	(*g_engfuncs.pfnMessageBegin)(msg_dest, msg_type, pOrigin, ed);
+}
+#define MESSAGE_END (*g_engfuncs.pfnMessageEnd)
+#define WRITE_BYTE (*g_engfuncs.pfnWriteByte)
+#define WRITE_CHAR (*g_engfuncs.pfnWriteChar)
+#define WRITE_SHORT (*g_engfuncs.pfnWriteShort)
+#define WRITE_LONG (*g_engfuncs.pfnWriteLong)
+#define WRITE_ANGLE (*g_engfuncs.pfnWriteAngle)
+#define WRITE_COORD (*g_engfuncs.pfnWriteCoord)
+#define WRITE_STRING (*g_engfuncs.pfnWriteString)
+#define WRITE_ENTITY (*g_engfuncs.pfnWriteEntity)
 
-// inline void WRITE_FLOAT(float value)
-// {
-// 	WRITE_LONG(*reinterpret_cast<int*>(&value));
-// }
-// BSVR end
-
-// BSVR start
-#include "vr/VREngineMessages.h"
-// BSVR end
+inline void WRITE_FLOAT(float value)
+{
+	WRITE_LONG(*reinterpret_cast<int*>(&value));
+}
 
 #define CVAR_REGISTER (*g_engfuncs.pfnCVarRegister)
 #define CVAR_GET_FLOAT (*g_engfuncs.pfnCVarGetFloat)

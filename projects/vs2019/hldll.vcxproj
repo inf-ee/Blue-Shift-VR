@@ -239,6 +239,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClCompile Include="..\..\dlls\vr\VRCrushEntityHandler.cpp" />
     <ClCompile Include="..\..\dlls\vr\VREngineCallbacks.cpp" />
     <ClCompile Include="..\..\dlls\vr\VREngineFuncSwaps.cpp" />
+    <ClCompile Include="..\..\dlls\vr\VREngineMessages.cpp" />
     <ClCompile Include="..\..\dlls\vr\VRGroundEntityHandler.cpp" />
     <ClCompile Include="..\..\dlls\vr\VRGibs.cpp" />
     <ClCompile Include="..\..\dlls\vr\VRGrenadeDrag.cpp" />
@@ -259,7 +260,6 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClInclude Include="..\..\dlls\vr\VRControllerInteractionManager.h" />
     <ClInclude Include="..\..\dlls\vr\VRControllerModel.h" />
     <ClInclude Include="..\..\dlls\vr\VRControllerTeleporter.h" />
-    <ClInclude Include="..\..\dlls\vr\VREngineMessages.h" />
     <ClInclude Include="..\..\dlls\vr\VRGroundEntityHandler.h" />
     <ClInclude Include="..\..\dlls\vr\VRModelHelper.h" />
     <ClInclude Include="..\..\dlls\vr\VRMovementHandler.h" />

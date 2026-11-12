@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   Use, distribution, and modification of this source code and/or resulting
@@ -29,9 +29,9 @@ class CHealthKit : public CItem
 	bool MyTouch(CBasePlayer* pPlayer) override;
 
 	/*
-	int		Save( CSave &save ) override; 
+	int		Save( CSave &save ) override;
 	int		Restore( CRestore &restore ) override;
-	
+
 	static	TYPEDESCRIPTION m_SaveData[];
 */
 };
@@ -40,7 +40,7 @@ class CHealthKit : public CItem
 LINK_ENTITY_TO_CLASS(item_healthkit, CHealthKit);
 
 /*
-TYPEDESCRIPTION	CHealthKit::m_SaveData[] = 
+TYPEDESCRIPTION	CHealthKit::m_SaveData[] =
 {
 
 };

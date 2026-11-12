@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   This source code contains proprietary and confidential information of
@@ -754,11 +754,11 @@ void CFlockingFlyer::FlockFollowerThink()
 	BoidAdvanceFrame();
 }
 
-/*	
+/*
 	// Is this boid's course blocked?
 	if ( FBoidPathBlocked (pev) )
 	{
-		// course is still blocked from last time. Just keep flying along adjusted 
+		// course is still blocked from last time. Just keep flying along adjusted
 		// velocity
 		if ( m_fCourseAdjust )
 		{
@@ -768,7 +768,7 @@ void CFlockingFlyer::FlockFollowerThink()
 		else // set course adjust flag and calculate adjusted velocity
 		{
 			m_fCourseAdjust = true;
-			
+
 			// use VELOCITY, not angles, not all boids point the direction they are flying
 			//vecDir = UTIL_VecToAngles( pev->velocity );
 			//UTIL_MakeVectors ( vecDir );

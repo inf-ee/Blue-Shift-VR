@@ -44,7 +44,7 @@ extern Vector v_angles;	   // last view angle
 extern Vector v_cl_angles; // last client/mouse angle
 extern Vector v_sim_org;   // last sim origin
 
-#if 0 
+#if 0
 const char *GetSpectatorLabel ( int iMode )
 {
 	switch ( iMode )
@@ -57,7 +57,7 @@ const char *GetSpectatorLabel ( int iMode )
 
 		case OBS_ROAMING:
 			return "#OBS_ROAMING";
-		
+
 		case OBS_IN_EYE:
 			return "#OBS_IN_EYE";
 

@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   This source code contains proprietary and confidential information of
@@ -104,7 +104,7 @@ void CBaseMonster::ChangeSchedule(Schedule_t* pNewSchedule)
 	if ( FClassnameIs( pev, "monster_human_grunt" ) )
 	{
 		Task_t *pTask = GetTask();
-		
+
 		if ( pTask )
 		{
 			const char *pName = NULL;
@@ -117,7 +117,7 @@ void CBaseMonster::ChangeSchedule(Schedule_t* pNewSchedule)
 			{
 				pName = "No Schedule";
 			}
-			
+
 			if ( !pName )
 			{
 				pName = "Unknown";

@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   Use, distribution, and modification of this source code and/or resulting
@@ -205,7 +205,7 @@ typedef struct
 // events
 #include "studio_event.h"
 /*
-typedef struct 
+typedef struct
 {
 	int 				frame;
 	int					event;
@@ -314,7 +314,7 @@ typedef struct
 
 // triangles
 #if 0
-typedef struct 
+typedef struct
 {
 	short				vertindex;		// index into vertex array
 	short				normindex;		// index into normal array

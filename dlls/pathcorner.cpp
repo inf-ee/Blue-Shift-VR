@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   Use, distribution, and modification of this source code and/or resulting
@@ -72,7 +72,7 @@ void CPathCorner::Spawn()
 void CPathCorner:: Touch( CBaseEntity *pOther )
 {
 	entvars_t*		pevToucher = pOther->pev;
-		
+
 	if ( FBitSet ( pevToucher->flags, FL_MONSTER ) )
 	{// monsters don't navigate path corners based on touch anymore
 		return;
@@ -89,7 +89,7 @@ void CPathCorner:: Touch( CBaseEntity *pOther )
 	{
 		return;		// fighting, not following a path
 	}
-	
+
 	// UNDONE: support non-zero flWait
 	/*
 	if (m_flWait != 0)

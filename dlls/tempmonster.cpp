@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   This source code contains proprietary and confidential information of
@@ -39,7 +39,7 @@ public:
 LINK_ENTITY_TO_CLASS( my_monster, CMyMonster );
 
 //=========================================================
-// Classify - indicates this monster's place in the 
+// Classify - indicates this monster's place in the
 // relationship table.
 //=========================================================
 int	CMyMonster:: Classify ()
@@ -109,7 +109,7 @@ void CMyMonster:: Precache()
 	PRECACHE_SOUND("mysound.wav");
 
 	PRECACHE_MODEL("models/mymodel.mdl");
-}	
+}
 
 //=========================================================
 // AI Schedules Specific to this monster

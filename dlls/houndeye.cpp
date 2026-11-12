@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   This source code contains proprietary and confidential information of
@@ -722,7 +722,7 @@ void CHoundeye::StartTask(Task_t* pTask)
 		/*
 			if ( InSquad() )
 			{
-				// see if there is a battery to connect to. 
+				// see if there is a battery to connect to.
 				CSquadMonster *pSquad = m_pSquadLeader;
 
 				while ( pSquad )

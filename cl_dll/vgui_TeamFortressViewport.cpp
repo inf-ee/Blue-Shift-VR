@@ -193,15 +193,15 @@ void CCommandMenu::RemoveAllButtons()
 	/*
 	for(int i=0;i<m_iButtons;i++)
 	{
-		CommandButton *pTemp = m_aButtons[i]; 
+		CommandButton *pTemp = m_aButtons[i];
 		m_aButtons[i] = NULL;
-		
+
 		pTemp
 		if(pTemp)
 		{
 			delete(pTemp);
 		}
-		
+
 	}
 	*/
 	removeAllChildren();
@@ -1298,9 +1298,9 @@ void TeamFortressViewport::UpdateSpectatorPanel()
 			 timer	= 0;
 
 		snprintf ( szText, 63, "%d:%02d\n", (timer / 60), (timer % 60) );
-		
+
 		szText[63] = 0;
-				
+
 		m_pSpectatorPanel->m_CurrentTime->setText( szText ); */
 
 		// update spectator panel

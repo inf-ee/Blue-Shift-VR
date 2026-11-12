@@ -366,6 +366,9 @@
     <ClCompile Include="..\..\game_shared\filesystem_utils.cpp">
       <Filter>Source Files\game_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\game_shared\vr\VRPMShared.cpp">
+      <Filter>Source Files\game_shared</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\public\interface.cpp">
       <Filter>Source Files\public</Filter>
     </ClCompile>
@@ -693,9 +696,6 @@
       <Filter>Header Files\game_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\..\game_shared\vr\VRPMShared.h">
-      <Filter>Header Files\game_shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\game_shared\vr\VRPMSharedFunctions.h">
       <Filter>Header Files\game_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\..\public\interface.h">

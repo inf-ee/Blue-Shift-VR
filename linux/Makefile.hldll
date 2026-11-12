@@ -135,7 +135,8 @@ PM_OBJS = \
 
 GAME_SHARED_OBJS = \
 	$(GAME_SHARED_OBJ_DIR)/filesystem_utils.o \
-	$(GAME_SHARED_OBJ_DIR)/voice_gamemgr.o
+	$(GAME_SHARED_OBJ_DIR)/voice_gamemgr.o \
+	$(GAME_SHARED_OBJ_DIR)/vr/VRPMShared.o
 
 PUBLIC_OBJS = \
 	$(PUBLIC_OBJ_DIR)/interface.o \
@@ -174,6 +175,7 @@ dirs:
 	-mkdir -p $(HLDLL_OBJ_DIR)
 	-mkdir -p $(PM_OBJ_DIR)
 	-mkdir -p $(GAME_SHARED_OBJ_DIR)
+	-mkdir -p $(GAME_SHARED_OBJ_DIR)/vr
 	-mkdir -p $(PUBLIC_OBJ_DIR)
 	-mkdir -p $(COMMON_OBJ_DIR)
 	-mkdir -p $(VR_OBJ_DIR)

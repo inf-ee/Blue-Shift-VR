@@ -162,6 +162,7 @@ COMMON_OBJS = \
 
 GAME_SHARED_OBJS = \
 	$(GAME_SHARED_OBJ_DIR)/filesystem_utils.o \
+	$(GAME_SHARED_OBJ_DIR)/vr/VRPMShared.o \
 	$(GAME_SHARED_OBJ_DIR)/vgui_checkbutton2.o \
 	$(GAME_SHARED_OBJ_DIR)/vgui_grid.o \
 	$(GAME_SHARED_OBJ_DIR)/vgui_helpers.o \
@@ -265,6 +266,7 @@ $(COMMON_OBJ_DIR):
 
 $(GAME_SHARED_OBJ_DIR):
 	mkdir -p $(GAME_SHARED_OBJ_DIR)
+	mkdir -p $(GAME_SHARED_OBJ_DIR)/vr
 
 $(PM_SHARED_OBJ_DIR):
 	mkdir -p $(PM_SHARED_OBJ_DIR)

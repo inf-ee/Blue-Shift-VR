@@ -225,6 +225,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClCompile Include="..\..\dlls\xen.cpp" />
     <ClCompile Include="..\..\dlls\zombie.cpp" />
     <ClCompile Include="..\..\game_shared\filesystem_utils.cpp" />
+    <ClCompile Include="..\..\game_shared\vr\VRPMShared.cpp" />
     <ClCompile Include="..\..\game_shared\voice_gamemgr.cpp" />
     <ClCompile Include="..\..\pm_shared\pm_debug.cpp" />
     <ClCompile Include="..\..\pm_shared\pm_math.cpp" />
@@ -356,7 +357,6 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClInclude Include="..\..\game_shared\vr\VRShared.h" />
     <ClInclude Include="..\..\game_shared\vr\VRComModelHL25.h" />
     <ClInclude Include="..\..\game_shared\vr\VRPMShared.h" />
-    <ClInclude Include="..\..\game_shared\vr\VRPMSharedFunctions.h" />
     <ClInclude Include="..\..\pm_shared\pm_debug.h" />
     <ClInclude Include="..\..\pm_shared\pm_defs.h" />
     <ClInclude Include="..\..\pm_shared\pm_info.h" />

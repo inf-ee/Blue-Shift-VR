@@ -300,10 +300,8 @@ public:
 	bool HasPlayerItem(CBasePlayerItem* pCheckItem);
 	bool HasNamedPlayerItem(const char* pszItemName);
 	bool HasWeapons(); // do I have ANY weapons?
-	// BSVR start
-	// void SelectPrevItem(int iItem); - original
-	// void SelectNextItem(int iItem); - original
-	// BSVR end
+	void SelectPrevItem(int iItem);
+	void SelectNextItem(int iItem);
 	void SelectLastItem();
 	void SelectItem(const char* pstr);
 	void ItemPreFrame();
@@ -510,6 +508,7 @@ private:
 	void VRSendRestoreYaw();
 	Vector VRGetGunPosition();
 	Vector VRGetAutoaimVector();
+	void VRSelectLastItem();
 
 	// public VR methods:
 public:

@@ -369,6 +369,9 @@
     <ClCompile Include="..\..\game_shared\vr\VRPMShared.cpp">
       <Filter>Source Files\game_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\game_shared\vr\VRWeaponsShared.cpp">
+      <Filter>Source Files\game_shared</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\public\interface.cpp">
       <Filter>Source Files\public</Filter>
     </ClCompile>

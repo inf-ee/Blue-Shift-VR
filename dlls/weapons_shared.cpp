@@ -277,38 +277,3 @@ void CBasePlayer::SelectLastItem()
 
 	m_pActiveItem->UpdateItemInfo();
 }
-
-// BSVR start
-// VR version: with no last item, switch to the bare hand
-void CBasePlayer::VRSelectLastItem()
-{
-	if (m_pActiveItem != nullptr && !m_pActiveItem->CanHolster())
-	{
-		return;
-	}
-
-	ResetAutoaim();
-
-	// FIX, this needs to queue them up and delay
-	if (m_pActiveItem != nullptr)
-	{
-		m_pActiveItem->Holster();
-	}
-
-	if (m_pLastItem == nullptr)
-	{
-		m_pLastItem = m_pActiveItem;
-		m_pActiveItem = nullptr;
-		pev->viewmodel = MAKE_STRING("models/v_hand.mdl");
-		pev->weaponmodel = iStringNull;
-	}
-	else
-	{
-		CBasePlayerItem* pTemp = m_pActiveItem;
-		m_pActiveItem = m_pLastItem;
-		m_pLastItem = pTemp;
-		m_pActiveItem->Deploy();
-		m_pActiveItem->UpdateItemInfo();
-	}
-}
-// BSVR end

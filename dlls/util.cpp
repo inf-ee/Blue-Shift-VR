@@ -1171,53 +1171,10 @@ bool UTIL_ShouldShowBlood(int color)
 	return false;
 }
 
-// BSVR start - replaced with new version
-// Extended UTIL_PointContents to also detect solid entities - Max Makes Mods, 2017-08-26
-int UTIL_PointContents(const Vector& vec, bool detectSolidEntities, edict_t** pPent)
+int UTIL_PointContents(const Vector& vec)
 {
-	int pointContents = POINT_CONTENTS(vec);
-	if (detectSolidEntities)
-	{
-		edict_t* pEnt = g_engfuncs.pfnPEntityOfEntIndex(1);
-		if (pEnt != nullptr)
-		{
-			for (int i = 1; i < gpGlobals->maxEntities; i++, pEnt++)
-			{
-				if (0 != pEnt->free)
-				{
-					continue;
-				}
-				if (vec.x > pEnt->v.absmax.x ||
-					vec.y > pEnt->v.absmax.y ||
-					vec.z > pEnt->v.absmax.z ||
-					vec.x < pEnt->v.absmin.x ||
-					vec.y < pEnt->v.absmin.y ||
-					vec.z < pEnt->v.absmin.z)
-				{
-					continue;
-				}
-				if (pEnt->v.solid == SOLID_BSP && UTIL_PointInsideBSPModel(vec, pEnt->v.absmin, pEnt->v.absmax)) // Trace actual brush model to see if point really is inside the entity!
-				{
-					if (pPent)
-						*pPent = pEnt;
-					return CONTENTS_SOLID;
-				}
-				else if (pEnt->v.movetype == MOVETYPE_PUSHSTEP && pEnt->v.solid != SOLID_NOT && pEnt->v.solid != SOLID_TRIGGER)
-				{
-					if (pPent)
-						*pPent = pEnt;
-					return CONTENTS_SOLID;
-				}
-			}
-		}
-	}
-	return pointContents;
+	return POINT_CONTENTS(vec);
 }
-// int UTIL_PointContents(const Vector& vec)
-// {
-// 	return POINT_CONTENTS(vec);
-// }
-// BSVR end
 
 void UTIL_BloodStream(const Vector& origin, const Vector& direction, int color, int amount)
 {

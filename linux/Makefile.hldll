@@ -145,6 +145,7 @@ COMMON_OBJS = \
 
 VR_OBJS = \
 	$(VR_OBJ_DIR)/hlmv_mathlib.o \
+	$(VR_OBJ_DIR)/VRClientCommands.o \
 	$(VR_OBJ_DIR)/VRCommons.o \
 	$(VR_OBJ_DIR)/VRController.o \
 	$(VR_OBJ_DIR)/VRControllerInteractionManager.o \

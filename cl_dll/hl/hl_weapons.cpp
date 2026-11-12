@@ -437,7 +437,7 @@ void HUD_InitClientWeapons()
 	gpGlobals->time = gEngfuncs.GetClientTime();
 
 	// Fake functions
-	g_engfuncs.pfnPrecacheModel3 = stub_PrecacheModel; // BSVR: field renamed in eiface.h
+	g_engfuncs.pfnPrecacheModel = stub_PrecacheModel;
 	g_engfuncs.pfnPrecacheSound = stub_PrecacheSound;
 	g_engfuncs.pfnPrecacheEvent = stub_PrecacheEvent;
 	g_engfuncs.pfnNameForFunction = stub_NameForFunction;

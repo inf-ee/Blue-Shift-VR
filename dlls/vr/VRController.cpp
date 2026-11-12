@@ -28,44 +28,7 @@ enum HandModelSequences
 	FULLGRAB_START,
 	FULLGRAB_END
 };
-
-std::unordered_map<std::string, const char*> g_animatedWeaponModelNameMap = {
-	{"models/v_357.mdl", "models/animov/v_357.mdl"},
-	{"models/v_9mmar.mdl", "models/animov/v_9mmar.mdl"},
-	{"models/v_9mmhandgun.mdl", "models/animov/v_9mmhandgun.mdl"},
-	{"models/v_crossbow.mdl", "models/animov/v_crossbow.mdl"},
-	{"models/v_crowbar.mdl", "models/animov/v_crowbar.mdl"},
-	{"models/v_egon.mdl", "models/animov/v_egon.mdl"},
-	{"models/v_gauss.mdl", "models/animov/v_gauss.mdl"},
-	{"models/v_grenade.mdl", "models/animov/v_grenade.mdl"},
-	{"models/v_hgun.mdl", "models/animov/v_hgun.mdl"},
-	{"models/v_rpg.mdl", "models/animov/v_rpg.mdl"},
-	{"models/v_satchel.mdl", "models/animov/v_satchel.mdl"},
-	{"models/v_satchel_radio.mdl", "models/animov/v_satchel_radio.mdl"},
-	{"models/v_shotgun.mdl", "models/animov/v_shotgun.mdl"},
-	{"models/v_squeak.mdl", "models/animov/v_squeak.mdl"},
-	{"models/v_tripmine.mdl", "models/animov/v_tripmine.mdl"},
-};
-
-string_t GetAnimatedWeaponModelName(string_t modelName)
-{
-	auto it = g_animatedWeaponModelNameMap.find(STRING(modelName));
-	if (it != g_animatedWeaponModelNameMap.end())
-		return MAKE_STRING(it->second);
-	else
-		return modelName;
-}
 } // namespace
-
-const char* GetAnimatedWeaponModelName(const char* modelName)
-{
-	auto it = g_animatedWeaponModelNameMap.find(modelName);
-	if (it != g_animatedWeaponModelNameMap.end())
-		return it->second;
-	else
-		return modelName;
-}
-
 
 void VRController::Update(CBasePlayer* pPlayer, const int timestamp, const bool isValid, const bool isMirrored, const Vector& offset, const Vector& angles, const Vector& velocity, bool isDragging, bool isFiring, VRControllerID id, int weaponId)
 {
@@ -196,11 +159,6 @@ void VRController::UpdateModel(CBasePlayer* pPlayer)
 	else
 	{
 		m_modelName = pPlayer->pev->viewmodel;
-	}
-
-	if (CVAR_GET_FLOAT("vr_use_animated_weapons") != 0.f)
-	{
-		m_modelName = GetAnimatedWeaponModelName(m_modelName);
 	}
 
 	CVRControllerModel* pModel = GetModel();

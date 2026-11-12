@@ -7,8 +7,8 @@ Steam app manifests, warns when Half-Life/Blue Shift/VR Mod is missing because S
 then creates `<Half-Life>\bsvr\` and `<Half-Life>\bsvr_hd\` with:
 
 - the embedded payload: `liblist.gam`, `delta.lst`, the `game.*` icons, `dlls\hl.dll`,
-  `cl_dlls\client.dll`, `maps\ba_yard4a.ent`, the SD weapon view models in `models\` and `models\animov\`, licenses;
-- the HD weapon view models in `bsvr_hd\models\` and `bsvr_hd\models\animov\`. The engine puts `bsvr_hd` ahead of
+  `cl_dlls\client.dll`, `maps\ba_yard4a.ent`, the SD weapon view models in `models\`, licenses;
+- the HD weapon view models in `bsvr_hd\models\`. The engine puts `bsvr_hd` ahead of
   `bsvr` when HD models are on (the game's own HD models checkbox, `OriginalModels` in **Options > Advanced**, which runs `_sethdmodels`);
 - `openvr_api.dll` and `EasyHook32.dll` next to `hl.exe` in the Half-Life folder, because `client.dll`
   imports them implicitly and Windows does not search `cl_dlls\` for imports;
@@ -27,14 +27,15 @@ then creates `<Half-Life>\bsvr\` and `<Half-Life>\bsvr_hd\` with:
 
 Both folders come only from Steam; the installer quits with a hint when Steam or a game is not found.
 If the Half-Life folder already has `bsvr\liblist.gam`, the installer asks whether to update it, does not wait for Steam
-to exit (the mod is already in the library) and only waits for the game to quit.
+to exit (the mod is already in the library) and only waits for the game to quit. Every run also deletes files that older versions
+installed and the mod no longer uses (`Obsolete` in `Assets.cs`), from both `bsvr` and `bsvr_hd`.
 
 ## Payload
 
 `payload/` is the `bsvr` folder and `payload_hd/` the `bsvr_hd` folder (embedded as `halflife/bsvr_hd/...`, see the csproj).
-The SD set has no `v_gauss.mdl` (SD gauss is not converted), so `payload/models` and `payload/models/animov` keep the HD gauss
+The SD set has no `v_gauss.mdl` (SD gauss is not converted), so `payload/models` keeps the HD gauss
 for SD mode. Blue Shift's own NPC and world models are not copied: the engine finds them in `bshift` and, with HD on,
-`bshift_hd`. Both animov sets must be complete, because the animov twin of every weapon is precached unconditionally.
+`bshift_hd`.
 
 `payload/liblist.gam`, the icons and `maps/ba_yard4a.ent` are tracked; the last four come from the
 Blue Shift Updated release. `payload/resource/GameMenu.res` is tracked too: the game's main menu with a "VR Options" entry

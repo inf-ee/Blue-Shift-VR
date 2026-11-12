@@ -423,9 +423,6 @@
     <ClCompile Include="..\..\dlls\vr\VRUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dlls\vr\VRAnimatedModelHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dlls\vr\VRAnimation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -684,6 +681,9 @@
       <Filter>Header Files\game_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\..\game_shared\vr\VRShared.h">
+      <Filter>Header Files\game_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\game_shared\vr\VRComModelHL25.h">
       <Filter>Header Files\game_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\..\public\interface.h">

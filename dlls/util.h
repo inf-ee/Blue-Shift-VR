@@ -298,9 +298,7 @@ extern void UTIL_TraceHull(const Vector& vecStart, const Vector& vecEnd, IGNORE_
 extern TraceResult UTIL_GetGlobalTrace();
 extern void UTIL_TraceModel(const Vector& vecStart, const Vector& vecEnd, int hullNumber, edict_t* pentModel, TraceResult* ptr);
 extern Vector UTIL_GetAimVector(edict_t* pent, float flSpeed);
-// BSVR start - replaced with new version
-// extern int UTIL_PointContents(const Vector& vec);
-// BSVR end
+extern int UTIL_PointContents(const Vector& vec);
 
 extern bool UTIL_IsMasterTriggered(string_t sMaster, CBaseEntity* pActivator);
 extern void UTIL_BloodStream(const Vector& origin, const Vector& direction, int color, int amount);
@@ -633,7 +631,7 @@ inline void UTIL_MakeAimVectorsPrivate(const Vector& vecAngles, float* p_vForwar
 
 std::string UTIL_GetFilePath(const std::string& filename);
 extern bool UTIL_PointInsideBSPModel(const Vector& vec, const Vector& absmin, const Vector& absmax);
-extern int UTIL_PointContents(const Vector& vec, bool detectSolidEntities = false, edict_t** pPent = nullptr);
+extern int UTIL_PointContents(const Vector& vec, bool detectSolidEntities, edict_t** pPent = nullptr); // vr/VRUtil.cpp
 extern bool UTIL_CheckClearSight(const Vector& pos1, const Vector& pos2, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass, edict_t* pentIgnore = nullptr);
 extern bool UTIL_BBoxIntersectsBBox(const Vector& absmins1, const Vector& absmaxs1, const Vector& absmins2, const Vector& absmaxs2);
 extern bool UTIL_PointInsideRotatedBBox(const Vector& bboxCenter, const Vector& bboxAngles, const Vector& bboxMins, const Vector& bboxMaxs, const Vector& checkVec);

@@ -23,8 +23,39 @@
 
 // Defined in StudioModelRenderer.cpp
 extern engine_studio_api_t IEngineStudio;
-extern std::unordered_set<cl_entity_t*> g_curFrameTempEnts;
-studiohdr_t* Mod_Extradata(const char* callerInfo, cl_entity_t* ent, model_t* mod);
+
+// moved from StudioModelRenderer.cpp
+// Set by HUD_TempEntUpdate, used here to filter out temp ents when applying scale (as scale is used as a timer in HUD_TempEntUpdate) - Max Makes Mods, 2019-05-26
+std::unordered_set<cl_entity_t*> g_curFrameTempEnts;
+
+// Custom implementation of Mod_Extradata based on WinQuake to prevent the engine from
+// crashing to desktop with "Mod_Extradata: caching failed" errors. Instead we display
+// a warning in the console with the name of the affected model and some more useful info.
+// - Max Makes Mods, 2019-04-27
+studiohdr_t* Mod_Extradata(const char* callerInfo, cl_entity_t* ent, model_t* mod)
+{
+	if (!mod || mod->type != mod_studio || mod->name[0] == '*')
+	{
+		gEngfuncs.Con_DPrintf("Mod_Extradata: invalid model: %s (caller: %s, entity: %i)\n", mod ? mod->name : "nullptr", callerInfo, ent ? ent->index : -1);
+		return nullptr;
+	}
+
+	void* r = IEngineStudio.Cache_Check(&mod->cache);
+	if (r)
+	{
+		return static_cast<studiohdr_t*>(r);
+	}
+
+	mod = IEngineStudio.Mod_ForName(mod->name, 1);
+
+	if (!mod->cache.data)
+	{
+		gEngfuncs.Con_DPrintf("Mod_Extradata: caching failed: %s (caller: %s, entity: %i)\n", mod->name, callerInfo, ent ? ent->index : -1);
+		return nullptr;
+	}
+
+	return static_cast<studiohdr_t*>(mod->cache.data);
+}
 
 namespace
 {

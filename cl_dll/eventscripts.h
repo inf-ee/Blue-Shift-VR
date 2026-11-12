@@ -11,8 +11,8 @@
 
 // Some of these are HL/TFC specific?
 void EV_EjectBrass(float* origin, float* velocity, float rotation, int model, int soundtype);
+void EV_GetGunPosition(struct event_args_s* args, float* pos, float* origin);
 // BSVR start
-// void EV_GetGunPosition(struct event_args_s* args, float* pos, float* origin);
 void EV_GetGunPosition(float* pos);
 void EV_GetGunAim(float* forward, float* right, float* up, float* angles);
 // BSVR end

@@ -495,10 +495,6 @@ void CTripmine::Holster()
 	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "common/null.wav", 1.0, ATTN_NORM);
 }
 
-// BSVR start
-constexpr const float VR_TRIPMINE_PLACEMENT_DISTANCE = 32.f;
-// BSVR end
-
 void CTripmine::PrimaryAttack()
 {
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
@@ -591,68 +587,6 @@ void CTripmine::PrimaryAttack()
 #endif
 	// BSVR end
 }
-
-// BSVR start
-#ifndef CLIENT_DLL
-void CTripmine::UpdateGhost()
-{
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
-	{
-		if (m_hGhost)
-		{
-			UTIL_Remove(m_hGhost);
-		}
-		m_hGhost = nullptr;
-		return;
-	}
-
-	float distance = 0.f;
-	if (CVAR_GET_FLOAT("vr_weapon_grenade_mode") != 0.f)
-	{
-		distance = 128.f;
-	}
-	else
-	{
-		distance = VR_TRIPMINE_PLACEMENT_DISTANCE;
-	}
-
-	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecAiming = m_pPlayer->GetAutoaimVector();
-
-	TraceResult tr;
-
-	UTIL_TraceLine(vecSrc, vecSrc + (vecAiming * distance), dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-
-	bool hideGhost = true;
-	if (tr.flFraction < 1.0)
-	{
-		CBaseEntity* pEntity = CBaseEntity::SafeInstance<CBaseEntity>(tr.pHit);
-		if (pEntity && (pEntity->pev->flags & FL_CONVEYOR) == 0)
-		{
-			Vector origin = tr.vecEndPos;
-			if (!m_hGhost)
-			{
-				m_hGhost = CSprite::SpriteCreate("models/v_tripmine.mdl", origin, false);
-				m_hGhost->pev->spawnflags |= SF_SPRITE_TEMPORARY | SF_SPRITE_STARTON;
-				m_hGhost->pev->rendermode = kRenderTransTexture;
-				m_hGhost->pev->renderamt = 50;
-				m_hGhost->pev->body = 3;
-				m_hGhost->pev->sequence = TRIPMINE_WORLD;
-			}
-			m_hGhost->pev->angles = UTIL_VecToAngles(tr.vecPlaneNormal);
-			m_hGhost->pev->origin = origin;
-			m_hGhost->pev->effects &= ~EF_NODRAW;
-			hideGhost = false;
-		}
-	}
-
-	if (m_hGhost && hideGhost)
-	{
-		m_hGhost->pev->effects |= EF_NODRAW;
-	}
-}
-#endif
-// BSVR end
 
 void CTripmine::WeaponIdle()
 {

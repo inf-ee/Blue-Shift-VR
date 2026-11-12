@@ -1014,29 +1014,31 @@ void CBasePlayerWeapon::RetireWeapon()
 	// BSVR end
 }
 
-// BSVR start - commented out original
 void CBasePlayerWeapon::DoRetireWeapon()
 {
-	// if (!m_pPlayer || m_pPlayer->m_pActiveItem != this)
-	// {
-	// 	// Already retired?
-	// 	return;
-	// }
+	// BSVR start - disabled in VR (as in Half-Life-VR)
+	return;
+	// BSVR end
 
-	// // first, no viewmodel at all.
-	// m_pPlayer->pev->viewmodel = iStringNull;
-	// m_pPlayer->pev->weaponmodel = iStringNull;
-	// //m_pPlayer->pev->viewmodelindex = NULL;
+	if (!m_pPlayer || m_pPlayer->m_pActiveItem != this)
+	{
+		// Already retired?
+		return;
+	}
 
-	// g_pGameRules->GetNextBestWeapon(m_pPlayer, this);
+	// first, no viewmodel at all.
+	m_pPlayer->pev->viewmodel = iStringNull;
+	m_pPlayer->pev->weaponmodel = iStringNull;
+	//m_pPlayer->pev->viewmodelindex = NULL;
 
-	// //If we're still equipped and we couldn't switch to another weapon, dequip this one
-	// if (CanHolster() && m_pPlayer->m_pActiveItem == this)
-	// {
-	// 	m_pPlayer->SwitchWeapon(nullptr);
-	// }
+	g_pGameRules->GetNextBestWeapon(m_pPlayer, this);
+
+	//If we're still equipped and we couldn't switch to another weapon, dequip this one
+	if (CanHolster() && m_pPlayer->m_pActiveItem == this)
+	{
+		m_pPlayer->SwitchWeapon(nullptr);
+	}
 }
-// BSVR end
 
 //=========================================================================
 // GetNextAttackDelay - An accurate way of calcualting the next attack time.

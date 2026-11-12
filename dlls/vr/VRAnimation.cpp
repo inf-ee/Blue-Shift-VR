@@ -647,3 +647,41 @@ int GetHitboxesAndAttachments(entvars_t* pev, void* pmodel, int sequence, float 
 
 	return 1;
 }
+
+// Extended GetSequenceInfo, also returns fps, frame count and looping flag (moved from animation.cpp)
+int GetSequenceInfo(void* pmodel, int sequence, float* pflFrameRate, float* pflGroundSpeed, float* pflFPS, int* piNumFrames, bool* pfIsLooping)
+{
+	studiohdr_t* pstudiohdr = static_cast<studiohdr_t*>(pmodel);
+	if (!pstudiohdr)
+		return 0;
+
+	if (sequence >= pstudiohdr->numseq)
+	{
+		*pflFrameRate = 0.0;
+		*pflGroundSpeed = 0.0;
+		return 0;
+	}
+
+	mstudioseqdesc_t* pseqdesc = reinterpret_cast<mstudioseqdesc_t*>(reinterpret_cast<byte*>(pstudiohdr) + pstudiohdr->seqindex) + sequence;
+
+	if (pflFPS)
+		*pflFPS = pseqdesc->fps;
+	if (piNumFrames)
+		*piNumFrames = pseqdesc->numframes;
+	if (pfIsLooping)
+		*pfIsLooping = ((pseqdesc->flags & STUDIO_LOOPING) != 0);
+
+	if (pseqdesc->numframes > 1)
+	{
+		*pflFrameRate = 256 * pseqdesc->fps / (pseqdesc->numframes - 1);
+		*pflGroundSpeed = sqrtf(pseqdesc->linearmovement[0] * pseqdesc->linearmovement[0] + pseqdesc->linearmovement[1] * pseqdesc->linearmovement[1] + pseqdesc->linearmovement[2] * pseqdesc->linearmovement[2]);
+		*pflGroundSpeed = *pflGroundSpeed * pseqdesc->fps / (pseqdesc->numframes - 1);
+	}
+	else
+	{
+		*pflFrameRate = 256.0;
+		*pflGroundSpeed = 0.0;
+	}
+
+	return 1;
+}

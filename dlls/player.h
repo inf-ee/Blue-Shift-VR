@@ -495,6 +495,20 @@ private:
 
 	void VRHandleRetinaScanners();
 
+	// Hooks called from the SDK player code (vr/VRPlayer.cpp)
+	void VRPreThinkStart();
+	void VRPreThinkControllersAndTrain();
+	void VRPostThinkStart();
+	void VRPostFrameControllers();
+	void VRKilled(entvars_t* pevAttacker, int iGib);
+	void VRSave(CSave& save);
+	void VRRestore(CRestore& restore);
+	void VRRestoreEnd();
+	void VRFlashlightTurnOn();
+	void VRFlashlightTurnOff();
+	void VRSendTrainControls();
+	void VRSendRestoreYaw();
+
 	// public VR methods:
 public:
 	void StartVRTele();

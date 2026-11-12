@@ -372,15 +372,6 @@
     <ClCompile Include="..\..\dlls\vr\hlmv_mathlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dlls\vr\StudioModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dlls\vr\studio_render.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dlls\vr\studio_utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dlls\vr\VRCommons.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -397,9 +388,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dlls\vr\VRCrushEntityHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dlls\vr\VRDebugBBoxDrawer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dlls\vr\VRGroundEntityHandler.cpp">
@@ -680,9 +668,6 @@
     <ClInclude Include="..\..\dlls\vr\hlmv_mathlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dlls\vr\StudioModel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dlls\vr\VRCommons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -696,9 +681,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\vr\VRControllerTeleporter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dlls\vr\VRDebugBBoxDrawer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\vr\VRGroundEntityHandler.h">

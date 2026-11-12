@@ -7,6 +7,7 @@
 
 #include "openvr.h"
 
+#include "cl_dll.h"
 #include "vr/VRShared.h"
 
 #include "VRInputAction.h"

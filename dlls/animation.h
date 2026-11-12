@@ -24,9 +24,7 @@ extern bool IsSoundEvent(int eventNumber);
 int LookupActivity(void* pmodel, entvars_t* pev, int activity);
 int LookupActivityHeaviest(void* pmodel, entvars_t* pev, int activity);
 int LookupSequence(void* pmodel, const char* label);
-// BSVR start
-// void GetSequenceInfo(void* pmodel, entvars_t* pev, float* pflFrameRate, float* pflGroundSpeed); - original, replaced by the extended version below (as in Half-Life-VR)
-// BSVR end
+void GetSequenceInfo(void* pmodel, entvars_t* pev, float* pflFrameRate, float* pflGroundSpeed);
 int GetSequenceFlags(void* pmodel, entvars_t* pev);
 int LookupAnimationEvents(void* pmodel, entvars_t* pev, float flStart, float flEnd);
 float SetController(void* pmodel, entvars_t* pev, int iController, float flValue);
@@ -44,7 +42,6 @@ bool ExtractBbox(void* pmodel, int sequence, float* mins, float* maxs);
 
 // BSVR start
 #include "vr/VRAnimation.h"
-int GetSequenceInfo(void* pmodel, entvars_t* pev, float* pflFrameRate, float* pflGroundSpeed, float* pflFPS = nullptr, int* piNumFrames = nullptr, bool* pfIsLooping = nullptr);
 int GetSequenceInfo(void* pmodel, int sequence, float* pflFrameRate, float* pflGroundSpeed, float* pflFPS = nullptr, int* piNumFrames = nullptr, bool* pfIsLooping = nullptr);
 // BSVR end
 

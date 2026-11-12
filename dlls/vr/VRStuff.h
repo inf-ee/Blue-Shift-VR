@@ -2,8 +2,13 @@
 
 // Bunch of simple classes, structs and other stuff - Max Makes Mods - 2019-04-07
 
+#include <map>
+
+#include "extdll.h"
 #include "vector.h"
 #include "Platform.h"
+
+class CBasePlayer;
 
 class GlobalXenMounds
 {

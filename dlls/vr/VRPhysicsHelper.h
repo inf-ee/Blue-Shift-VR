@@ -1,9 +1,13 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <unordered_map>
+
+#include "extdll.h"
+#include "util.h" // TraceResult
 
 namespace reactphysics3d
 {

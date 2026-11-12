@@ -1,8 +1,11 @@
 #pragma once
 
+#include <vector>
+
 #include "VRCommons.h"
 #include "vector.h"
 #include "eiface.h"
+#include "VREHandle.h"
 
 constexpr const int XEN_MOUND_MAX_TRIGGER_DISTANCE = 128;
 constexpr const int VR_TELEPORT_MAX_DOWNWARDS_TELE_LENGTH = 512;

@@ -4,6 +4,7 @@
 
 #include "openvr.h"
 
+#include "cl_dll.h"
 #include "Matrices.h"
 
 #include "vr/VRShared.h"

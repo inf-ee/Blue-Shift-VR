@@ -56,6 +56,11 @@ bool IsExcludedByMapSpecificRule(edict_t* pent)
 // BSVR end
 } // namespace
 
+// Out of line, so the header doesn't need the full CBasePlayer class
+VRGroundEntityHandler::VRGroundEntityHandler(CBasePlayer* pPlayer) : m_pPlayer{pPlayer}
+{
+}
+
 void VRGroundEntityHandler::HandleMovingWithSolidGroundEntities()
 {
 	if (!m_pPlayer)

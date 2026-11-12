@@ -714,10 +714,10 @@ void DLLEXPORT IN_ClearStates()
 	mouse_oldbuttonstate = 0;
 }
 
-/* 
-=============== 
-IN_StartupJoystick 
-=============== 
+/*
+===============
+IN_StartupJoystick
+===============
 */
 void IN_StartupJoystick()
 {
@@ -930,10 +930,10 @@ void IN_Commands()
 }
 
 
-/* 
-=============== 
+/*
+===============
 IN_ReadJoystick
-=============== 
+===============
 */
 bool IN_ReadJoystick()
 {

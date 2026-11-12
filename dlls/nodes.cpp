@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   This source code contains proprietary and confidential information of
@@ -285,14 +285,14 @@ bool CGraph::HandleLinkEnt(int iNode, entvars_t* pevLinkEnt, int afCapMask, NODE
 // FindNearestLink - finds the connection (line) nearest
 // the given point. Returns false if fails, or true if it
 // has stuffed the index into the nearest link pool connection
-// into the passed int pointer, and a bool telling whether or 
+// into the passed int pointer, and a bool telling whether or
 // not the point is along the line into the passed bool pointer.
 //=========================================================
 int	CGraph:: FindNearestLink ( const Vector &vecTestPoint, int *piNearestLink, bool *pfAlongLine )
 {
 	int			i, j;// loops
-	
-	int			iNearestLink;// index into the link pool, this is the nearest node at any time. 
+
+	int			iNearestLink;// index into the link pool, this is the nearest node at any time.
 	float		flMinDist;// the distance of of the nearest case so far
 	float		flDistToLine;// the distance of the current test case
 
@@ -312,7 +312,7 @@ int	CGraph:: FindNearestLink ( const Vector &vecTestPoint, int *piNearestLink, b
 
 	flMinDist = 9999;// anything will be closer than this
 
-// go through all of the nodes, and each node's connections	
+// go through all of the nodes, and each node's connections
 	int	cSkip = 0;// how many links proper pairing allowed us to skip
 	int cChecked = 0;// how many links were checked
 
@@ -329,7 +329,7 @@ int	CGraph:: FindNearestLink ( const Vector &vecTestPoint, int *piNearestLink, b
 		for ( j = 0 ; j < m_pNodes[ i ].m_cNumLinks ; j++ )
 		{
 			/*
-			!!!This optimization only works when the node graph consists of properly linked pairs. 
+			!!!This optimization only works when the node graph consists of properly linked pairs.
 			if ( INodeLink ( i, j ) <= i )
 			{
 				// since we're going through the nodes in order, don't check
@@ -346,24 +346,24 @@ int	CGraph:: FindNearestLink ( const Vector &vecTestPoint, int *piNearestLink, b
 			// these values need a little attention now and then, or sometimes ramps cause trouble.
 			if ( fabs ( vecSpot1.z - vecTestPoint.z ) > 48 && fabs ( vecSpot2.z - vecTestPoint.z ) > 48 )
 			{
-				// if both endpoints of the line are 32 units or more above or below the monster, 
+				// if both endpoints of the line are 32 units or more above or below the monster,
 				// the monster won't be able to get to them, so we do a bit of trivial rejection here.
-				// this may change if monsters are allowed to jump down. 
-				// 
+				// this may change if monsters are allowed to jump down.
+				//
 				// !!!LATER: some kind of clever X/Y hashing should be used here, too
 				continue;
 			}
 
-// now we have two endpoints for a line segment that we've not already checked. 
+// now we have two endpoints for a line segment that we've not already checked.
 // since all lines that make it this far are within -/+ 32 units of the test point's
 // Z Plane, we can get away with doing the point->line check in 2d.
-			
+
 			cChecked++;
 
 			vec2Spot1 = vecSpot1.Make2D();
 			vec2Spot2 = vecSpot2.Make2D();
 			vec2TestPoint = vecTestPoint.Make2D();
-		
+
 			// get the line normal.
 			vec2Line = ( vec2Spot1 - vec2Spot2 ).Normalize();
 			vec2Normal.x = -vec2Line.y;
@@ -387,12 +387,12 @@ int	CGraph:: FindNearestLink ( const Vector &vecTestPoint, int *piNearestLink, b
 
 			if ( flDistToLine < flMinDist )
 			{// just found a line nearer than any other so far
-				
+
 				UTIL_TraceLine ( vecTestPoint, SourceNode( i, j ).m_vecOrigin, ignore_monsters, g_pBodyQueueHead, &tr );
 
 				if ( tr.flFraction != 1.0 )
 				{// crap. can't see the first node of this link, try to see the other
-					
+
 					UTIL_TraceLine ( vecTestPoint, DestNode( i, j ).m_vecOrigin, ignore_monsters, g_pBodyQueueHead, &tr );
 					if ( tr.flFraction != 1.0 )
 					{// can't use this link, cause can't see either node!
@@ -400,7 +400,7 @@ int	CGraph:: FindNearestLink ( const Vector &vecTestPoint, int *piNearestLink, b
 					}
 
 				}
-				
+
 				fSuccess = true;// we know there will be something to return.
 				flMinDist = flDistToLine;
 				iNearestLink = m_pNodes [ i ].m_iFirstLink + j;
@@ -415,7 +415,7 @@ int	CGraph:: FindNearestLink ( const Vector &vecTestPoint, int *piNearestLink, b
 	{
 		WRITE_BYTE(MSG_BROADCAST, SVC_TEMPENTITY);
 		WRITE_BYTE(MSG_BROADCAST, TE_SHOWLINE);
-		
+
 		WRITE_COORD(MSG_BROADCAST, m_pNodes[ m_pLinkPool[ iNearestLink ].m_iSrcNode ].m_vecOrigin.x );
 		WRITE_COORD(MSG_BROADCAST, m_pNodes[ m_pLinkPool[ iNearestLink ].m_iSrcNode ].m_vecOrigin.y );
 		WRITE_COORD(MSG_BROADCAST, m_pNodes[ m_pLinkPool[ iNearestLink ].m_iSrcNode ].m_vecOrigin.z + NODE_HEIGHT);
@@ -744,7 +744,7 @@ int CGraph::FindShortestPath(int* piPath, int iStart, int iDest, int iHull, int 
 		{
 			MESSAGE_BEGIN( MSG_BROADCAST, SVC_TEMPENTITY );
 				WRITE_BYTE( TE_SHOWLINE);
-				
+
 				WRITE_COORD( m_pNodes[ piPath[ i ] ].m_vecOrigin.x );
 				WRITE_COORD( m_pNodes[ piPath[ i ] ].m_vecOrigin.y );
 				WRITE_COORD( m_pNodes[ piPath[ i ] ].m_vecOrigin.z + NODE_HEIGHT );
@@ -760,7 +760,7 @@ int CGraph::FindShortestPath(int* piPath, int iStart, int iDest, int iHull, int 
 #if 0 // MAZE map
 	MESSAGE_BEGIN( MSG_BROADCAST, SVC_TEMPENTITY );
 		WRITE_BYTE( TE_SHOWLINE);
-		
+
 		WRITE_COORD( m_pNodes[ 4 ].m_vecOrigin.x );
 		WRITE_COORD( m_pNodes[ 4 ].m_vecOrigin.y );
 		WRITE_COORD( m_pNodes[ 4 ].m_vecOrigin.z + NODE_HEIGHT );
@@ -1240,7 +1240,7 @@ int CGraph::LinkVisibleNodes(CLink* pLinkPool, FSFile& file, int* piBadNode)
 			}
 
 #if 0
-			
+
 			if ( (m_pNodes[ i ].m_afNodeInfo & bits_NODE_WATER) != (m_pNodes[ j ].m_afNodeInfo & bits_NODE_WATER) )
 			{
 				// don't connect water nodes to air nodes or land nodes. It just wouldn't be prudent at this juncture.

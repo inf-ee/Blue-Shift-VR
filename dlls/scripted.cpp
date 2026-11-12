@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   This source code contains proprietary and confidential information of
@@ -216,14 +216,14 @@ void CCineMonster::Touch(CBaseEntity* pOther)
 /*
 	entvars_t *pevOther = VARS( gpGlobals->other );
 
-	if ( !FBitSet ( pevOther->flags , FL_MONSTER ) ) 
+	if ( !FBitSet ( pevOther->flags , FL_MONSTER ) )
 	{// touched by a non-monster.
 		return;
 	}
 
 	pevOther->origin.z += 1;
-	
-	if ( FBitSet ( pevOther->flags, FL_ONGROUND ) ) 
+
+	if ( FBitSet ( pevOther->flags, FL_ONGROUND ) )
 	{// clear the onground so physics don't bitch
 		pevOther->flags -= FL_ONGROUND;
 	}
@@ -497,7 +497,7 @@ bool CCineMonster::StartSequence(CBaseMonster* pTarget, int iszSeq, bool complet
 
 #if 0
 	char *s;
-	if ( pev->spawnflags & SF_SCRIPT_NOINTERRUPT ) 
+	if ( pev->spawnflags & SF_SCRIPT_NOINTERRUPT )
 		s = "No";
 	else
 		s = "Yes";

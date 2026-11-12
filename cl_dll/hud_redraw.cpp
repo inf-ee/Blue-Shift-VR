@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1999, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   Use, distribution, and modification of this source code and/or resulting
@@ -187,7 +187,7 @@ bool CHud::Redraw(float flTime, bool intermission)
 		int mx, my;
 
 		IN_GetMousePos( &mx, &my );
-		
+
 		if (m_hsprCursor == 0)
 		{
 			char sz[256];
@@ -196,7 +196,7 @@ bool CHud::Redraw(float flTime, bool intermission)
 		}
 
 		SPR_Set(m_hsprCursor, 250, 250, 250 );
-		
+
 		// Draw the logo at 20 fps
 		SPR_DrawAdditive( 0, mx, my, NULL );
 	}

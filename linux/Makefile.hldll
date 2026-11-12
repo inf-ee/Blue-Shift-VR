@@ -155,6 +155,7 @@ VR_OBJS = \
 	$(VR_OBJ_DIR)/VRModelHelper.o \
 	$(VR_OBJ_DIR)/VRMovementHandler.o \
 	$(VR_OBJ_DIR)/VRPhysicsHelper.o \
+	$(VR_OBJ_DIR)/VRPlayer.o \
 	$(VR_OBJ_DIR)/VRRotatableEnt.o \
 	$(VR_OBJ_DIR)/VRAnimatedModelHelper.o
 

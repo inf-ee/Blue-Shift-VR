@@ -402,6 +402,9 @@
     <ClCompile Include="..\..\dlls\vr\VRPhysicsHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dlls\vr\VRPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\dlls\vr\VRRotatableEnt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

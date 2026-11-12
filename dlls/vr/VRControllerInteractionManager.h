@@ -1,5 +1,8 @@
 #pragma once
 
+#include "extdll.h"
+
+class CBaseEntity;
 class CBasePlayer;
 class CTalkMonster; // BSVR: forward declared here instead of in cbase.h
 class VRController;

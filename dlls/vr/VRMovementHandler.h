@@ -1,6 +1,9 @@
 #pragma once
 
+#include "extdll.h"
 #include "vector.h"
+
+class CBaseEntity;
 
 class VRMovementHandler
 {

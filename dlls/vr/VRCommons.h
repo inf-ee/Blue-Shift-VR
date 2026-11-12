@@ -3,6 +3,9 @@
 // Common defines and types for VR - Max Makes Mods - 2019-04-07
 
 #include <map>
+#include <cstdint>
+
+#include "extdll.h"
 #include "vector.h"
 
 class CBasePlayer;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cl_dll.h"
 #include "vr/VRShared.h"
 
 #define VEC_HULL_MIN      Vector(-16, -16, -36)

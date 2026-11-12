@@ -1,5 +1,7 @@
 #pragma once
 
+#include "extdll.h"
+
 class CBaseEntity;
 
 class VRRotatableEnt

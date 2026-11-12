@@ -269,45 +269,44 @@ void SequencePrecache(void* pmodel, const char* pSequenceName)
 	}
 }
 
-// BSVR start
-// stock GetSequenceInfo, replaced by the extended version further below (as in Half-Life-VR) - original:
-// void GetSequenceInfo(void* pmodel, entvars_t* pev, float* pflFrameRate, float* pflGroundSpeed)
-// {
-// 	studiohdr_t* pstudiohdr;
-//
-// 	pstudiohdr = (studiohdr_t*)pmodel;
-// 	if (!pstudiohdr)
-// 		return;
-//
-// 	mstudioseqdesc_t* pseqdesc;
-//
-// 	if (pev->sequence < 0 || pev->sequence >= pstudiohdr->numseq)
-// 	{
-// 		*pflFrameRate = 0.0;
-// 		*pflGroundSpeed = 0.0;
-// 		return;
-// 	}
-//
-// 	pseqdesc = (mstudioseqdesc_t*)((byte*)pstudiohdr + pstudiohdr->seqindex) + (int)pev->sequence;
-//
-// 	if (pseqdesc->numframes > 1)
-// 	{
-// 		*pflFrameRate = 256 * pseqdesc->fps / (pseqdesc->numframes - 1);
-// 		*pflGroundSpeed = sqrt(pseqdesc->linearmovement[0] * pseqdesc->linearmovement[0] + pseqdesc->linearmovement[1] * pseqdesc->linearmovement[1] + pseqdesc->linearmovement[2] * pseqdesc->linearmovement[2]);
-// 		*pflGroundSpeed = *pflGroundSpeed * pseqdesc->fps / (pseqdesc->numframes - 1);
-// 	}
-// 	else
-// 	{
-// 		*pflFrameRate = 256.0;
-// 		*pflGroundSpeed = 0.0;
-// 	}
-// }
-
-int GetSequenceInfo(void* pmodel, entvars_t* pev, float* pflFrameRate, float* pflGroundSpeed, float* pflFPS, int* piNumFrames, bool* pfIsLooping)
+void GetSequenceInfo(void* pmodel, entvars_t* pev, float* pflFrameRate, float* pflGroundSpeed)
 {
-	return GetSequenceInfo(pmodel, pev->sequence, pflFrameRate, pflGroundSpeed, pflFPS, piNumFrames, pfIsLooping);
+	// BSVR start - the VR version below can also return the fps, frame count and looping flag (as in Half-Life-VR)
+	GetSequenceInfo(pmodel, pev->sequence, pflFrameRate, pflGroundSpeed);
+	return;
+	// BSVR end
+
+	studiohdr_t* pstudiohdr;
+
+	pstudiohdr = (studiohdr_t*)pmodel;
+	if (!pstudiohdr)
+		return;
+
+	mstudioseqdesc_t* pseqdesc;
+
+	if (pev->sequence < 0 || pev->sequence >= pstudiohdr->numseq)
+	{
+		*pflFrameRate = 0.0;
+		*pflGroundSpeed = 0.0;
+		return;
+	}
+
+	pseqdesc = (mstudioseqdesc_t*)((byte*)pstudiohdr + pstudiohdr->seqindex) + (int)pev->sequence;
+
+	if (pseqdesc->numframes > 1)
+	{
+		*pflFrameRate = 256 * pseqdesc->fps / (pseqdesc->numframes - 1);
+		*pflGroundSpeed = sqrt(pseqdesc->linearmovement[0] * pseqdesc->linearmovement[0] + pseqdesc->linearmovement[1] * pseqdesc->linearmovement[1] + pseqdesc->linearmovement[2] * pseqdesc->linearmovement[2]);
+		*pflGroundSpeed = *pflGroundSpeed * pseqdesc->fps / (pseqdesc->numframes - 1);
+	}
+	else
+	{
+		*pflFrameRate = 256.0;
+		*pflGroundSpeed = 0.0;
+	}
 }
 
+// BSVR start
 int GetSequenceInfo(void* pmodel, int sequence, float* pflFrameRate, float* pflGroundSpeed, float* pflFPS, int* piNumFrames, bool* pfIsLooping)
 {
 	studiohdr_t* pstudiohdr = static_cast<studiohdr_t*>(pmodel);

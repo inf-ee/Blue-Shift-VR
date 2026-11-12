@@ -3,14 +3,16 @@
 #include <unordered_set>
 #include <string>
 
+#include "extdll.h"
+#include "VREHandle.h"
+
+class CBaseEntity;
 class CBasePlayer;
 
 class VRGroundEntityHandler
 {
 public:
-	VRGroundEntityHandler(CBasePlayer* pPlayer) : m_pPlayer{pPlayer}
-	{
-	}
+	VRGroundEntityHandler(CBasePlayer* pPlayer);
 
 	void HandleMovingWithSolidGroundEntities();
 

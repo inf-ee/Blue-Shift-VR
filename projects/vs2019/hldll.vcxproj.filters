@@ -692,6 +692,12 @@
     <ClInclude Include="..\..\game_shared\vr\VRComModelHL25.h">
       <Filter>Header Files\game_shared</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\game_shared\vr\VRPMShared.h">
+      <Filter>Header Files\game_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\game_shared\vr\VRPMSharedFunctions.h">
+      <Filter>Header Files\game_shared</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\public\interface.h">
       <Filter>Header Files\public</Filter>
     </ClInclude>

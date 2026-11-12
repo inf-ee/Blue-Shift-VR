@@ -28,9 +28,7 @@
 
 class CBaseEntity;
 
-// BSVR start - in enginecallback.h
-// inline void MESSAGE_BEGIN(int msg_dest, int msg_type, const float* pOrigin, entvars_t* ent); // implementation later in this file
-// BSVR end
+inline void MESSAGE_BEGIN(int msg_dest, int msg_type, const float* pOrigin, entvars_t* ent); // implementation later in this file
 
 inline globalvars_t* gpGlobals = nullptr;
 
@@ -148,12 +146,10 @@ inline entvars_t* VARS(edict_t* pent)
 
 inline int ENTINDEX(edict_t* pEdict) { return (*g_engfuncs.pfnIndexOfEdict)(pEdict); }
 inline edict_t* INDEXENT(int iEdictNum) { return (*g_engfuncs.pfnPEntityOfEntIndex)(iEdictNum); }
-// BSVR start - in enginecallback.h
-// inline void MESSAGE_BEGIN(int msg_dest, int msg_type, const float* pOrigin, entvars_t* ent)
-// {
-// 	(*g_engfuncs.pfnMessageBegin)(msg_dest, msg_type, pOrigin, ENT(ent));
-// }
-// BSVR end
+inline void MESSAGE_BEGIN(int msg_dest, int msg_type, const float* pOrigin, entvars_t* ent)
+{
+	(*g_engfuncs.pfnMessageBegin)(msg_dest, msg_type, pOrigin, ENT(ent));
+}
 
 // Testing the three types of "entity" for nullity
 #define eoNullEntity 0

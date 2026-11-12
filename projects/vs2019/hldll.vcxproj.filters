@@ -396,6 +396,9 @@
     <ClCompile Include="..\..\dlls\vr\VREngineFuncSwaps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dlls\vr\VREngineMessages.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\dlls\vr\VRGroundEntityHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -708,9 +711,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\vr\VRControllerTeleporter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dlls\vr\VREngineMessages.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\vr\VRGroundEntityHandler.h">

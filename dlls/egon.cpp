@@ -414,8 +414,12 @@ void CEgon::UpdateEffect(const Vector& startPoint, const Vector& endPoint, float
 
 	extern int gmsgVRUpdateEgon;
 	MESSAGE_BEGIN(MSG_ONE, gmsgVRUpdateEgon, nullptr, m_pPlayer->pev);
-	WRITE_PRECISE_VECTOR(startPoint);
-	WRITE_PRECISE_VECTOR(endPoint);
+	WRITE_FLOAT(startPoint.x);
+	WRITE_FLOAT(startPoint.y);
+	WRITE_FLOAT(startPoint.z);
+	WRITE_FLOAT(endPoint.x);
+	WRITE_FLOAT(endPoint.y);
+	WRITE_FLOAT(endPoint.z);
 	MESSAGE_END();
 	// BSVR end
 #endif

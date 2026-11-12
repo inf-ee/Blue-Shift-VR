@@ -9,6 +9,16 @@
 #include "saverestore.h"
 #include "func_break.h"
 
+namespace
+{
+void WriteCoords(const Vector& v)
+{
+	WRITE_COORD(v.x);
+	WRITE_COORD(v.y);
+	WRITE_COORD(v.z);
+}
+} // namespace
+
 void CBreakable::VRSpawnTempEnts(
 	int modelIndex,
 	const Vector& pos,
@@ -24,9 +34,9 @@ void CBreakable::VRSpawnTempEnts(
 
 	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pos);
 	WRITE_BYTE(TE_BREAKMODEL);
-	WRITE_COORDS(pos);
-	WRITE_COORDS(size);
-	WRITE_COORDS(direction);
+	WriteCoords(pos);
+	WriteCoords(size);
+	WriteCoords(direction);
 	WRITE_BYTE(static_cast<int>(random));
 	WRITE_SHORT(modelIndex);
 	WRITE_BYTE(count);

@@ -2,8 +2,10 @@
 // Only calls made by this DLL are affected, the engine's own code is not touched.
 
 void VRSwapEngineCallbacks(); // VREngineCallbacks.cpp
+void VRSwapEngineMessages();  // VREngineMessages.cpp
 
 void VRSwapEngineFuncs()
 {
 	VRSwapEngineCallbacks();
+	VRSwapEngineMessages();
 }

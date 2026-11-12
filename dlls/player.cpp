@@ -55,7 +55,7 @@
 #include "vr/VRMovementHandler.h"
 #include "vr/VRControllerModel.h"
 
-bool g_vrNeedRecheckForSpecialEntities = true;
+extern bool g_vrNeedRecheckForSpecialEntities; // vr/VRPlayer.cpp
 
 // Savedata descriptor for vr level change data
 TYPEDESCRIPTION g_vrLevelChangeDataSaveData[] =
@@ -1538,43 +1538,9 @@ void CBasePlayer::StartObserver(Vector vecPosition, Vector vecViewAngle)
 	Observer_SetMode(m_iObserverLastMode);
 }
 
-// BSVR start
-float GetTrainSpeed(const char* cvarname)
-{
-	float speed = CVAR_GET_FLOAT(cvarname);
-
-	if (speed <= 0.f)
-		return 0.25f;
-
-	if (speed > 1.f)
-		return 1.f;
-
-	return speed;
-}
-
-bool IsTrashCompactor(CBaseEntity* pEntity)
-{
-	// if (!pEntity)
-	// 	return false;
-
-	// std::string modelname = STRING(pEntity->pev->model);
-
-	// if (modelname.empty() || modelname[0] != '*')
-	// 	return false;
-
-	// std::string mapname = STRING(INDEXENT(0)->v.model);
-
-	// if (mapname != std::string{ "maps/c2a3e.bsp" })
-	// 	return false;
-
-	// return modelname == "*6" || modelname == "*13";
-	return false;
-}
-
-bool CBasePlayer::IsUsableTrackTrain(CBaseEntity* pTrain)
-{
-	return nullptr != pTrain && !FBitSet(pTrain->pev->spawnflags, SF_TRACKTRAIN_NOCONTROL) && FBitSet(pTrain->ObjectCaps(), FCAP_DIRECTIONAL_USE) && pTrain->OnControls(pev) && !IsTrashCompactor(pTrain);
-}
+// BSVR start - moved to vr/VRPlayer.cpp
+float GetTrainSpeed(const char* cvarname);
+bool IsTrashCompactor(CBaseEntity* pEntity);
 // BSVR end
 
 //
@@ -3499,16 +3465,6 @@ void CBasePlayer::RenewItems()
 {
 }
 
-// BSVR start
-void CBasePlayer::StoreVROffsetsForLevelchange()
-{
-	g_vrLevelChangeData.lastHMDOffset = this->vr_lastHMDOffset;
-	g_vrLevelChangeData.clientOriginOffset = this->vr_ClientOriginOffset;
-	g_vrLevelChangeData.prevYaw = this->vr_prevYaw;
-	g_vrLevelChangeData.currentYaw = this->vr_currentYaw;
-	g_vrLevelChangeData.hasData = true;
-}
-// BSVR end
 
 bool CBasePlayer::Restore(CRestore& restore)
 {

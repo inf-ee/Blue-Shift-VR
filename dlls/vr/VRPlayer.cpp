@@ -16,10 +16,15 @@
 #include "vr/VRPhysicsHelper.h"
 #include "vr/VRMovementHandler.h"
 #include "vr/VRControllerModel.h"
+#include "vr/VRCommons.h"
+#include "trains.h"
 
 constexpr const float VR_RETINASCANNER_ACTIVATE_LOOK_TIME = 1.f;
 std::unordered_map<EHandleT<CBaseEntity>, EHandleT<CBaseEntity>, EHandleT<CBaseEntity>::Hash, EHandleT<CBaseEntity>::Equal> g_vrRetinaScanners;
 std::unordered_set<EHandleT<CBaseEntity>, EHandleT<CBaseEntity>::Hash, EHandleT<CBaseEntity>::Equal> g_vrRetinaScannerButtons;
+
+// Set by ClientPrecache on every map load (new game, changelevel, load save), checked in PreThink
+bool g_vrNeedRecheckForSpecialEntities = true;
 
 bool CBasePlayer::CheckVRTRainButtonTouched(const Vector& buttonLeftPos, const Vector& buttonRightPos)
 {
@@ -1073,4 +1078,50 @@ bool CBasePlayer::IsAnyControllerFiringAndHoldingThisTank(CBaseEntity* pTank)
 	}
 
 	return false;
+}
+
+float GetTrainSpeed(const char* cvarname)
+{
+	float speed = CVAR_GET_FLOAT(cvarname);
+
+	if (speed <= 0.f)
+		return 0.25f;
+
+	if (speed > 1.f)
+		return 1.f;
+
+	return speed;
+}
+
+bool IsTrashCompactor(CBaseEntity* pEntity)
+{
+	// if (!pEntity)
+	// 	return false;
+
+	// std::string modelname = STRING(pEntity->pev->model);
+
+	// if (modelname.empty() || modelname[0] != '*')
+	// 	return false;
+
+	// std::string mapname = STRING(INDEXENT(0)->v.model);
+
+	// if (mapname != std::string{ "maps/c2a3e.bsp" })
+	// 	return false;
+
+	// return modelname == "*6" || modelname == "*13";
+	return false;
+}
+
+bool CBasePlayer::IsUsableTrackTrain(CBaseEntity* pTrain)
+{
+	return nullptr != pTrain && !FBitSet(pTrain->pev->spawnflags, SF_TRACKTRAIN_NOCONTROL) && FBitSet(pTrain->ObjectCaps(), FCAP_DIRECTIONAL_USE) && pTrain->OnControls(pev) && !IsTrashCompactor(pTrain);
+}
+
+void CBasePlayer::StoreVROffsetsForLevelchange()
+{
+	g_vrLevelChangeData.lastHMDOffset = this->vr_lastHMDOffset;
+	g_vrLevelChangeData.clientOriginOffset = this->vr_ClientOriginOffset;
+	g_vrLevelChangeData.prevYaw = this->vr_prevYaw;
+	g_vrLevelChangeData.currentYaw = this->vr_currentYaw;
+	g_vrLevelChangeData.hasData = true;
 }

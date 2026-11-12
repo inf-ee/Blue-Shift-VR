@@ -250,7 +250,9 @@ called each time a player is spawned
 void ClientPutInServer(edict_t* pEntity)
 {
 	// BSVR start
-	if (!FNullEnt(pEntity))
+	// Not FNullEnt(pEntity): on a new game the player's edict doesn't have pContainingEntity set yet,
+	// FNullEnt treats that as null, and this is where it gets set.
+	if (pEntity != nullptr && !FNullEnt(OFFSET(pEntity)))
 	{
 		ALERT(at_console, "ClientPutInServer: Got a player that already spawned!\n");
 		g_engfuncs.pfnFreeEntPrivateData(pEntity);

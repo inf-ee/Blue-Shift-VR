@@ -530,22 +530,6 @@ float TEXTURETYPE_PlaySound(TraceResult* ptr, Vector vecSrc, Vector vecEnd, int 
 void EMIT_SOUND_DYN(edict_t* entity, int channel, const char* sample, float volume, float attenuation,
 	int flags, int pitch);
 
-// BSVR start - Half-Life-VR intercepts the model precache engine calls to precache the animated weapon models too.
-// The raw engine calls are PRECACHE_MODEL3 / PRECACHE_GENERIC3 (enginecallback.h).
-#ifdef CLIENT_DLL
-inline int PRECACHE_MODEL(const char* s) { return PRECACHE_MODEL3(s); }
-inline int PRECACHE_GENERIC(const char* s) { return PRECACHE_GENERIC3(s); }
-inline int PRECACHE_MODEL2(const char* s) { return PRECACHE_MODEL3(s); }
-inline int PRECACHE_GENERIC2(const char* s) { return PRECACHE_GENERIC3(s); }
-#else
-// Implemented in vr/VRAnimatedModelHelper.cpp
-int PRECACHE_MODEL(const char* s);
-int PRECACHE_GENERIC(const char* s);
-int PRECACHE_MODEL2(const char* s);
-int PRECACHE_GENERIC2(const char* s);
-#endif
-// BSVR end
-
 
 inline void EMIT_SOUND(edict_t* entity, int channel, const char* sample, float volume, float attenuation)
 {

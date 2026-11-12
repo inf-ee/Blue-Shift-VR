@@ -21,18 +21,35 @@ static class Assets
         ("valve/sound/plats/train_use2.wav", "sound/plats/"),
     ];
 
-    // Files earlier versions installed that are no longer used (the old VR menu), removed on update
+    // Files earlier versions installed that are no longer used, removed on update from both bsvr and bsvr_hd:
+    // the old VR menu, and the animated weapon models (vr_use_animated_weapons, removed)
     static readonly string[] Obsolete =
     [
         "fonts/Roboto-Regular.ttf",
         "textures/null.png",
         "THIRD_PARTY_LICENSES/Nuklear.txt",
+        "models/animov/v_357.mdl",
+        "models/animov/v_9mmar.mdl",
+        "models/animov/v_9mmhandgun.mdl",
+        "models/animov/v_crossbow.mdl",
+        "models/animov/v_crowbar.mdl",
+        "models/animov/v_egon.mdl",
+        "models/animov/v_gauss.mdl",
+        "models/animov/v_grenade.mdl",
+        "models/animov/v_hgun.mdl",
+        "models/animov/v_rpg.mdl",
+        "models/animov/v_satchel.mdl",
+        "models/animov/v_satchel_radio.mdl",
+        "models/animov/v_shotgun.mdl",
+        "models/animov/v_squeak.mdl",
+        "models/animov/v_tripmine.mdl",
     ];
 
     public static void Install(string halfLifeDir, string halfLifeVrDir, string modDir)
     {
         Directory.CreateDirectory(modDir);
         RemoveObsolete(modDir);
+        RemoveObsolete(Path.Combine(halfLifeDir, "bsvr_hd"));
 
         Console.WriteLine("Mod files");
         ExtractPayload(modDir, halfLifeDir);

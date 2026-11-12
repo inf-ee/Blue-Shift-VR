@@ -19,6 +19,17 @@
 #include "vr/VRCommons.h"
 #include "trains.h"
 
+// Train HUD states and TrainSpeed from player.cpp (SDK code local to that file), used by the VR train controls
+#define TRAIN_ACTIVE 0x80
+#define TRAIN_NEW 0xc0
+#define TRAIN_OFF 0x00
+#define TRAIN_NEUTRAL 0x01
+#define TRAIN_SLOW 0x02
+#define TRAIN_MEDIUM 0x03
+#define TRAIN_FAST 0x04
+#define TRAIN_BACK 0x05
+int TrainSpeed(int iSpeed, int iMax);
+
 constexpr const float VR_RETINASCANNER_ACTIVATE_LOOK_TIME = 1.f;
 std::unordered_map<EHandleT<CBaseEntity>, EHandleT<CBaseEntity>, EHandleT<CBaseEntity>::Hash, EHandleT<CBaseEntity>::Equal> g_vrRetinaScanners;
 std::unordered_set<EHandleT<CBaseEntity>, EHandleT<CBaseEntity>::Hash, EHandleT<CBaseEntity>::Equal> g_vrRetinaScannerButtons;
@@ -1124,4 +1135,469 @@ void CBasePlayer::StoreVROffsetsForLevelchange()
 	g_vrLevelChangeData.prevYaw = this->vr_prevYaw;
 	g_vrLevelChangeData.currentYaw = this->vr_currentYaw;
 	g_vrLevelChangeData.hasData = true;
+}
+
+// Savedata descriptor for vr level change data
+TYPEDESCRIPTION g_vrLevelChangeDataSaveData[] =
+	{
+		DEFINE_FIELD(VRLevelChangeData, lastHMDOffset, FIELD_VECTOR),
+		DEFINE_FIELD(VRLevelChangeData, clientOriginOffset, FIELD_VECTOR),
+		DEFINE_FIELD(VRLevelChangeData, hasData, FIELD_BOOLEAN),
+		DEFINE_FIELD(VRLevelChangeData, prevYaw, FIELD_FLOAT),
+		DEFINE_FIELD(VRLevelChangeData, currentYaw, FIELD_FLOAT),
+};
+
+// Savedata descriptor for vr level change data
+// TYPEDESCRIPTION g_vrAchievementsAndStatsData[] =
+// {
+// 	DEFINE_FIELD(CVRAchievementsAndStatsData, m_bitFlags, FIELD_INTEGER),
+// 	DEFINE_FIELD(CVRAchievementsAndStatsData, m_bpBridgesDestroyed, FIELD_CHARACTER),
+// 	DEFINE_FIELD(CVRAchievementsAndStatsData, m_exp1HeadcrabsKilled, FIELD_CHARACTER),
+// 	DEFINE_FIELD(CVRAchievementsAndStatsData, m_exp2HeadcrabsKilled, FIELD_CHARACTER),
+// 	DEFINE_FIELD(CVRAchievementsAndStatsData, m_totalNegativeCrushDamage, FIELD_FLOAT),
+// 	DEFINE_FIELD(CVRAchievementsAndStatsData, m_residueBarneyStartedRunningTime, FIELD_FLOAT),
+// 	DEFINE_ARRAY(CVRAchievementsAndStatsData, m_prevMap, FIELD_CHARACTER, 32)
+// };
+
+// Hooks called from the SDK player code in player.cpp
+
+// Start of PreThink: achievement checks (disabled) and the special VR entity scan after a map load
+void CBasePlayer::VRPreThinkStart()
+{
+	// VRAchievementsAndStatsTracker::Update(this);
+
+	if (!m_vrHasSurfacedInThatMapWithTheTank)
+	{
+		// if (pev->origin.z > 0.f && FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a5b.bsp"))
+		// {
+		// 	m_vrHasSurfacedInThatMapWithTheTank = true;
+		// 	VRAchievementsAndStatsTracker::PlayerSurfacedInThatMapWithTheTank(this);
+		// }
+	}
+
+	if (m_vrJustGotYeetedByBPTrain && FBitSet(pev->flags, FL_ONGROUND))
+	{
+		// we landed after getting yeeted by that train at the beginning of Blast Pit
+		m_vrJustGotYeetedByBPTrain = false;
+
+		// // sanity check that map is still correct
+		// if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a4.bsp"))
+		// {
+		// 	// check that player landed roughly in pipe opening
+		// 	if (pev->absmin.z > -3290.f && pev->absmin.z < -3130.f
+		// 		&& pev->origin.x > -990.f && pev->origin.x < -780.f
+		// 		&& pev->origin.y > -2610.f && pev->origin.y < -2470.f)
+		// 	{
+		// 		UTIL_VRGiveAchievement(this, VRAchievement::BP_PERFECT);
+		// 	}
+		// }
+	}
+
+	extern bool VRGlobalGetNoclipMode();
+	if (VRGlobalGetNoclipMode())
+	{
+		// VRAchievementsAndStatsTracker::PlayerUsedNoclip(this);
+	}
+
+	// gets reset by ClientPrecache everytime new map is loaded (new game, changelevel, load save)
+	if (g_vrNeedRecheckForSpecialEntities)
+	{
+		g_vrNeedRecheckForSpecialEntities = false;
+		for (int index = 1; index < gpGlobals->maxEntities; index++)
+		{
+			edict_t* pent = INDEXENT(index);
+			if (FNullEnt(pent))
+				continue;
+
+			EHandleT<CBaseEntity> hEntity = CBaseEntity::SafeInstance<CBaseEntity>(pent);
+			if (hEntity)
+			{
+				if (!hEntity->CheckIsSpecialVREntity())
+				{
+					g_vrNeedRecheckForSpecialEntities = true;
+				}
+			}
+		}
+	}
+}
+
+// PreThink: controller interactions with the world, retina scanners and VR train controls
+void CBasePlayer::VRPreThinkControllersAndTrain()
+{
+	// VR stuff: Calculate controller interactions with world
+	m_vrControllerInteractionManager.CheckAndPressButtons(this, m_vrControllers[VRControllerID::HAND], m_vrControllers[VRControllerID::WEAPON]);
+	m_vrControllerInteractionManager.CheckAndPressButtons(this, m_vrControllers[VRControllerID::WEAPON], m_vrControllers[VRControllerID::HAND]);
+
+	// Special interaction with 2 controllers at once (e.g. pull up on ledges)
+	if (m_vrControllers[VRControllerID::HAND].IsValid() && m_vrControllers[VRControllerID::WEAPON].IsValid())
+	{
+		m_vrControllerInteractionManager.DoMultiControllerActions(this, m_vrControllers[VRControllerID::HAND], m_vrControllers[VRControllerID::WEAPON]);
+	}
+
+	// Handle retina scanners
+	VRHandleRetinaScanners();
+
+	// Check if we are on a train
+	if (CVAR_GET_FLOAT("vr_train_controls") == 0.f)
+	{
+		if (pev->groundentity && !FBitSet(m_afPhysicsFlags, PFLAG_ONTRAIN))
+		{
+			CBaseEntity* pMaybeTrain = CBaseEntity::InstanceOrWorld(pev->groundentity);
+			if (IsUsableTrackTrain(pMaybeTrain))
+			{
+				// Start controlling the train!
+				m_afPhysicsFlags |= PFLAG_ONTRAIN;
+				m_iTrain = TrainSpeed(pMaybeTrain->pev->speed, pMaybeTrain->pev->impulse);
+				m_iTrain |= TRAIN_NEW;
+				EMIT_SOUND(ENT(pev), CHAN_ITEM, "plats/train_use1.wav", 0.8, ATTN_NORM);
+				// VRAchievementsAndStatsTracker::PlayerUsedTrain(this);
+			}
+		}
+	}
+
+	// Set FL_STUCK_ONTRAIN only if legacy train controls are enabled (this flag prevents movement in pm_shared)
+	if (CVAR_GET_FLOAT("vr_train_controls") != 0.f && (m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)
+		pev->flags |= FL_STUCK_ONTRAIN;
+	else
+		pev->flags &= ~FL_STUCK_ONTRAIN;
+
+	// Check if we are still on a train
+	if ((m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)
+	{
+		CBaseEntity* pTrain = CBaseEntity::InstanceOrWorld(pev->groundentity);
+
+		if (!pTrain)
+		{
+			// Maybe this is on the other side of a level transition
+			TraceResult trainTrace;
+			UTIL_TraceLine(pev->origin, pev->origin + Vector(0, 0, -38), ignore_monsters, ENT(pev), &trainTrace);
+
+			// HACKHACK - Just look for the func_tracktrain classname
+			if (trainTrace.flFraction != 1.0 && trainTrace.pHit)
+			{
+				pTrain = CBaseEntity::InstanceOrWorld(trainTrace.pHit);
+			}
+		}
+
+		if (!IsUsableTrackTrain(pTrain))
+		{
+			// Turn off the train if the train controls go dead or you leave the control area
+			m_afPhysicsFlags &= ~PFLAG_ONTRAIN;
+			m_iTrain = TRAIN_NEW | TRAIN_OFF;
+		}
+		else
+		{
+			// Train speed control
+			Vector forward;
+			Vector right;
+			Vector up;
+			UTIL_MakeVectorsPrivate(pTrain->pev->angles, forward, right, up);
+			forward.z = 0.f;
+			right.z = 0.f;
+			forward = forward.Normalize();
+			right = right.Normalize();
+
+			Vector2D controlsOffset;
+			auto pTrackTrain = dynamic_cast<CFuncTrackTrain*>(pTrain);
+			if (pTrackTrain)
+			{
+				controlsOffset = pTrackTrain->GetVRControlsOffset();
+			}
+			else
+			{
+				controlsOffset = Vector2D{-48.f, 20.f};
+			}
+			vr_trainControlPosition = pTrain->pev->origin + (forward * controlsOffset.x) + (right * controlsOffset.y);
+			vr_trainControlPosition.z = pev->origin.z + 8.f;
+			vr_trainControlYaw = pTrain->pev->angles.y;
+
+			if (m_iTrain == TRAIN_OFF)
+			{
+				m_iTrain = TrainSpeed(pTrain->pev->speed, pTrain->pev->impulse);
+			}
+
+			if (CVAR_GET_FLOAT("vr_train_controls") != 0.f)
+			{
+				pev->velocity = g_vecZero;
+				float vel = 0;
+				if ((m_afButtonPressed & IN_FORWARD) != 0)
+				{
+					vel = 1;
+				}
+				else if ((m_afButtonPressed & IN_BACK) != 0)
+				{
+					vel = -1;
+				}
+				if (0 != vel)
+				{
+					pTrain->Use(this, this, USE_SET, vel);
+					m_iTrain = TrainSpeed(pTrain->pev->speed, pTrain->pev->impulse);
+				}
+			}
+			else
+			{
+				Vector trainFastButtonPos = vr_trainControlPosition + (forward * -8.f) + (up * 20.f);
+				Vector trainMedmButtonPos = vr_trainControlPosition + (forward * -6.25f) + (up * 15.5f);
+				Vector trainSlowButtonPos = vr_trainControlPosition + (forward * -4.5f) + (up * 11.5f);
+				Vector trainNeutButtonPos = vr_trainControlPosition + (forward * -2.75f) + (up * 6.5f);
+				Vector trainBackButtonPos = vr_trainControlPosition + (forward * -1.f) + (up * 2.f);
+
+				float newspeed = pTrain->pev->speed;
+				if (CheckVRTRainButtonTouched(trainNeutButtonPos + (right * 8.f), trainNeutButtonPos - (right * 8.f)))
+				{
+					m_iTrain = TRAIN_NEUTRAL;
+					newspeed = 0.f;
+				}
+				else if (CheckVRTRainButtonTouched(trainSlowButtonPos + (right * 8.f), trainSlowButtonPos - (right * 8.f)))
+				{
+					m_iTrain = TRAIN_SLOW;
+					newspeed = pTrain->pev->impulse * GetTrainSpeed("vr_train_speed_slow");
+				}
+				else if (CheckVRTRainButtonTouched(trainMedmButtonPos + (right * 8.f), trainMedmButtonPos - (right * 8.f)))
+				{
+					m_iTrain = TRAIN_MEDIUM;
+					newspeed = pTrain->pev->impulse * GetTrainSpeed("vr_train_speed_medium");
+				}
+				else if (CheckVRTRainButtonTouched(trainFastButtonPos + (right * 8.f), trainFastButtonPos - (right * 8.f)))
+				{
+					m_iTrain = TRAIN_FAST;
+					newspeed = pTrain->pev->impulse * GetTrainSpeed("vr_train_speed_fast");
+				}
+				else if (CheckVRTRainButtonTouched(trainBackButtonPos + (right * 8.f), trainBackButtonPos - (right * 8.f)))
+				{
+					m_iTrain = TRAIN_BACK;
+					newspeed = -pTrain->pev->impulse * GetTrainSpeed("vr_train_speed_back");
+				}
+
+				if (newspeed != pTrain->pev->speed)
+				{
+					EMIT_SOUND(ENT(pev), CHAN_ITEM, "plats/train_use2.wav", 0.6, ATTN_NORM);
+
+					pTrain->pev->speed = newspeed;
+					auto pTrackTrain = dynamic_cast<CFuncTrackTrain*>(pTrain);
+					if (pTrackTrain)
+						pTrackTrain->Next();
+				}
+			}
+
+			m_iTrain |= TRAIN_ACTIVE | TRAIN_NEW;
+
+			m_hLastTrain = pTrain;
+		}
+	}
+
+	// autostop train if we are not standing on it anymore
+	if (!FBitSet(m_afPhysicsFlags, PFLAG_ONTRAIN))
+	{
+		if (m_hLastTrain && (m_hLastTrain->edict() != pev->groundentity) && m_hLastTrain->pev->speed > 0 && CVAR_GET_FLOAT("vr_train_autostop") != 0.f)
+		{
+			m_hLastTrain->pev->speed = 0;
+			m_hLastTrain->pev->velocity = g_vecZero;
+			m_hLastTrain->pev->avelocity = g_vecZero;
+			m_hLastTrain->SetThink(nullptr);
+			EHandleT<CFuncTrackTrain> hTrackTrain = m_hLastTrain;
+			if (hTrackTrain)
+			{
+				hTrackTrain->StopSound();
+			}
+			m_hLastTrain = nullptr;
+		}
+	}
+
+	if (FBitSet(m_iTrain, TRAIN_ACTIVE) && !FBitSet(m_afPhysicsFlags, PFLAG_ONTRAIN))
+	{
+		m_iTrain = TRAIN_NEW; // turn off train
+	}
+}
+
+// Start of PostThink: flashlight, teleporter, laser spot and VR tank use
+void CBasePlayer::VRPostThinkStart()
+{
+	UpdateFlashlight();
+	UpdateVRTele();
+	UpdateVRLaserSpot();
+
+	VRUseOrUnuseTank();
+	if (!m_vrIsUsingTankWithVRControllers && m_pTank != nullptr)
+	{
+		if (!m_pTank->OnControls(pev))
+		{
+			// player moved too far from the gun, unuse the gun
+			m_pTank->Use(this, this, USE_OFF, 0);
+			m_pTank = nullptr;
+			SelectLastItem();
+		}
+		else if (m_pActiveItem != nullptr || 0 != pev->weaponmodel || m_vrControllers[VRControllerID::WEAPON].GetWeaponId() != WEAPON_BAREHAND)
+		{
+			// player selected a weapon, unuse the gun
+			m_pTank->Use(this, this, USE_OFF, 0);
+			m_pTank = nullptr;
+			if (m_pActiveItem == nullptr)
+			{
+				SelectLastItem();
+			}
+		}
+		else
+		{
+			// fire the gun
+			m_pTank->Use(this, this, USE_SET, 2);
+		}
+	}
+}
+
+// PostThink, after ItemPostFrame
+void CBasePlayer::VRPostFrameControllers()
+{
+	// controller feedback
+	for (auto& [id, controller] : m_vrControllers)
+	{
+		if (controller.IsValid())
+		{
+			controller.PostFrame();
+		}
+	}
+}
+
+// Start of Killed
+void CBasePlayer::VRKilled(entvars_t* pevAttacker, int iGib)
+{
+	FlashlightTurnOff();
+	ClearLadderGrabbingControllers();
+	StopPullingLedge();
+
+	m_afPhysicsFlags &= ~PFLAG_ONBARNACLE;
+	pev->flags &= ~FL_BARNACLED;
+
+	// Debug death console message - Max Makes Mods, 2019-04-13
+	// if (pevAttacker)
+	// {
+	// 	ALERT(at_console, "Killed by %s %s, damage type: %s, iGib: %s\n", STRING(pevAttacker->classname), STRING(pevAttacker->targetname), DamageBitsToString(bitsDamageType).data(), GibToString(iGib));
+	// }
+	// else
+	// {
+	// 	ALERT(at_console, "Killed by world, damage type: %s, iGib: %s\n", DamageBitsToString(bitsDamageType).data(), GibToString(iGib));
+	// }
+
+	// if (pevAttacker
+	// 	&& FClassnameIs(pevAttacker, "func_tank")
+	// 	&& (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a5c.bsp") || FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a5e.bsp") || FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a2g.bsp"))
+	// 	&& (FStrEq(STRING(pevAttacker->targetname), "sniper1") || FStrEq(STRING(pevAttacker->targetname), "sniper2")))
+	// {
+	// 	UTIL_VRGiveAchievement(this, VRAchievement::GEN_SNIPED);
+	// }
+}
+
+// Save, after the PLAYER fields
+void CBasePlayer::VRSave(CSave& save)
+{
+	StoreVROffsetsForLevelchange();
+
+	save.WriteFields("PLAYERVROffsetsForLevelchange", &g_vrLevelChangeData, g_vrLevelChangeDataSaveData, (int)std::size(g_vrLevelChangeDataSaveData));
+	// save.WriteFields("PLAYERVRAchievementsAndStatsData", &m_vrAchievementsAndStatsData, g_vrAchievementsAndStatsData, (int)std::size(g_vrAchievementsAndStatsData));
+}
+
+// Restore, after the PLAYER fields: VR fields and the VR offsets stored by the last level change
+void CBasePlayer::VRRestore(CRestore& restore)
+{
+	restore.ReadFields("PLAYERVROffsetsForLevelchange", &g_vrLevelChangeData, g_vrLevelChangeDataSaveData, (int)std::size(g_vrLevelChangeDataSaveData));
+	// restore.ReadFields("PLAYERVRAchievementsAndStatsData", &m_vrAchievementsAndStatsData, g_vrAchievementsAndStatsData, (int)std::size(g_vrAchievementsAndStatsData));
+
+	// Restore VR offsets if levelchange has stored them (fixes origin issues in roomscale) - Max Makes Mods, 2018-04-02
+	if (g_vrLevelChangeData.hasData)
+	{
+		this->vr_lastHMDOffset = g_vrLevelChangeData.lastHMDOffset;
+		this->vr_ClientOriginOffset = g_vrLevelChangeData.clientOriginOffset;
+		this->vr_prevYaw = g_vrLevelChangeData.prevYaw;
+		this->vr_currentYaw = g_vrLevelChangeData.currentYaw;
+		vr_needsToSendRestoreYawMsgToClient = true;
+	}
+
+	g_vrLevelChangeData.hasData = false;
+}
+
+// End of Restore
+void CBasePlayer::VRRestoreEnd()
+{
+	// Make sure old predisaster savegames start up with hand model
+	if (m_pActiveItem == nullptr)
+	{
+		pev->viewmodel = MAKE_STRING("models/v_hand.mdl");
+		pev->weaponmodel = iStringNull;
+	}
+
+	vr_IsJustRestored = true;
+	vr_hasSentRestoreYawMsgToClient = false;
+	vr_hasSentSpawnYawToClient = false;
+
+	// ugly but easy hack to ensure damage visuals don't disturb the end scene with gman
+	// if player health is very low
+	if (pev->health < 100)
+	{
+		std::string mapname = STRING(INDEXENT(0)->v.model);
+		if (mapname == std::string{"maps/c5a1.bsp"})
+		{
+			pev->health = 100;
+		}
+	}
+}
+
+// FlashlightTurnOn: the VR flashlight is a light entity, not EF_DIMLIGHT on the player
+void CBasePlayer::VRFlashlightTurnOn()
+{
+	if (!hFlashLight)
+	{
+		hFlashLight = CBaseEntity::Create<CBaseEntity>("info_target", pev->origin, Vector());
+		hFlashLight->m_objectCaps = FCAP_DONT_SAVE;
+		SET_MODEL(hFlashLight->edict(), "sprites/black.spr");
+		UTIL_SetOrigin(hFlashLight->pev, pev->origin);
+		UTIL_SetSize(hFlashLight->pev, Vector(-4, -4, -4), Vector(4, 4, 4));
+		hFlashLight->pev->effects = EF_NODRAW;
+		hFlashLight->pev->rendermode = kRenderTransAlpha;
+	}
+	fFlashlightIsOn = true;
+}
+
+// FlashlightTurnOff
+void CBasePlayer::VRFlashlightTurnOff()
+{
+	if (hFlashLight)
+	{
+		hFlashLight->pev->effects = EF_NODRAW;
+		UTIL_Remove(hFlashLight);
+		hFlashLight = nullptr;
+	}
+	if (hFlashlightMonster)
+	{
+		ClearBits(hFlashlightMonster->pev->effects, EF_DIMLIGHT);
+		hFlashlightMonster = nullptr;
+	}
+	fFlashlightIsOn = false;
+}
+
+// UpdateClientData: where the VR train controls are
+void CBasePlayer::VRSendTrainControls()
+{
+	if ((m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgVRTrainControls, nullptr, pev);
+		WRITE_COORD(vr_trainControlPosition.x);
+		WRITE_COORD(vr_trainControlPosition.y);
+		WRITE_COORD(vr_trainControlPosition.z);
+		WRITE_ANGLE(vr_trainControlYaw);
+		MESSAGE_END();
+	}
+}
+
+// UpdateClientData: view yaw after loading a save or a level change
+void CBasePlayer::VRSendRestoreYaw()
+{
+	if (vr_needsToSendRestoreYawMsgToClient)
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgVRRestoreYaw, nullptr, pev);
+		WRITE_ANGLE(this->vr_prevYaw);
+		WRITE_ANGLE(this->vr_currentYaw);
+		MESSAGE_END();
+		vr_hasSentRestoreYawMsgToClient = true;
+		vr_needsToSendRestoreYawMsgToClient = false;
+	}
 }

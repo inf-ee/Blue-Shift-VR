@@ -274,13 +274,9 @@ void CBasePlayer::Precache() {}
 bool CBasePlayer::Save(CSave& save) { return false; }
 void CBasePlayer::RenewItems() {}
 bool CBasePlayer::Restore(CRestore& restore) { return false; }
-// BSVR start
-// void CBasePlayer::SelectNextItem(int iItem) {} - original
-// BSVR end
+void CBasePlayer::SelectNextItem(int iItem) {}
 bool CBasePlayer::HasWeapons() { return false; }
-// BSVR start
-// void CBasePlayer::SelectPrevItem(int iItem) {} - original
-// BSVR end
+void CBasePlayer::SelectPrevItem(int iItem) {}
 bool CBasePlayer::FlashlightIsOn() { return false; }
 void CBasePlayer::FlashlightTurnOn() {}
 void CBasePlayer::FlashlightTurnOff() {}

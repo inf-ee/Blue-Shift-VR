@@ -1706,25 +1706,23 @@ void CBasePlayer::Jump()
 }
 
 
-// BSVR start - commented out
 // This is a glorious hack to find free space when you've crouched into some solid space
 // Our crouching collisions do not work correctly for some reason and this is easier
 // than fixing the problem :(
-// void FixPlayerCrouchStuck(edict_t* pPlayer)
-// {
-// 	TraceResult trace;
+void FixPlayerCrouchStuck(edict_t* pPlayer)
+{
+	TraceResult trace;
 
-// 	// Move up as many as 18 pixels if the player is stuck.
-// 	for (int i = 0; i < 18; i++)
-// 	{
-// 		UTIL_TraceHull(pPlayer->v.origin, pPlayer->v.origin, dont_ignore_monsters, head_hull, pPlayer, &trace);
-// 		if (0 != trace.fStartSolid)
-// 			pPlayer->v.origin.z++;
-// 		else
-// 			break;
-// 	}
-// }
-// BSVR end
+	// Move up as many as 18 pixels if the player is stuck.
+	for (int i = 0; i < 18; i++)
+	{
+		UTIL_TraceHull(pPlayer->v.origin, pPlayer->v.origin, dont_ignore_monsters, head_hull, pPlayer, &trace);
+		if (0 != trace.fStartSolid)
+			pPlayer->v.origin.z++;
+		else
+			break;
+	}
+}
 
 void CBasePlayer::Duck()
 {
@@ -3251,53 +3249,51 @@ bool CBasePlayer::Restore(CRestore& restore)
 }
 
 
-// BSVR start - originals disabled
-// void CBasePlayer::SelectNextItem(int iItem)
-// {
-// 	CBasePlayerItem* pItem;
+void CBasePlayer::SelectNextItem(int iItem)
+{
+	CBasePlayerItem* pItem;
 
-// 	pItem = m_rgpPlayerItems[iItem];
+	pItem = m_rgpPlayerItems[iItem];
 
-// 	if (!pItem)
-// 		return;
+	if (!pItem)
+		return;
 
-// 	if (pItem == m_pActiveItem)
-// 	{
-// 		// select the next one in the chain
-// 		pItem = m_pActiveItem->m_pNext;
-// 		if (!pItem)
-// 		{
-// 			return;
-// 		}
+	if (pItem == m_pActiveItem)
+	{
+		// select the next one in the chain
+		pItem = m_pActiveItem->m_pNext;
+		if (!pItem)
+		{
+			return;
+		}
 
-// 		CBasePlayerItem* pLast;
-// 		pLast = pItem;
-// 		while (pLast->m_pNext)
-// 			pLast = pLast->m_pNext;
+		CBasePlayerItem* pLast;
+		pLast = pItem;
+		while (pLast->m_pNext)
+			pLast = pLast->m_pNext;
 
-// 		// relink chain
-// 		pLast->m_pNext = m_pActiveItem;
-// 		m_pActiveItem->m_pNext = NULL;
-// 		m_rgpPlayerItems[iItem] = pItem;
-// 	}
+		// relink chain
+		pLast->m_pNext = m_pActiveItem;
+		m_pActiveItem->m_pNext = NULL;
+		m_rgpPlayerItems[iItem] = pItem;
+	}
 
-// 	ResetAutoaim();
+	ResetAutoaim();
 
-// 	// FIX, this needs to queue them up and delay
-// 	if (m_pActiveItem)
-// 	{
-// 		m_pActiveItem->Holster();
-// 	}
+	// FIX, this needs to queue them up and delay
+	if (m_pActiveItem)
+	{
+		m_pActiveItem->Holster();
+	}
 
-// 	m_pActiveItem = pItem;
+	m_pActiveItem = pItem;
 
-// 	if (m_pActiveItem)
-// 	{
-// 		m_pActiveItem->Deploy();
-// 		m_pActiveItem->UpdateItemInfo();
-// 	}
-// }
-// BSVR end
+	if (m_pActiveItem)
+	{
+		m_pActiveItem->Deploy();
+		m_pActiveItem->UpdateItemInfo();
+	}
+}
 
 void CBasePlayer::SelectItem(const char* pstr)
 {
@@ -3365,39 +3361,6 @@ void CBasePlayer::SelectItem(const char* pstr)
 }
 // BSVR end
 
-// BSVR start - moved to weapons_shared
-// void CBasePlayer::SelectLastItem(void)
-// {
-// 	if (m_pActiveItem != nullptr && !m_pActiveItem->CanHolster())
-// 	{
-// 		return;
-// 	}
-
-// 	ResetAutoaim();
-
-// 	// FIX, this needs to queue them up and delay
-// 	if (m_pActiveItem != nullptr)
-// 	{
-// 		m_pActiveItem->Holster();
-// 	}
-
-// 	if (m_pLastItem == nullptr)
-// 	{
-// 		m_pLastItem = m_pActiveItem;
-// 		m_pActiveItem = nullptr;
-// 		pev->viewmodel = MAKE_STRING("models/v_hand.mdl");
-// 		pev->weaponmodel = iStringNull;
-// 	}
-// 	else
-// 	{
-// 		CBasePlayerItem* pTemp = m_pActiveItem;
-// 		m_pActiveItem = m_pLastItem;
-// 		m_pLastItem = pTemp;
-// 		m_pActiveItem->Deploy();
-// 		m_pActiveItem->UpdateItemInfo();
-// 	}
-// }
-// BSVR end
 
 //==============================================
 // HasWeapons - do I have any weapons at all?
@@ -3417,11 +3380,9 @@ bool CBasePlayer::HasWeapons()
 	return false;
 }
 
-// BSVR start - commented out
-// void CBasePlayer::SelectPrevItem(int iItem)
-// {
-// }
-// BSVR end
+void CBasePlayer::SelectPrevItem(int iItem)
+{
+}
 
 
 const char* CBasePlayer::TeamID()

@@ -235,47 +235,52 @@ void CBasePlayerWeapon::ItemPostFrame()
 	}
 }
 
+void CBasePlayer::SelectLastItem()
+{
+	// BSVR start
+	return VRSelectLastItem();
+	// BSVR end
+
+	if (!m_pLastItem)
+	{
+		return;
+	}
+
+	if (m_pActiveItem && !m_pActiveItem->CanHolster())
+	{
+		return;
+	}
+
+	ResetAutoaim();
+
+	// FIX, this needs to queue them up and delay
+	if (m_pActiveItem)
+		m_pActiveItem->Holster();
+
+	CBasePlayerItem* pTemp = m_pActiveItem;
+	m_pActiveItem = m_pLastItem;
+	m_pLastItem = pTemp;
+
+	auto weapon = m_pActiveItem->GetWeaponPtr();
+
+	if (weapon)
+	{
+		weapon->m_ForceSendAnimations = true;
+	}
+
+	m_pActiveItem->Deploy();
+
+	if (weapon)
+	{
+		weapon->m_ForceSendAnimations = false;
+	}
+
+	m_pActiveItem->UpdateItemInfo();
+}
+
 // BSVR start
-// void CBasePlayer::SelectLastItem()
-// {
-// 	if (!m_pLastItem)
-// 	{
-// 		return;
-// 	}
-
-// 	if (m_pActiveItem && !m_pActiveItem->CanHolster())
-// 	{
-// 		return;
-// 	}
-
-// 	ResetAutoaim();
-
-// 	// FIX, this needs to queue them up and delay
-// 	if (m_pActiveItem)
-// 		m_pActiveItem->Holster();
-
-// 	CBasePlayerItem* pTemp = m_pActiveItem;
-// 	m_pActiveItem = m_pLastItem;
-// 	m_pLastItem = pTemp;
-
-// 	auto weapon = m_pActiveItem->GetWeaponPtr();
-
-// 	if (weapon)
-// 	{
-// 		weapon->m_ForceSendAnimations = true;
-// 	}
-
-// 	m_pActiveItem->Deploy();
-
-// 	if (weapon)
-// 	{
-// 		weapon->m_ForceSendAnimations = false;
-// 	}
-
-// 	m_pActiveItem->UpdateItemInfo();
-// }
-
-void CBasePlayer::SelectLastItem(void)
+// VR version: with no last item, switch to the bare hand
+void CBasePlayer::VRSelectLastItem()
 {
 	if (m_pActiveItem != nullptr && !m_pActiveItem->CanHolster())
 	{

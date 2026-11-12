@@ -1,7 +1,27 @@
-// VR movement functions, moved from pm_shared.cpp. Included only at the end of pm_shared.cpp,
-// so they see all its file-local helpers, like the code they were moved from.
+// VR movement functions, moved from pm_shared.cpp. Built into both DLLs, like pm_shared.cpp.
 
-#pragma once
+#include "Platform.h"
+
+#include <assert.h>
+#include "mathlib.h"
+#include "cdll_dll.h"
+#include "const.h"
+#include "usercmd.h"
+#include "pm_defs.h"
+#include "pm_shared.h"
+#include "pm_materials.h"
+#include "pm_movevars.h"
+#include "pm_debug.h"
+#include "com_model.h"
+#include "vr/VRPMShared.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#pragma warning(disable : 4305) // same as pm_shared.cpp
+
+bool pmoveIgnoreLadders = false;
 
 // No gravity under water in VR - Max Makes Mods, 2018-01-28
 // Moved into separate function with improved logic - Max Makes Mods, 2018-11-18

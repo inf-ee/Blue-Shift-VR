@@ -345,6 +345,9 @@
     <ClCompile Include="..\..\game_shared\filesystem_utils.cpp">
       <Filter>Source Files\game_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\game_shared\vr\VRPMShared.cpp">
+      <Filter>Source Files\game_shared</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\cl_dll\particleman\CMiniMem.cpp">
       <Filter>Source Files\cl_dll\particleman</Filter>
     </ClCompile>
@@ -978,9 +981,6 @@
       <Filter>VR\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\game_shared\vr\VRPMShared.h">
-      <Filter>VR\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\game_shared\vr\VRPMSharedFunctions.h">
       <Filter>VR\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -241,6 +241,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClCompile Include="..\..\dlls\weapons_shared.cpp" />
     <ClCompile Include="..\..\dlls\glock.cpp" />
     <ClCompile Include="..\..\game_shared\filesystem_utils.cpp" />
+    <ClCompile Include="..\..\game_shared\vr\VRPMShared.cpp" />
     <ClCompile Include="..\..\game_shared\vgui_checkbutton2.cpp" />
     <ClCompile Include="..\..\game_shared\vgui_grid.cpp" />
     <ClCompile Include="..\..\game_shared\vgui_helpers.cpp" />
@@ -662,7 +663,6 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClInclude Include="..\..\game_shared\vr\VRShared.h" />
     <ClInclude Include="..\..\game_shared\vr\VRComModelHL25.h" />
     <ClInclude Include="..\..\game_shared\vr\VRPMShared.h" />
-    <ClInclude Include="..\..\game_shared\vr\VRPMSharedFunctions.h" />
     <ClInclude Include="..\..\common\beamdef.h" />
     <ClInclude Include="..\..\common\cl_entity.h" />
     <ClInclude Include="..\..\common\common_types.h" />

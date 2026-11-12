@@ -1448,7 +1448,7 @@ void PM_WaterMove()
 	// 	wishvel[2] -= 60; // drift towards bottom - original
 	// else				  // Go straight up by upmove amount. - original
 	// 	wishvel[2] += pmove->cmd.upmove; - original
-	PM_VRWaterWishVelocity(wishvel); // vr/VRPMSharedFunctions.h
+	PM_VRWaterWishVelocity(wishvel); // vr/VRPMShared.cpp
 	// BSVR end
 
 	// Copy it over and determine speed
@@ -2233,7 +2233,7 @@ void PM_Duck()
 void PM_LadderMove(physent_t* pLadder)
 {
 	// BSVR start
-	PM_VRLadderMove(pLadder); // vr/VRPMSharedFunctions.h
+	PM_VRLadderMove(pLadder); // vr/VRPMShared.cpp
 	return;
 	// BSVR end
 
@@ -3205,7 +3205,7 @@ void PM_PlayerMove(qboolean server)
 	// 		}
 	// 	}
 	// }
-	if (PM_VRCheckStuck(server)) // vr/VRPMSharedFunctions.h
+	if (PM_VRCheckStuck(server)) // vr/VRPMShared.cpp
 	{
 		return;
 	}
@@ -3275,7 +3275,7 @@ void PM_PlayerMove(qboolean server)
 	// {
 	// 	VectorScale(pmove->velocity, 0.3, pmove->velocity);
 	// }
-	PM_VRMove(pLadder); // vr/VRPMSharedFunctions.h
+	PM_VRMove(pLadder); // vr/VRPMShared.cpp
 	return;
 	// BSVR end
 
@@ -3660,7 +3660,3 @@ bool PM_GetHullBounds(int hullnumber, float* mins, float* maxs)
 
 	return false;
 }
-
-// BSVR start
-#include "vr/VRPMSharedFunctions.h"
-// BSVR end

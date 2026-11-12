@@ -1,11 +1,15 @@
 // Typed entity handle template that replaces the SDK EHANDLE class, moved from cbase.h
-// Included from cbase.h in place of the SDK class, so it relies on the declarations before it there
+// Included from cbase.h in place of the SDK class
 
 #pragma once
+
+#include "extdll.h"
 
 #include <functional>
 #include <memory>
 #include <unordered_set>
+
+class CBaseEntity;
 
 template <class ENTITY>
 class EHandleT

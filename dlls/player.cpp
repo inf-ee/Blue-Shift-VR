@@ -300,18 +300,20 @@ bool CBasePlayer::TakeHealth(float flHealth, int bitsDamageType)
 	return CBaseMonster::TakeHealth(flHealth, bitsDamageType);
 }
 
-// BSVR start - original
-// Vector CBasePlayer::GetGunPosition()
-// {
-// 	//	UTIL_MakeVectors(pev->v_angle);
-// 	//	m_HackedGunPos = pev->view_ofs;
-// 	Vector origin;
+Vector CBasePlayer::GetGunPosition()
+{
+	// BSVR start
+	return VRGetGunPosition(); // vr/VRPlayer.cpp
+	// BSVR end
 
-// 	origin = pev->origin + pev->view_ofs;
+	//	UTIL_MakeVectors(pev->v_angle);
+	//	m_HackedGunPos = pev->view_ofs;
+	Vector origin;
 
-// 	return origin;
-// }
-// BSVR end
+	origin = pev->origin + pev->view_ofs;
+
+	return origin;
+}
 
 //=========================================================
 // TraceAttack
@@ -4631,279 +4633,236 @@ void CBasePlayer::EnableControl(bool fControl)
 // Autoaim
 // set crosshair position to point to enemey
 //=========================================================
-// BSVR start
+Vector CBasePlayer::GetAutoaimVector(float flDelta)
+{
+	// BSVR start
+	return VRGetAutoaimVector(); // vr/VRPlayer.cpp
+	// BSVR end
+
+	if (g_iSkillLevel == SKILL_HARD)
+	{
+		UTIL_MakeVectors(pev->v_angle + pev->punchangle);
+		return gpGlobals->v_forward;
+	}
+
+	Vector vecSrc = GetGunPosition();
+	float flDist = 8192;
+
+	// always use non-sticky autoaim
+	// UNDONE: use sever variable to chose!
+	if (true || g_iSkillLevel == SKILL_MEDIUM)
+	{
+		m_vecAutoAim = Vector(0, 0, 0);
+		// flDelta *= 0.5;
+	}
+
+	bool m_fOldTargeting = m_fOnTarget;
+	Vector angles = AutoaimDeflection(vecSrc, flDist, flDelta);
+
+	// update ontarget if changed
+	if (!g_pGameRules->AllowAutoTargetCrosshair())
+		m_fOnTarget = false;
+	else if (m_fOldTargeting != m_fOnTarget)
+	{
+		m_pActiveItem->UpdateItemInfo();
+	}
+
+	if (angles.x > 180)
+		angles.x -= 360;
+	if (angles.x < -180)
+		angles.x += 360;
+	if (angles.y > 180)
+		angles.y -= 360;
+	if (angles.y < -180)
+		angles.y += 360;
+
+	if (angles.x > 25)
+		angles.x = 25;
+	if (angles.x < -25)
+		angles.x = -25;
+	if (angles.y > 12)
+		angles.y = 12;
+	if (angles.y < -12)
+		angles.y = -12;
+
+
+	// always use non-sticky autoaim
+	// UNDONE: use sever variable to chose!
+	if (false || g_iSkillLevel == SKILL_EASY)
+	{
+		m_vecAutoAim = m_vecAutoAim * 0.67 + angles * 0.33;
+	}
+	else
+	{
+		m_vecAutoAim = angles * 0.9;
+	}
+
+	// m_vecAutoAim = m_vecAutoAim * 0.99;
+
+	// Don't send across network if sv_aim is 0
+	if (g_psv_aim->value != 0 && g_psv_allow_autoaim != 0)
+	{
+		if (m_vecAutoAim.x != m_lastx ||
+			m_vecAutoAim.y != m_lasty)
+		{
+			SET_CROSSHAIRANGLE(edict(), -m_vecAutoAim.x, m_vecAutoAim.y);
+
+			m_lastx = m_vecAutoAim.x;
+			m_lasty = m_vecAutoAim.y;
+		}
+	}
+	else
+	{
+		ResetAutoaim();
+	}
+
+	// ALERT( at_console, "%f %f\n", angles.x, angles.y );
+
+	UTIL_MakeVectors(pev->v_angle + pev->punchangle + m_vecAutoAim);
+	return gpGlobals->v_forward;
+}
+
+
 Vector CBasePlayer::AutoaimDeflection(Vector& vecSrc, float flDist, float flDelta)
 {
+	// BSVR start
 	// no auto aim in VR
 	return Vector{};
+	// BSVR end
+
+	edict_t* pEdict = UTIL_GetEntityList() + 1;
+	CBaseEntity* pEntity;
+	float bestdot;
+	Vector bestdir;
+	edict_t* bestent;
+	TraceResult tr;
+
+	if (g_psv_aim->value == 0 || g_psv_allow_autoaim->value == 0)
+	{
+		m_fOnTarget = false;
+		return g_vecZero;
+	}
+
+	UTIL_MakeVectors(pev->v_angle + pev->punchangle + m_vecAutoAim);
+
+	// try all possible entities
+	bestdir = gpGlobals->v_forward;
+	bestdot = flDelta; // +- 10 degrees
+	bestent = NULL;
+
+	m_fOnTarget = false;
+
+	UTIL_TraceLine(vecSrc, vecSrc + bestdir * flDist, dont_ignore_monsters, edict(), &tr);
+
+
+	if (tr.pHit && tr.pHit->v.takedamage != DAMAGE_NO)
+	{
+		// don't look through water
+		if (!((pev->waterlevel != 3 && tr.pHit->v.waterlevel == 3) || (pev->waterlevel == 3 && tr.pHit->v.waterlevel == 0)))
+		{
+			if (tr.pHit->v.takedamage == DAMAGE_AIM)
+				m_fOnTarget = true;
+
+			return m_vecAutoAim;
+		}
+	}
+
+	for (int i = 1; i < gpGlobals->maxEntities; i++, pEdict++)
+	{
+		Vector center;
+		Vector dir;
+		float dot;
+
+		if (0 != pEdict->free) // Not in use
+			continue;
+
+		if (pEdict->v.takedamage != DAMAGE_AIM)
+			continue;
+		if (pEdict == edict())
+			continue;
+		//		if (pev->team > 0 && pEdict->v.team == pev->team)
+		//			continue;	// don't aim at teammate
+		if (!g_pGameRules->ShouldAutoAim(this, pEdict))
+			continue;
+
+		pEntity = Instance(pEdict);
+		if (pEntity == NULL)
+			continue;
+
+		if (!pEntity->IsAlive())
+			continue;
+
+		// don't look through water
+		if ((pev->waterlevel != 3 && pEntity->pev->waterlevel == 3) || (pev->waterlevel == 3 && pEntity->pev->waterlevel == 0))
+			continue;
+
+		center = pEntity->BodyTarget(vecSrc);
+
+		dir = (center - vecSrc).Normalize();
+
+		// make sure it's in front of the player
+		if (DotProduct(dir, gpGlobals->v_forward) < 0)
+			continue;
+
+		dot = fabs(DotProduct(dir, gpGlobals->v_right)) + fabs(DotProduct(dir, gpGlobals->v_up)) * 0.5;
+
+		// tweek for distance
+		dot *= 1.0 + 0.2 * ((center - vecSrc).Length() / flDist);
+
+		if (dot > bestdot)
+			continue; // to far to turn
+
+		UTIL_TraceLine(vecSrc, center, dont_ignore_monsters, edict(), &tr);
+		if (tr.flFraction != 1.0 && tr.pHit != pEdict)
+		{
+			// ALERT( at_console, "hit %s, can't see %s\n", STRING( tr.pHit->v.classname ), STRING( pEdict->v.classname ) );
+			continue;
+		}
+
+		// don't shoot at friends
+		if (IRelationship(pEntity) < 0)
+		{
+			if (!pEntity->IsPlayer() && !g_pGameRules->IsDeathmatch())
+				// ALERT( at_console, "friend\n");
+				continue;
+		}
+
+		// can shoot at this one
+		bestdot = dot;
+		bestent = pEdict;
+		bestdir = dir;
+	}
+
+	if (bestent)
+	{
+		bestdir = UTIL_VecToAngles(bestdir);
+		bestdir.x = -bestdir.x;
+		bestdir = bestdir - pev->v_angle - pev->punchangle;
+
+		if (bestent->v.takedamage == DAMAGE_AIM)
+			m_fOnTarget = true;
+
+		return bestdir;
+	}
+
+	return Vector(0, 0, 0);
 }
+
 
 void CBasePlayer::ResetAutoaim()
 {
+	// BSVR start
 	// no auto aim in VR
-}
+	return;
+	// BSVR end
 
-Vector CBasePlayer::GetGunPosition()
-{
-	// Gun position and angles determined by attachments on weapon model - Max Makes Mods, 2019-03-30
-	if (m_vrControllers[VRControllerID::WEAPON].IsValid())
+	if (m_vecAutoAim.x != 0 || m_vecAutoAim.y != 0)
 	{
-		Vector pos;
-		bool result = m_vrControllers[VRControllerID::WEAPON].GetAttachment(VR_MUZZLE_ATTACHMENT, pos);
-		if (result)
-		{
-			return pos;
-		}
+		m_vecAutoAim = Vector(0, 0, 0);
+		SET_CROSSHAIRANGLE(edict(), 0, 0);
 	}
-
-	return GetWeaponPosition();
+	m_fOnTarget = false;
 }
-// BSVR end
-
-// BSVR start - replaced with VR autoaim
-// Vector CBasePlayer::GetAutoaimVector(float flDelta)
-// {
-// 	if (g_iSkillLevel == SKILL_HARD)
-// 	{
-// 		UTIL_MakeVectors(pev->v_angle + pev->punchangle);
-// 		return gpGlobals->v_forward;
-// 	}
-
-// 	Vector vecSrc = GetGunPosition();
-// 	float flDist = 8192;
-
-// 	// always use non-sticky autoaim
-// 	// UNDONE: use sever variable to chose!
-// 	if (true || g_iSkillLevel == SKILL_MEDIUM)
-// 	{
-// 		m_vecAutoAim = Vector(0, 0, 0);
-// 		// flDelta *= 0.5;
-// 	}
-
-// 	bool m_fOldTargeting = m_fOnTarget;
-// 	Vector angles = AutoaimDeflection(vecSrc, flDist, flDelta);
-
-// 	// update ontarget if changed
-// 	if (!g_pGameRules->AllowAutoTargetCrosshair())
-// 		m_fOnTarget = false;
-// 	else if (m_fOldTargeting != m_fOnTarget)
-// 	{
-// 		m_pActiveItem->UpdateItemInfo();
-// 	}
-
-// 	if (angles.x > 180)
-// 		angles.x -= 360;
-// 	if (angles.x < -180)
-// 		angles.x += 360;
-// 	if (angles.y > 180)
-// 		angles.y -= 360;
-// 	if (angles.y < -180)
-// 		angles.y += 360;
-
-// 	if (angles.x > 25)
-// 		angles.x = 25;
-// 	if (angles.x < -25)
-// 		angles.x = -25;
-// 	if (angles.y > 12)
-// 		angles.y = 12;
-// 	if (angles.y < -12)
-// 		angles.y = -12;
-
-
-// 	// always use non-sticky autoaim
-// 	// UNDONE: use sever variable to chose!
-// 	if (false || g_iSkillLevel == SKILL_EASY)
-// 	{
-// 		m_vecAutoAim = m_vecAutoAim * 0.67 + angles * 0.33;
-// 	}
-// 	else
-// 	{
-// 		m_vecAutoAim = angles * 0.9;
-// 	}
-
-// 	// m_vecAutoAim = m_vecAutoAim * 0.99;
-
-// 	// Don't send across network if sv_aim is 0
-// 	if (g_psv_aim->value != 0 && g_psv_allow_autoaim != 0)
-// 	{
-// 		if (m_vecAutoAim.x != m_lastx ||
-// 			m_vecAutoAim.y != m_lasty)
-// 		{
-// 			SET_CROSSHAIRANGLE(edict(), -m_vecAutoAim.x, m_vecAutoAim.y);
-
-// 			m_lastx = m_vecAutoAim.x;
-// 			m_lasty = m_vecAutoAim.y;
-// 		}
-// 	}
-// 	else
-// 	{
-// 		ResetAutoaim();
-// 	}
-
-// 	// ALERT( at_console, "%f %f\n", angles.x, angles.y );
-
-// 	UTIL_MakeVectors(pev->v_angle + pev->punchangle + m_vecAutoAim);
-// 	return gpGlobals->v_forward;
-// }
-// BSVR end
-
-// BSVR start
-Vector CBasePlayer::GetAimAngles()
-{
-	return UTIL_VecToAngles(GetAutoaimVector());
-}
-
-Vector CBasePlayer::GetAutoaimVector(float flDelta)
-{
-	// Gun position and angles determined by attachments on weapon model - Max Makes Mods, 2019-03-30
-	if (m_vrControllers[VRControllerID::WEAPON].IsValid())
-	{
-		Vector pos1;
-		Vector pos2;
-		bool result1 = m_vrControllers[VRControllerID::WEAPON].GetAttachment(VR_MUZZLE_ATTACHMENT, pos1);
-		bool result2 = m_vrControllers[VRControllerID::WEAPON].GetAttachment(VR_MUZZLE_ATTACHMENT + 1, pos2);
-		if (result1 && result2 && pos2 != pos1)
-		{
-			return (pos2 - pos1).Normalize();
-		}
-	}
-	UTIL_MakeAimVectors(GetWeaponAngles());
-	return gpGlobals->v_forward;
-}
-// BSVR end
-
-// BSVR start - commented out original
-// Vector CBasePlayer::AutoaimDeflection(Vector& vecSrc, float flDist, float flDelta)
-// {
-// 	edict_t* pEdict = UTIL_GetEntityList() + 1;
-// 	CBaseEntity* pEntity;
-// 	float bestdot;
-// 	Vector bestdir;
-// 	edict_t* bestent;
-// 	TraceResult tr;
-
-// 	if (g_psv_aim->value == 0 || g_psv_allow_autoaim->value == 0)
-// 	{
-// 		m_fOnTarget = false;
-// 		return g_vecZero;
-// 	}
-
-// 	UTIL_MakeVectors(pev->v_angle + pev->punchangle + m_vecAutoAim);
-
-// 	// try all possible entities
-// 	bestdir = gpGlobals->v_forward;
-// 	bestdot = flDelta; // +- 10 degrees
-// 	bestent = NULL;
-
-// 	m_fOnTarget = false;
-
-// 	UTIL_TraceLine(vecSrc, vecSrc + bestdir * flDist, dont_ignore_monsters, edict(), &tr);
-
-
-// 	if (tr.pHit && tr.pHit->v.takedamage != DAMAGE_NO)
-// 	{
-// 		// don't look through water
-// 		if (!((pev->waterlevel != 3 && tr.pHit->v.waterlevel == 3) || (pev->waterlevel == 3 && tr.pHit->v.waterlevel == 0)))
-// 		{
-// 			if (tr.pHit->v.takedamage == DAMAGE_AIM)
-// 				m_fOnTarget = true;
-
-// 			return m_vecAutoAim;
-// 		}
-// 	}
-
-// 	for (int i = 1; i < gpGlobals->maxEntities; i++, pEdict++)
-// 	{
-// 		Vector center;
-// 		Vector dir;
-// 		float dot;
-
-// 		if (0 != pEdict->free) // Not in use
-// 			continue;
-
-// 		if (pEdict->v.takedamage != DAMAGE_AIM)
-// 			continue;
-// 		if (pEdict == edict())
-// 			continue;
-// 		//		if (pev->team > 0 && pEdict->v.team == pev->team)
-// 		//			continue;	// don't aim at teammate
-// 		if (!g_pGameRules->ShouldAutoAim(this, pEdict))
-// 			continue;
-
-// 		pEntity = Instance(pEdict);
-// 		if (pEntity == NULL)
-// 			continue;
-
-// 		if (!pEntity->IsAlive())
-// 			continue;
-
-// 		// don't look through water
-// 		if ((pev->waterlevel != 3 && pEntity->pev->waterlevel == 3) || (pev->waterlevel == 3 && pEntity->pev->waterlevel == 0))
-// 			continue;
-
-// 		center = pEntity->BodyTarget(vecSrc);
-
-// 		dir = (center - vecSrc).Normalize();
-
-// 		// make sure it's in front of the player
-// 		if (DotProduct(dir, gpGlobals->v_forward) < 0)
-// 			continue;
-
-// 		dot = fabs(DotProduct(dir, gpGlobals->v_right)) + fabs(DotProduct(dir, gpGlobals->v_up)) * 0.5;
-
-// 		// tweek for distance
-// 		dot *= 1.0 + 0.2 * ((center - vecSrc).Length() / flDist);
-
-// 		if (dot > bestdot)
-// 			continue; // to far to turn
-
-// 		UTIL_TraceLine(vecSrc, center, dont_ignore_monsters, edict(), &tr);
-// 		if (tr.flFraction != 1.0 && tr.pHit != pEdict)
-// 		{
-// 			// ALERT( at_console, "hit %s, can't see %s\n", STRING( tr.pHit->v.classname ), STRING( pEdict->v.classname ) );
-// 			continue;
-// 		}
-
-// 		// don't shoot at friends
-// 		if (IRelationship(pEntity) < 0)
-// 		{
-// 			if (!pEntity->IsPlayer() && !g_pGameRules->IsDeathmatch())
-// 				// ALERT( at_console, "friend\n");
-// 				continue;
-// 		}
-
-// 		// can shoot at this one
-// 		bestdot = dot;
-// 		bestent = pEdict;
-// 		bestdir = dir;
-// 	}
-
-// 	if (bestent)
-// 	{
-// 		bestdir = UTIL_VecToAngles(bestdir);
-// 		bestdir.x = -bestdir.x;
-// 		bestdir = bestdir - pev->v_angle - pev->punchangle;
-
-// 		if (bestent->v.takedamage == DAMAGE_AIM)
-// 			m_fOnTarget = true;
-
-// 		return bestdir;
-// 	}
-
-// 	return Vector(0, 0, 0);
-// }
-
-
-// void CBasePlayer::ResetAutoaim()
-// {
-// 	if (m_vecAutoAim.x != 0 || m_vecAutoAim.y != 0)
-// 	{
-// 		m_vecAutoAim = Vector(0, 0, 0);
-// 		SET_CROSSHAIRANGLE(edict(), 0, 0);
-// 	}
-// 	m_fOnTarget = false;
-// }
-// BSVR end
 
 /*
 =============

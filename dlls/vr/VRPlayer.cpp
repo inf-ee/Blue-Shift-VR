@@ -1601,3 +1601,43 @@ void CBasePlayer::VRSendRestoreYaw()
 		vr_needsToSendRestoreYawMsgToClient = false;
 	}
 }
+
+// Weapon aim from the controller: replace the SDK GetGunPosition and GetAutoaimVector (early return there)
+Vector CBasePlayer::VRGetGunPosition()
+{
+	// Gun position and angles determined by attachments on weapon model - Max Makes Mods, 2019-03-30
+	if (m_vrControllers[VRControllerID::WEAPON].IsValid())
+	{
+		Vector pos;
+		bool result = m_vrControllers[VRControllerID::WEAPON].GetAttachment(VR_MUZZLE_ATTACHMENT, pos);
+		if (result)
+		{
+			return pos;
+		}
+	}
+
+	return GetWeaponPosition();
+}
+
+Vector CBasePlayer::GetAimAngles()
+{
+	return UTIL_VecToAngles(GetAutoaimVector());
+}
+
+Vector CBasePlayer::VRGetAutoaimVector()
+{
+	// Gun position and angles determined by attachments on weapon model - Max Makes Mods, 2019-03-30
+	if (m_vrControllers[VRControllerID::WEAPON].IsValid())
+	{
+		Vector pos1;
+		Vector pos2;
+		bool result1 = m_vrControllers[VRControllerID::WEAPON].GetAttachment(VR_MUZZLE_ATTACHMENT, pos1);
+		bool result2 = m_vrControllers[VRControllerID::WEAPON].GetAttachment(VR_MUZZLE_ATTACHMENT + 1, pos2);
+		if (result1 && result2 && pos2 != pos1)
+		{
+			return (pos2 - pos1).Normalize();
+		}
+	}
+	UTIL_MakeAimVectors(GetWeaponAngles());
+	return gpGlobals->v_forward;
+}

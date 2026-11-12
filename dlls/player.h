@@ -508,6 +508,8 @@ private:
 	void VRFlashlightTurnOff();
 	void VRSendTrainControls();
 	void VRSendRestoreYaw();
+	Vector VRGetGunPosition();
+	Vector VRGetAutoaimVector();
 
 	// public VR methods:
 public:

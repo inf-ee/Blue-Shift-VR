@@ -38,3 +38,10 @@ physent_t* PM_Ladder2(void);
 bool PM_TryUnstuck();
 void PM_YesClip(physent_t* pLadder);
 void PM_HandleMovement(physent_t* pLadder);
+
+// Hooks called from the SDK functions, defined in VRPMSharedFunctions.h
+void PM_VRLadderMove(physent_t* pLadder);
+void PM_VRMove(physent_t* pLadder);
+bool PM_VRCheckStuck(qboolean server);
+void PM_VRWaterWishVelocity(Vector& wishvel);
+void PM_VRDuckSpeedAndHull();

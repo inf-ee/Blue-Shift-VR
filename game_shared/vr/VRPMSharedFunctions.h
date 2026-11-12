@@ -385,3 +385,340 @@ struct playermove_s* PM_GetPlayerMove(void)
 {
 	return pmove;
 }
+
+// Hooks called from the SDK functions in pm_shared.cpp
+
+// Replaces the SDK PM_LadderMove (early return there): Half-Life: VR ladder movement
+void PM_VRLadderMove(physent_t* pLadder)
+{
+	if (VRGlobalGetNoclipMode())
+	{
+		return;
+	}
+
+	int ladderMode = VRGetLadderMode();
+	if (ladderMode == VR_LADDER_MODE_IMMERSIVE_ONLY)
+	{
+		return;
+	}
+
+	pmove->gravity = 0;
+	pmove->movetype = MOVETYPE_FLY;
+
+	Vector modelmins{0.f, 0.f, 0.f};
+	Vector modelmaxs{0.f, 0.f, 0.f};
+	pmove->PM_GetModelBounds(pLadder->model, modelmins, modelmaxs);
+
+	Vector ladderCenter{0.f, 0.f, 0.f};
+	VectorAdd(modelmins, modelmaxs, ladderCenter);
+	VectorScale(ladderCenter, 0.5, ladderCenter);
+	VectorAdd(ladderCenter, pLadder->origin, ladderCenter);
+
+	bool onFloor = ((pmove->flags & FL_ONGROUND) != 0) || pmove->onground >= 0;
+
+	if (!onFloor)
+	{
+		Vector floor{0.f, 0.f, 0.f};
+		VectorCopy(pmove->origin, floor);
+		floor[2] += pmove->player_mins[pmove->usehull][2] - 1;
+		onFloor = pmove->PM_PointContents(floor, nullptr) == CONTENTS_SOLID;
+	}
+
+	trace_t trace{0};
+	float result = pmove->PM_TraceModel(pLadder, pmove->origin, ladderCenter, &trace);
+	if (result >= 0.f && result < 1.f && trace.fraction >= 0.f && trace.fraction < 1.f && !IS_NAN(trace.plane.normal[0]) && !IS_NAN(trace.plane.normal[1]) && !IS_NAN(trace.plane.normal[2]))
+	{
+		if ((pmove->cmd.buttons & IN_JUMP) != 0 && ladderMode == VR_LADDER_MODE_LEGACY_ONLY)
+		{
+			pmove->movetype = MOVETYPE_NOCLIP; // pmove->movetype = MOVETYPE_WALK; Restore to MOVETYPE_NOCLIP in VR
+			VectorScale(trace.plane.normal, 270, pmove->velocity);
+		}
+		else
+		{
+			float forwardSpeed = DEFAULT_MOVEMENT_SPEED;
+			float backSpeed = DEFAULT_MOVEMENT_SPEED;
+			float sideSpeed = DEFAULT_MOVEMENT_SPEED;
+			float upSpeed = DEFAULT_MOVEMENT_SPEED;
+			float maxClimbSpeed = DEFAULT_MAX_CLIMB_SPEED;
+			float maxSidewaysSpeed = DEFAULT_MAX_SIDEWAYS_SPEED;
+			VRGetCVARSpeeds(forwardSpeed, backSpeed, sideSpeed, upSpeed);
+			VRGetMaxClimbSpeed(maxClimbSpeed, maxSidewaysSpeed);
+			if (forwardSpeed <= 1.f)
+				forwardSpeed = DEFAULT_MOVEMENT_SPEED;
+			if (backSpeed <= 1.f)
+				backSpeed = DEFAULT_MOVEMENT_SPEED;
+			if (sideSpeed <= 1.f)
+				sideSpeed = DEFAULT_MOVEMENT_SPEED;
+			if (upSpeed <= 1.f)
+				upSpeed = DEFAULT_MOVEMENT_SPEED;
+			if (maxClimbSpeed <= 1.f)
+				maxClimbSpeed = DEFAULT_MAX_CLIMB_SPEED;
+			if (maxSidewaysSpeed <= 1.f)
+				maxSidewaysSpeed = DEFAULT_MAX_SIDEWAYS_SPEED;
+
+			float up;
+			if (pmove->cmd.forwardmove > 0.f)
+			{
+				up = (pmove->cmd.forwardmove / forwardSpeed) * maxClimbSpeed;
+			}
+			else
+			{
+				up = (pmove->cmd.forwardmove / backSpeed) * maxClimbSpeed;
+			}
+			up += (pmove->cmd.upmove / upSpeed) * maxClimbSpeed;
+
+			float right = (pmove->cmd.sidemove / sideSpeed) * maxSidewaysSpeed;
+
+			if (up != 0.f || right != 0.f)
+			{
+				Vector ladderSize;
+				VectorSubtract(pLadder->maxs, pLadder->mins, ladderSize);
+
+				// get direction vectors for climbing on this ladder
+				Vector v_up{0.f, 0.f, 0.f};
+				Vector v_right{0.f, 0.f, 0.f};
+
+				// ladder is horizontal
+				if (fabs(trace.plane.normal[2]) > 0.995f)
+				{
+					// guesstimate vectors in horizontal ladder plane
+					if (ladderSize[0] > ladderSize[1])
+					{
+						v_up[0] = 1.f;
+						v_right[1] = -1.f;
+					}
+					else
+					{
+						v_up[1] = 1.f;
+						v_right[0] = 1.f;
+					}
+				}
+				else
+				{
+					// calculate vectors in vertical ladder plane
+					CrossProduct(Vector{0.f, 0.f, 1.f}, trace.plane.normal, v_right);
+					CrossProduct(trace.plane.normal, v_right, v_up);
+				}
+
+				// Calculate velocity
+				Vector velocity;
+				VectorScale(v_up, up, velocity);
+				VectorMA(velocity, right, v_right, velocity);
+
+				if (onFloor && velocity[2] < 0.f)
+				{
+					VectorScale(trace.plane.normal, Length(velocity), pmove->velocity);
+				}
+				else
+				{
+					VectorCopy(velocity, pmove->velocity);
+				}
+			}
+			else
+			{
+				VectorClear(pmove->velocity);
+			}
+		}
+	}
+
+	PM_CheckVelocity();
+}
+
+// End of PM_PlayerMove, replaces the SDK movement switch (early return there): movement with auto-duck, see PM_HandleMovement
+void PM_VRMove(physent_t* pLadder)
+{
+	// Always calculate movement (on land) as if ducking, then afterwards unduck if possible or stay ducked if not possible (this essentially makes players autoduck if necessary)
+	// In water we don't do this, as it messes with waterjump
+	bool tryAutoDuck = VRIsAutoDuckingEnabled(pmove->player_index) && pmove->usehull == 0 && (pmove->flags & FL_DUCKING) == 0 && nullptr == pLadder && pmove->waterlevel == 0;
+
+	if (tryAutoDuck && pmove->onground != -1)
+	{
+		// same logic as in PM_CategorizePosition()
+		Vector point;
+		VectorCopy(pmove->origin, point);
+		point[2] -= 2.f;
+		auto tr = pmove->PM_PlayerTrace(pmove->origin, point, PM_NORMAL, -1);
+		// don't auto crouch if surface isn't horizontal
+		if (tr.fraction >= 1.f || tr.plane.normal[2] < 1.f)
+		{
+			tryAutoDuck = false;
+		}
+	}
+	if (tryAutoDuck)
+	{
+		// Backup original origin and velocity (velocity gets changed to add in gravity!)
+		Vector original_origin;
+		Vector original_velocity;
+		VectorCopy(pmove->origin, original_origin);
+		VectorCopy(pmove->velocity, original_velocity);
+
+		// Move standing up
+		PM_HandleMovement(pLadder);
+
+		// Backup standmove origin
+		Vector standmove_origin;
+		Vector standmove_velocity;
+		VectorCopy(pmove->origin, standmove_origin);
+		VectorCopy(pmove->velocity, standmove_velocity);
+
+		// Restore original origin and velocity
+		VectorCopy(original_origin, pmove->origin);
+		VectorCopy(original_velocity, pmove->velocity);
+		PM_CatagorizePosition();
+
+		// Set crouching
+		pmove->usehull = 1;
+		pmove->flags |= FL_DUCKING;
+		pmove->origin[2] = pmove->origin[2] + pmove->player_mins[0][2] - pmove->player_mins[1][2];
+
+		// Make sure we stay onground when switching to crouching
+		if (pmove->onground != -1) // upstream: IsOnGround()
+		{
+			PM_CatagorizePosition();
+			int tries = 0;
+			while (pmove->onground == -1 && tries < 20) // upstream: !IsOnGround()
+			{
+				pmove->origin[2] -= 0.1f;
+				PM_CatagorizePosition();
+				tries++;
+			}
+			// if we can't get properly back on ground, smth is wrong, and we cannot reliably do auto-crouch (steep ground or whatever), cancel and use standing movement
+			if (pmove->onground == -1) // upstream: !IsOnGround()
+			{
+				VectorCopy(standmove_origin, pmove->origin);
+				VectorCopy(standmove_velocity, pmove->velocity);
+				pmove->usehull = 0;
+				pmove->flags &= ~FL_DUCKING;
+				PM_CatagorizePosition();
+				return;
+			}
+		}
+
+		// Move crouching
+		PM_HandleMovement(pLadder);
+
+		// Backup duckmove origin
+		Vector duckmove_origin;
+		VectorCopy(pmove->origin, duckmove_origin);
+
+		// Get distance moved ducking and standing
+		Vector standmove_dist;
+		Vector duckmove_dist;
+		VectorSubtract(standmove_origin, original_origin, standmove_dist);
+		VectorSubtract(duckmove_origin, original_origin, duckmove_dist);
+
+		// Restore standing
+		pmove->usehull = 0;
+		pmove->flags &= ~FL_DUCKING;
+
+		// Use ducking if we walked 50% further ducking than standing (happens on entering something where we must duck)
+		if (duckmove_dist.Length2D() > standmove_dist.Length2D() * 1.5f)
+		{
+			// check if we can actually stand at the ducking origin!
+			Vector standing_ducking_origin;
+			VectorCopy(duckmove_origin, standing_ducking_origin);
+			standing_ducking_origin[2] = standing_ducking_origin[2] + pmove->player_mins[1][2] - pmove->player_mins[0][2];
+			if (pmove->PM_TestPlayerPosition(standing_ducking_origin, nullptr) < 0)
+			{
+				// use standing origin, if we can actually stand at the ducking origin!
+				VectorCopy(standmove_origin, pmove->origin);
+				VectorCopy(standmove_velocity, pmove->velocity);
+			}
+			else
+			{
+				// ducking origin is further away, and we can't stand here, really use ducking origin and stay ducked
+				pmove->usehull = 1;
+				pmove->flags |= FL_DUCKING;
+				VectorCopy(duckmove_origin, pmove->origin);
+			}
+		}
+		else // Use standing otherwise
+		{
+			VectorCopy(standmove_origin, pmove->origin);
+			VectorCopy(standmove_velocity, pmove->velocity);
+		}
+	}
+	else
+	{
+		PM_HandleMovement(pLadder);
+	}
+
+	PM_CatagorizePosition();
+}
+
+// PM_PlayerMove: VR unstuck handling, returns true when the player can't move this frame
+bool PM_VRCheckStuck(qboolean server)
+{
+	if (!VRGlobalGetNoclipMode() && pmove->movetype != MOVETYPE_NONE)
+	{
+		bool dontUnstuck = false;
+		int stuckent = pmove->PM_TestPlayerPosition(pmove->origin, nullptr);
+		if (stuckent > 0)
+		{
+			// Tell server dll that we got stuck in an entity - server dll can then determine if this entity should kill us or not
+			dontUnstuck = VRNotifyStuckEnt(pmove->player_index, pmove->physents[stuckent].info);
+		}
+		if (PM_CheckStuck() || stuckent >= 0)
+		{
+			// When we're stuck, move away if our move direction is going away from whatever we're stuck on
+			// (Only unstuck us on server, to not interfere with dontUnstuck, which is only set by server)
+			if ((0 != server || 0 != pmove->server) && !dontUnstuck)
+			{
+				if (!PM_TryUnstuck())
+				{
+					return true;
+				}
+			}
+			else
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+// PM_WaterMove: sinking and swimming up/down with the jump and duck buttons
+void PM_VRWaterWishVelocity(Vector& wishvel)
+{
+	if (0 == pmove->cmd.forwardmove && 0 == pmove->cmd.sidemove && 0 == pmove->cmd.upmove && (pmove->oldbuttons & (IN_JUMP | IN_DUCK)) == 0)
+	{
+		if (IsInWaterAndIsGravityDisabled())
+		{
+			wishvel[2] = 0;
+		}
+		else
+		{
+			wishvel[2] -= 60; // drift towards bottom
+		}
+	}
+	else
+	{
+		// Go straight up by upmove amount.
+		wishvel[2] += pmove->cmd.upmove;
+		if ((pmove->oldbuttons & IN_JUMP) != 0)
+		{
+			wishvel[2] += 320.f;
+		}
+		if ((pmove->oldbuttons & IN_DUCK) != 0)
+		{
+			wishvel[2] -= 320.f;
+		}
+	}
+}
+
+// End of PM_Duck: slower movement and the duck hull while ducking
+void PM_VRDuckSpeedAndHull()
+{
+	if ((pmove->flags & FL_DUCKING) != 0)
+	{
+		pmove->cmd.forwardmove *= 0.333;
+		pmove->cmd.sidemove *= 0.333;
+		pmove->cmd.upmove *= 0.333;
+		pmove->usehull = 1;
+	}
+	else
+	{
+		pmove->usehull = 0;
+	}
+}

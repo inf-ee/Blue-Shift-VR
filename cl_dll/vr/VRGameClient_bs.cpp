@@ -58,7 +58,7 @@ const char* VRGame::GetSkyboxName(const char* mapName)
 
 const char* VRGame::GetModTitle()
 {
-	return "Half-Life: VR";
+	return "Half-Life: Blue Shift VR";
 }
 
 const char* VRGame::GetVersionFilePath()

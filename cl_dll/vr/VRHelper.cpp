@@ -104,12 +104,6 @@ extern engine_studio_api_t IEngineStudio;
 
 extern cl_entity_t* SaveGetLocalPlayer();
 
-enum class VRControllerID : int32_t
-{
-	WEAPON = 0,
-	HAND
-};
-
 float VRGetSmoothStepsSetting()
 {
 	if (CVAR_GET_FLOAT("vr_smooth_steps") == 0.f)
@@ -1449,7 +1443,6 @@ bool VRHelper::HasValidHandController()
 }
 
 // VR related functions
-#define VR_MUZZLE_ATTACHMENT 0
 Vector VRHelper::GetGunPosition()
 {
 	cl_entity_t* viewent = gEngfuncs.GetViewModel();

@@ -1,5 +1,18 @@
 #pragma once
 
+#include <cstdint>
+
+// Definitions shared by the client and the server VR code
+
+enum class VRControllerID : int32_t
+{
+	WEAPON = 0,
+	HAND,
+	INVALID
+};
+
+// Index of the muzzle attachment in VR weapon and hand models (the attachment after it gives the aim direction)
+#define VR_MUZZLE_ATTACHMENT 0
 
 enum class VRPoseType
 {

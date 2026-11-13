@@ -1107,28 +1107,9 @@ float GetTrainSpeed(const char* cvarname)
 	return speed;
 }
 
-bool IsTrashCompactor(CBaseEntity* pEntity)
-{
-	// if (!pEntity)
-	// 	return false;
-
-	// std::string modelname = STRING(pEntity->pev->model);
-
-	// if (modelname.empty() || modelname[0] != '*')
-	// 	return false;
-
-	// std::string mapname = STRING(INDEXENT(0)->v.model);
-
-	// if (mapname != std::string{ "maps/c2a3e.bsp" })
-	// 	return false;
-
-	// return modelname == "*6" || modelname == "*13";
-	return false;
-}
-
 bool CBasePlayer::IsUsableTrackTrain(CBaseEntity* pTrain)
 {
-	return nullptr != pTrain && !FBitSet(pTrain->pev->spawnflags, SF_TRACKTRAIN_NOCONTROL) && FBitSet(pTrain->ObjectCaps(), FCAP_DIRECTIONAL_USE) && pTrain->OnControls(pev) && !IsTrashCompactor(pTrain);
+	return nullptr != pTrain && !FBitSet(pTrain->pev->spawnflags, SF_TRACKTRAIN_NOCONTROL) && FBitSet(pTrain->ObjectCaps(), FCAP_DIRECTIONAL_USE) && pTrain->OnControls(pev) && !VRGame::IsTrashCompactor(pTrain);
 }
 
 void CBasePlayer::StoreVROffsetsForLevelchange()
@@ -1257,7 +1238,7 @@ void CBasePlayer::VRPreThinkControllersAndTrain()
 				m_iTrain = TrainSpeed(pMaybeTrain->pev->speed, pMaybeTrain->pev->impulse);
 				m_iTrain |= TRAIN_NEW;
 				EMIT_SOUND(ENT(pev), CHAN_ITEM, "plats/train_use1.wav", 0.8, ATTN_NORM);
-				// VRAchievementsAndStatsTracker::PlayerUsedTrain(this);
+				VRGame::OnPlayerUsedTrain(this);
 			}
 		}
 	}
@@ -1485,13 +1466,7 @@ void CBasePlayer::VRKilled(entvars_t* pevAttacker, int iGib)
 	// 	ALERT(at_console, "Killed by world, damage type: %s, iGib: %s\n", DamageBitsToString(bitsDamageType).data(), GibToString(iGib));
 	// }
 
-	// if (pevAttacker
-	// 	&& FClassnameIs(pevAttacker, "func_tank")
-	// 	&& (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a5c.bsp") || FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a5e.bsp") || FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a2g.bsp"))
-	// 	&& (FStrEq(STRING(pevAttacker->targetname), "sniper1") || FStrEq(STRING(pevAttacker->targetname), "sniper2")))
-	// {
-	// 	UTIL_VRGiveAchievement(this, VRAchievement::GEN_SNIPED);
-	// }
+	VRGame::OnPlayerKilled(this, pevAttacker);
 }
 
 // Save, after the PLAYER fields

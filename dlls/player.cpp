@@ -54,6 +54,7 @@
 #include "vr/VRModelHelper.h"
 #include "vr/VRMovementHandler.h"
 #include "vr/VRControllerModel.h"
+#include "vr/VRGameServer.h"
 // BSVR end
 
 // #define DUCKFIX
@@ -399,20 +400,9 @@ bool CBasePlayer::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, fl
 		return false;
 	}
 
-	// //  start of office complex
-	// if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a2.bsp"))
-	// {
-	// 	// ceiling light that zaps the player
-	// 	if (FStrEq(STRING(pevInflictor->classname), "trigger_hurt") && FStrEq(STRING(pevInflictor->targetname), "kill_player_zap"))
-	// 	{
-	// 		UTIL_VRGiveAchievement(this, VRAchievement::OC_OSHAVIOLATION);
-	// 	}
-	// 	// fan that kills player in vents if not ducked
-	// 	else if (FStrEq(STRING(pevInflictor->classname), "func_rotating") && FStrEq(STRING(pevInflictor->model), "*76"))
-	// 	{
-	// 		UTIL_VRGiveAchievement(this, VRAchievement::OC_DUCK);
-	// 	}
-	// }
+	// BSVR start
+	VRGame::OnPlayerTakeDamage(this, pevInflictor);
+	// BSVR end
 
 	// keep track of amount of damage last sustained
 	m_lastDamageAmount = flDamage;
@@ -1459,10 +1449,6 @@ void CBasePlayer::StartObserver(Vector vecPosition, Vector vecViewAngle)
 	Observer_SetMode(m_iObserverLastMode);
 }
 
-// BSVR start
-bool IsTrashCompactor(CBaseEntity* pEntity); // vr/VRPlayer.cpp, for the disabled check in PlayerUse
-// BSVR end
-
 //
 // PlayerUse - handles USE keypress
 //
@@ -1534,7 +1520,7 @@ void CBasePlayer::PlayerUse()
 						m_iTrain = TrainSpeed(pMaybeTrain->pev->speed, pMaybeTrain->pev->impulse);
 						m_iTrain |= TRAIN_NEW;
 						EMIT_SOUND(ENT(pev), CHAN_ITEM, "plats/train_use1.wav", 0.8, ATTN_NORM);
-						// VRAchievementsAndStatsTracker::PlayerUsedTrain(this);
+						VRGame::OnPlayerUsedTrain(this);
 						return;
 					}
 				}
@@ -1543,12 +1529,7 @@ void CBasePlayer::PlayerUse()
 		}
 
 		// BSVR start
-		// // Check if player tries to use the trash compactors as train (which is possible in vanilla halflife)
-		// CBaseEntity* pMaybeTrash = CBaseEntity::InstanceOrWorld(pev->groundentity);
-		// if (IsTrashCompactor(pMaybeTrash))
-		// {
-		// 	UTIL_VRGiveAchievement(this, VRAchievement::HID_NOTTRAINS);
-		// }
+		VRGame::OnPlayerUsePressed(this);
 		// BSVR end
 	}
 
@@ -3157,18 +3138,10 @@ bool CBasePlayer::Restore(CRestore& restore)
 		// BSVR end
 	}
 	// BSVR start
-	// else
-	// {
-	// 	// Fix weird bug that puts players slightly too low under the actual spawn location in c4a1f
-	// 	if (STRING(INDEXENT(0)->v.model) == std::string{ "maps/c4a1f.bsp" })
-	// 	{
-	// 		edict_t* pentLandmark = UTIL_FindLandmark("c4a1f");
-	// 		if (pentLandmark)
-	// 		{
-	// 			pev->origin = VARS(pentLandmark)->origin + Vector(0, 0, 1);
-	// 		}
-	// 	}
-	// }
+	else
+	{
+		VRGame::OnPlayerRestoredWithLandmark(this);
+	}
 	// BSVR end
 
 	pev->v_angle.z = 0; // Clear out roll

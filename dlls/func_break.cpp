@@ -27,6 +27,9 @@
 #include "func_break.h"
 #include "decals.h"
 #include "explode.h"
+// BSVR start
+#include "vr/VRGameServer.h"
+// BSVR end
 
 // =================== FUNC_Breakable ==============================================
 
@@ -652,39 +655,7 @@ bool CBreakable::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, flo
 void CBreakable::Die()
 {
 	// BSVR start
-	// destroyed by trigger
-	// if (m_killMethod == KillMethod::TRIGGER)
-	// {
-	// 	// map with kitchen
-	// 	if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a0d.bsp"))
-	// 	{
-	// 		// microwave stew
-	// 		if (FStrEq(STRING(pev->targetname), "stewgibs"))
-	// 		{
-	// 			UTIL_VRGiveAchievementAll(VRAchievement::AM_MAGNUSSON);
-	// 		}
-	// 	}
-	// }
-
-	// // Blast Pit map outside tentacles/rocket silo
-	// if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a4b.bsp"))
-	// {
-	// 	if (FStrEq(STRING(pev->targetname), "barrel_explosion_1")
-	// 		|| FStrEq(STRING(pev->targetname), "barrel_explosion_1d")
-	// 		|| FStrEq(STRING(pev->targetname), "barrel_explosion_1e"))
-	// 	{
-	// 		VRAchievementsAndStatsTracker::PlayerDestroyedBlastPitBridge();
-	// 	}
-	// }
-	// // Blast Pit map with that big fan
-	// else if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a4e.bsp"))
-	// {
-	// 	// grate above big fan, if this breaks, player solved puzzle or cheated
-	// 	if (FStrEq(STRING(pev->model), "*24"))
-	// 	{
-	// 		VRAchievementsAndStatsTracker::PlayerSolvedBlastPitFan();
-	// 	}
-	// }
+	VRGame::OnBreakableDie(this, m_killMethod == KillMethod::TRIGGER);
 	// BSVR end
 
 	// Don't allow explosives to damage this again to prevent spawning multiple copies of items and gibs.

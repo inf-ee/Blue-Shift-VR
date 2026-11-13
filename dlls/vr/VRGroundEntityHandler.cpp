@@ -80,7 +80,7 @@ void VRGroundEntityHandler::DetectAndSetGroundEntity()
 					float b = gpGlobals->time;
 					if ((gpGlobals->time - m_pPlayer->m_spawnTime) > 2.f)
 					{
-						// UTIL_VRGiveAchievement(m_pPlayer, VRAchievement::HID_HOW);
+						VRGame::OnPlayerOutsideIntroTrain(m_pPlayer);
 					}
 
 					// if we fell out, teleport us back in

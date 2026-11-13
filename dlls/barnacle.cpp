@@ -21,6 +21,9 @@
 #include "cbase.h"
 #include "monsters.h"
 #include "schedule.h"
+// BSVR start
+#include "vr/VRGameServer.h"
+// BSVR end
 
 #define BARNACLE_BODY_HEIGHT 44 // how 'tall' the barnacle's model is.
 #define BARNACLE_PULL_SPEED 8
@@ -318,19 +321,7 @@ void CBarnacle::BarnacleThink()
 
 
 				// BSVR start
-				// // check if a scientist walked into the barnacle tongue while following a player, or after being pushed by the player
-				// if (FClassnameIs(pTouchEnt->pev, "monster_scientist"))
-				// {
-				// 	CBaseMonster* pMonster = dynamic_cast<CBaseMonster*>(pTouchEnt);
-				// 	if (pMonster)
-				// 	{
-				// 		// scientists use bits_COND_SPECIAL1 as bits_COND_CLIENT_PUSH
-				// 		if (pMonster->HasConditions(bits_COND_SPECIAL1) || pMonster->IsFollowing())
-				// 		{
-				// 			UTIL_VRGiveAchievementAll(VRAchievement::HID_ROPES);
-				// 		}
-				// 	}
-				// }
+				VRGame::OnBarnacleTongueTouch(this, pTouchEnt);
 				// BSVR end
 			}
 		}

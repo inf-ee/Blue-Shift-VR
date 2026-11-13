@@ -18,6 +18,7 @@
 #include "pm_defs.h"
 
 #include "VRControllerInteractionManager.h"
+#include "VRGameServer.h"
 #include "VRPhysicsHelper.h"
 #include "VRMovementHandler.h"
 #include "VRControllerModel.h"
@@ -464,9 +465,9 @@ void VRControllerInteractionManager::CheckAndPressButtons(CBasePlayer* pPlayer, 
 			continue;
 		}
 
-		if (FClassnameIs(pEntity->pev, "monster_houndeye") && !controller.HasDraggedEntity() && isTouching && (isDragging || controller.IsDragging()) && controller.GetWeaponId() == WEAPON_BAREHAND)
+		if (!controller.HasDraggedEntity() && isTouching && (isDragging || controller.IsDragging()) && controller.GetWeaponId() == WEAPON_BAREHAND)
 		{
-			// UTIL_VRGiveAchievement(pPlayer, VRAchievement::GEN_PETDOGGO);
+			VRGame::OnBareHandPetting(pPlayer, pEntity);
 		}
 
 		// vibrate if touching something solid (but not if we are dragging it!)

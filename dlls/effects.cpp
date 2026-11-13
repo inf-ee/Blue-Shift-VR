@@ -22,6 +22,9 @@
 #include "decals.h"
 #include "func_break.h"
 #include "shake.h"
+// BSVR start
+#include "vr/VRGameServer.h"
+// BSVR end
 
 #define SF_GIBSHOOTER_REPEATABLE 1 // allows a gibshooter to be refired
 
@@ -2343,10 +2346,9 @@ void CItemSoda::Drink(CBaseEntity* pDrinker)
 	pev->nextthink = gpGlobals->time;
 
 
-	// if (pDrinker && pDrinker->IsNetClient())
-	// {
-	// 	UTIL_VRGiveAchievement(pDrinker, VRAchievement::GEN_REFRESHING);
-	// }
+	// BSVR start
+	VRGame::OnSodaDrunk(pDrinker);
+	// BSVR end
 }
 
 // commented out originals

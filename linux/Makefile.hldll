@@ -172,6 +172,7 @@ VR_OBJS = \
 	$(VR_OBJ_DIR)/VRBreakable.o \
 	$(VR_OBJ_DIR)/VRServerHooks.o \
 	$(VR_OBJ_DIR)/VRSpecialEntities.o \
+	$(VR_OBJ_DIR)/VRUserMessages.o \
 	$(VR_OBJ_DIR)/VRGameServer_$(VR_GAME).o
 
 all: dirs hl.$(SHLIBEXT)

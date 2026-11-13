@@ -63,3 +63,9 @@ bool CHudAmmo::IsCurrentWeaponLastWeapon()
 {
 	return m_pWeapon != nullptr && m_pWeapon->iSlot >= LastSlotWithWeapon() && m_pWeapon->iSlotPos >= LastSlotPosWithWeapon(m_pWeapon->iSlot);
 }
+
+// For weapons_shared.cpp and hl_weapons.cpp - Max Makes Mods, 2018-02-04
+bool GetHUDWeaponBlocked()
+{
+	return (gHUD.m_iHideHUDDisplay & HIDEHUD_WEAPONBLOCKED) != 0;
+}

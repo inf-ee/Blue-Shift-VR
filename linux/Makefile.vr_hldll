@@ -6,9 +6,11 @@
 .DEFAULT_GOAL := all
 
 VR_OBJ_DIR=$(HLDLL_OBJ_DIR)/vr
+# Third-party code the VR code uses, in external/
+VR_EXTERNAL_OBJ_DIR=$(HLDLL_OBJ_DIR)/external
 
 VR_OBJS = \
-	$(VR_OBJ_DIR)/hlmv_mathlib.o \
+	$(VR_EXTERNAL_OBJ_DIR)/hlmv/hlmv_mathlib.o \
 	$(VR_OBJ_DIR)/VRClientCommands.o \
 	$(VR_OBJ_DIR)/VRCommons.o \
 	$(VR_OBJ_DIR)/VRController.o \
@@ -39,3 +41,5 @@ VR_GAME_SHARED_OBJS = \
 	$(GAME_SHARED_OBJ_DIR)/vr/VRPMShared.o \
 	$(GAME_SHARED_OBJ_DIR)/vr/VRWeaponsShared.o
 
+$(VR_EXTERNAL_OBJ_DIR)/%.o : $(SOURCE_DIR)/external/%.cpp
+	mkdir -p $(dir $@) && $(DO_CC_EXCEPTIONS)

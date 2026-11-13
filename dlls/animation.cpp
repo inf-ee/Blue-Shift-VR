@@ -25,7 +25,7 @@
 #pragma warning(disable : 4244)
 
 // BSVR start
-#include "vr/hlmv_mathlib.h"
+#include "hlmv/hlmv_mathlib.h"
 
 constexpr const int VR_MAX_VALID_MODEL_SEQUENCE_BBOX_SIZE = 1024;
 // BSVR end

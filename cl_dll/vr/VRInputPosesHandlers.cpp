@@ -3,7 +3,7 @@
 #include <string>
 
 #include "hud.h"
-#include "openvr.h"
+#include "openvr/openvr.h"
 #include "VRInput.h"
 #include "VRRenderer.h"
 #include "VRHelper.h"

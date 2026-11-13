@@ -6,6 +6,8 @@
 .DEFAULT_GOAL := all
 
 VR_OBJ_DIR=$(HL1_OBJ_DIR)/vr
+# Third-party code the VR code uses, in external/
+VR_EXTERNAL_OBJ_DIR=$(HL1_OBJ_DIR)/external
 
 # VGUI2 SDK subset for the VR Options dialog (external/hl1_source_sdk/README_BSVR.md). Its files and VRClientVGUI.cpp
 # are built with the SDK's include paths and defines instead of the game's (both have interface.h, FileSystem.h, ...).
@@ -24,7 +26,7 @@ VR_LDFLAGS=-Wl,-Bsymbolic
 VR_LIBS=libopenvr_api.so -lGL $(SDK_DIR)/lib/public/libtier0.so $(SDK_DIR)/lib/public/libvstdlib.so
 
 VR_OBJS = \
-	$(HL1_OBJ_DIR)/vr/Matrices.o \
+	$(VR_EXTERNAL_OBJ_DIR)/songho/Matrices.o \
 	$(HL1_OBJ_DIR)/vr/VRCommon.o \
 	$(HL1_OBJ_DIR)/vr/VRCvarCache.o \
 	$(HL1_OBJ_DIR)/vr/VRHelper.o \
@@ -61,7 +63,7 @@ VR_OBJS = \
 	$(HL1_OBJ_DIR)/vr/VRRenderer.o \
 	$(HL1_OBJ_DIR)/vr/VRTextureHelper.o \
 	$(HL1_OBJ_DIR)/vr/VRGameClient_$(VR_GAME).o \
-	$(HL1_OBJ_DIR)/vr/lodepng.o \
+	$(VR_EXTERNAL_OBJ_DIR)/lodepng/lodepng.o \
 	$(HL1_OBJ_DIR)/vr/vr_gl.o
 
 VR_GAME_SHARED_OBJS = \
@@ -153,3 +155,5 @@ $(SDK_OBJ_DIR)/public/%.o: $(SDK_DIR)/public/%.cpp
 $(HL1_OBJ_DIR)/vr/%.o: $(HL_SRC_DIR)/vr/%.cpp $(filter-out $(wildcard  $(VR_OBJ_DIR)),  $(VR_OBJ_DIR))
 	$(DO_CC)
 
+$(VR_EXTERNAL_OBJ_DIR)/%.o: $(SOURCE_DIR)/external/%.cpp
+	mkdir -p $(dir $@) && $(DO_CC)

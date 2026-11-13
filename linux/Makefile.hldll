@@ -19,7 +19,7 @@ VR_GAME=bs
 
 CFLAGS=$(BASE_CFLAGS)  $(ARCH_CFLAGS)
 
-INCLUDEDIRS=-I$(HLDLL_SRC_DIR) -I$(ENGINE_SRC_DIR) -I$(COMMON_SRC_DIR) -I$(PM_SRC_DIR) -I$(GAME_SHARED_SRC_DIR) -I$(PUBLIC_SRC_DIR) -I$(SOURCE_DIR)/external/reactphysics3d/include
+INCLUDEDIRS=-I$(HLDLL_SRC_DIR) -I$(ENGINE_SRC_DIR) -I$(COMMON_SRC_DIR) -I$(PM_SRC_DIR) -I$(GAME_SHARED_SRC_DIR) -I$(PUBLIC_SRC_DIR) -I$(SOURCE_DIR)/external -I$(SOURCE_DIR)/external/reactphysics3d/include
 
 RP3D_LIB=$(SOURCE_DIR)/external/reactphysics3d/lib/Linux/libreactphysics3d.a
 

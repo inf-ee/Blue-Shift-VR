@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include "openvr.h"
+#include "openvr/openvr.h"
 
 #include "cl_dll.h"
 #include "vr/VRShared.h"

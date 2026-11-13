@@ -10,7 +10,7 @@
 #include "VRCommon.h"
 
 #include "vr_gl.h"
-#include "lodepng.h"
+#include "lodepng/lodepng.h"
 
 void VRTextureHelper::PreloadAllTextures(const std::filesystem::path& path)
 {

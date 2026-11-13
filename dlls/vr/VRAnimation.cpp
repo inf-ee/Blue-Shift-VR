@@ -8,7 +8,7 @@
 #pragma warning(disable : 4244)
 
 #include "vr/VRAnimation.h"
-#include "vr/hlmv_mathlib.h"
+#include "hlmv/hlmv_mathlib.h"
 
 int GetNumSequences(void* pmodel)
 {

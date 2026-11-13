@@ -11,6 +11,8 @@ PM_OBJ_DIR=$(HLDLL_OBJ_DIR)/pm_shared
 GAME_SHARED_OBJ_DIR=$(HLDLL_OBJ_DIR)/game_shared
 PUBLIC_OBJ_DIR=$(HLDLL_OBJ_DIR)/public
 COMMON_OBJ_DIR=$(HLDLL_OBJ_DIR)/common
+# Which per-game VR data file is compiled (dlls/vr/VRGameServer_<game>.cpp): hl, bs or op
+VR_GAME=bs
 VR_OBJ_DIR=$(HLDLL_OBJ_DIR)/vr
 # Which per-game VR data file is compiled (dlls/vr/VRGameServer_<game>.cpp): hl, bs or op
 VR_GAME=bs
@@ -25,6 +27,9 @@ LDFLAGS= $(CPP_LIB)
 
 DO_CC=$(CPLUS) $(INCLUDEDIRS) $(CFLAGS) -o $@ -c $<
 DO_CC_EXCEPTIONS=$(CPLUS) $(INCLUDEDIRS) $(filter-out -fno-exceptions,$(CFLAGS)) -fexceptions -o $@ -c $<
+
+# VR code: object lists and rules
+include Makefile.vr_hldll
 
 #####################################################################
 
@@ -138,42 +143,13 @@ PM_OBJS = \
 GAME_SHARED_OBJS = \
 	$(GAME_SHARED_OBJ_DIR)/filesystem_utils.o \
 	$(GAME_SHARED_OBJ_DIR)/voice_gamemgr.o \
-	$(GAME_SHARED_OBJ_DIR)/vr/VRPMShared.o \
-	$(GAME_SHARED_OBJ_DIR)/vr/VRWeaponsShared.o
+	$(VR_GAME_SHARED_OBJS)
 
 PUBLIC_OBJS = \
 	$(PUBLIC_OBJ_DIR)/interface.o \
 	
 COMMON_OBJS = \
 	$(COMMON_OBJ_DIR)/mathlib.o
-
-VR_OBJS = \
-	$(VR_OBJ_DIR)/hlmv_mathlib.o \
-	$(VR_OBJ_DIR)/VRClientCommands.o \
-	$(VR_OBJ_DIR)/VRCommons.o \
-	$(VR_OBJ_DIR)/VRController.o \
-	$(VR_OBJ_DIR)/VRControllerInteractionManager.o \
-	$(VR_OBJ_DIR)/VRControllerModel.o \
-	$(VR_OBJ_DIR)/VRControllerTeleporter.o \
-	$(VR_OBJ_DIR)/VRCrushEntityHandler.o \
-	$(VR_OBJ_DIR)/VREngineCallbacks.o \
-	$(VR_OBJ_DIR)/VREngineFuncSwaps.o \
-	$(VR_OBJ_DIR)/VREngineMessages.o \
-	$(VR_OBJ_DIR)/VRGroundEntityHandler.o \
-	$(VR_OBJ_DIR)/VRGibs.o \
-	$(VR_OBJ_DIR)/VRGrenadeDrag.o \
-	$(VR_OBJ_DIR)/VRModelHelper.o \
-	$(VR_OBJ_DIR)/VRMovementHandler.o \
-	$(VR_OBJ_DIR)/VRPhysicsHelper.o \
-	$(VR_OBJ_DIR)/VRPlayer.o \
-	$(VR_OBJ_DIR)/VRRotatableEnt.o \
-	$(VR_OBJ_DIR)/VRUtil.o \
-	$(VR_OBJ_DIR)/VRAnimation.o \
-	$(VR_OBJ_DIR)/VRBreakable.o \
-	$(VR_OBJ_DIR)/VRServerHooks.o \
-	$(VR_OBJ_DIR)/VRSpecialEntities.o \
-	$(VR_OBJ_DIR)/VRUserMessages.o \
-	$(VR_OBJ_DIR)/VRGameServer_$(VR_GAME).o
 
 all: dirs hl.$(SHLIBEXT)
 

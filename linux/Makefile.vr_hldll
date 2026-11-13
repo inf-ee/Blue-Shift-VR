@@ -1,0 +1,41 @@
+# VR code of the server DLL: object lists and rules. Included by Makefile.hldll, which sets VR_GAME
+# (the per-game data file dlls/vr/VRGameServer_<game>.cpp) before the include.
+# New files in dlls/vr or game_shared/vr are added here, not in Makefile.hldll.
+
+# The rule below comes before the including Makefile's first target
+.DEFAULT_GOAL := all
+
+VR_OBJ_DIR=$(HLDLL_OBJ_DIR)/vr
+
+VR_OBJS = \
+	$(VR_OBJ_DIR)/hlmv_mathlib.o \
+	$(VR_OBJ_DIR)/VRClientCommands.o \
+	$(VR_OBJ_DIR)/VRCommons.o \
+	$(VR_OBJ_DIR)/VRController.o \
+	$(VR_OBJ_DIR)/VRControllerInteractionManager.o \
+	$(VR_OBJ_DIR)/VRControllerModel.o \
+	$(VR_OBJ_DIR)/VRControllerTeleporter.o \
+	$(VR_OBJ_DIR)/VRCrushEntityHandler.o \
+	$(VR_OBJ_DIR)/VREngineCallbacks.o \
+	$(VR_OBJ_DIR)/VREngineFuncSwaps.o \
+	$(VR_OBJ_DIR)/VREngineMessages.o \
+	$(VR_OBJ_DIR)/VRGroundEntityHandler.o \
+	$(VR_OBJ_DIR)/VRGibs.o \
+	$(VR_OBJ_DIR)/VRGrenadeDrag.o \
+	$(VR_OBJ_DIR)/VRModelHelper.o \
+	$(VR_OBJ_DIR)/VRMovementHandler.o \
+	$(VR_OBJ_DIR)/VRPhysicsHelper.o \
+	$(VR_OBJ_DIR)/VRPlayer.o \
+	$(VR_OBJ_DIR)/VRRotatableEnt.o \
+	$(VR_OBJ_DIR)/VRUtil.o \
+	$(VR_OBJ_DIR)/VRAnimation.o \
+	$(VR_OBJ_DIR)/VRBreakable.o \
+	$(VR_OBJ_DIR)/VRServerHooks.o \
+	$(VR_OBJ_DIR)/VRSpecialEntities.o \
+	$(VR_OBJ_DIR)/VRUserMessages.o \
+	$(VR_OBJ_DIR)/VRGameServer_$(VR_GAME).o
+
+VR_GAME_SHARED_OBJS = \
+	$(GAME_SHARED_OBJ_DIR)/vr/VRPMShared.o \
+	$(GAME_SHARED_OBJ_DIR)/vr/VRWeaponsShared.o
+

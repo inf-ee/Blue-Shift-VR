@@ -15,9 +15,10 @@
 #undef HSPRITE
 #else
 #include <SDL2/SDL_messagebox.h>
+#endif
+
 #include <string>
 #include "VRGameClient.h"
-#endif
 
 #ifdef _WIN32
 namespace

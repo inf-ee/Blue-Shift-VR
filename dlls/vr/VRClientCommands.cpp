@@ -34,17 +34,17 @@ bool VRClientCommand(edict_t* pEntity, CBasePlayer* player, const char* pcmd)
 			player->ClearTeleporterPose();
 		}
 	}
-	else if (FStrEq(pcmd, "vr_wpnanim")) // Client side weapon animations are now sent to the server - Max Makes Mods, 2019-04-13
+	else if (FStrEq(pcmd, VR_CMD_WEAPON_ANIM)) // Client side weapon animations are now sent to the server - Max Makes Mods, 2019-04-13
 	{
 		int sequence = atoi(CMD_ARGV(1));
 		int body = atoi(CMD_ARGV(2));
 		player->PlayVRWeaponAnimation(sequence, body);
 	}
-	else if (FStrEq(pcmd, "vr_muzzleflash")) // Client side weapon animations are now sent to the server - Max Makes Mods, 2019-04-13
+	else if (FStrEq(pcmd, VR_CMD_MUZZLEFLASH)) // Client side weapon animations are now sent to the server - Max Makes Mods, 2019-04-13
 	{
 		player->PlayVRWeaponMuzzleflash();
 	}
-	else if (FStrEq(pcmd, "vrupd_hmd")) // Client sends update for VR related data - Max Makes Mods, 2017-08-18
+	else if (FStrEq(pcmd, VR_CMD_UPDATE_HMD)) // Client sends update for VR related data - Max Makes Mods, 2017-08-18
 	{
 		int size = CMD_ARGC();
 		if (size == 14)
@@ -67,7 +67,7 @@ bool VRClientCommand(edict_t* pEntity, CBasePlayer* player, const char* pcmd)
 			ClientPrint(&pEntity->v, HUD_PRINTCONSOLE, errormsg);
 		}
 	}
-	else if (FStrEq(pcmd, "vrupdctrl")) // Client sends update for VR related data - Max Makes Mods, 2017-08-18
+	else if (FStrEq(pcmd, VR_CMD_UPDATE_CONTROLLER)) // Client sends update for VR related data - Max Makes Mods, 2017-08-18
 	{
 		int size = CMD_ARGC();
 		if (size == 16)
@@ -90,7 +90,7 @@ bool VRClientCommand(edict_t* pEntity, CBasePlayer* player, const char* pcmd)
 			ClientPrint(&pEntity->v, HUD_PRINTCONSOLE, errormsg);
 		}
 	}
-	else if (FStrEq(pcmd, "vrtele"))
+	else if (FStrEq(pcmd, VR_CMD_TELEPORT))
 	{
 		if (0 != atoi(CMD_ARGV(1)))
 		{

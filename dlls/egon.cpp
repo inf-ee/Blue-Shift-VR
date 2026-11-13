@@ -412,7 +412,6 @@ void CEgon::UpdateEffect(const Vector& startPoint, const Vector& endPoint, float
 	m_pNoise->SetStartPos(startPoint);
 	m_pNoise->SetEndPos(endPoint);
 
-	extern int gmsgVRUpdateEgon;
 	MESSAGE_BEGIN(MSG_ONE, gmsgVRUpdateEgon, nullptr, m_pPlayer->pev);
 	WRITE_FLOAT(startPoint.x);
 	WRITE_FLOAT(startPoint.y);

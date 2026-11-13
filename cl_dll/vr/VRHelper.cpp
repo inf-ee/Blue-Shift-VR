@@ -1248,7 +1248,7 @@ void VRHelper::SendPositionUpdateToServer()
 	float hmdHeightInRL = hlTransform.get()[13];
 
 	char cmdHMD[MAX_COMMAND_SIZE] = {0};
-	snprintf(cmdHMD, sizeof(cmdHMD), "vrupd_hmd %i %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %i %i",
+	snprintf(cmdHMD, sizeof(cmdHMD), VR_CMD_UPDATE_HMD " %i %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %i %i",
 		m_vrUpdateTimestamp,
 		hmdOffset.x, hmdOffset.y, hmdOffset.z,
 		hmdForward.x, hmdForward.y, hmdForward.z,
@@ -1275,10 +1275,10 @@ void VRHelper::SendPositionUpdateToServer()
 	rightControllerID = leftHandMode ? VRControllerID::HAND : VRControllerID::WEAPON;
 
 	char cmdLeftController[MAX_COMMAND_SIZE] = {0};
-	snprintf(cmdLeftController, sizeof(cmdLeftController), "vrupdctrl %i %i %i %i %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %i %i", m_vrUpdateTimestamp, m_fLeftControllerValid ? 1 : 0, leftControllerID, 1 /*isMirrored*/, m_leftControllerOffset.x, m_leftControllerOffset.y, m_leftControllerOffset.z, m_leftControllerAngles.x, m_leftControllerAngles.y, m_leftControllerAngles.z, m_leftControllerVelocity.x, m_leftControllerVelocity.y, m_leftControllerVelocity.z, leftDragOn ? 1 : 0, leftFiring ? 1 : 0);
+	snprintf(cmdLeftController, sizeof(cmdLeftController), VR_CMD_UPDATE_CONTROLLER " %i %i %i %i %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %i %i", m_vrUpdateTimestamp, m_fLeftControllerValid ? 1 : 0, leftControllerID, 1 /*isMirrored*/, m_leftControllerOffset.x, m_leftControllerOffset.y, m_leftControllerOffset.z, m_leftControllerAngles.x, m_leftControllerAngles.y, m_leftControllerAngles.z, m_leftControllerVelocity.x, m_leftControllerVelocity.y, m_leftControllerVelocity.z, leftDragOn ? 1 : 0, leftFiring ? 1 : 0);
 
 	char cmdRightController[MAX_COMMAND_SIZE] = {0};
-	snprintf(cmdRightController, sizeof(cmdRightController), "vrupdctrl %i %i %i %i %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %i %i", m_vrUpdateTimestamp, m_fRightControllerValid ? 1 : 0, rightControllerID, 0 /*isMirrored*/, m_rightControllerOffset.x, m_rightControllerOffset.y, m_rightControllerOffset.z, m_rightControllerAngles.x, m_rightControllerAngles.y, m_rightControllerAngles.z, m_rightControllerVelocity.x, m_rightControllerVelocity.y, m_rightControllerVelocity.z, rightDragOn ? 1 : 0, rightFiring ? 1 : 0);
+	snprintf(cmdRightController, sizeof(cmdRightController), VR_CMD_UPDATE_CONTROLLER " %i %i %i %i %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %i %i", m_vrUpdateTimestamp, m_fRightControllerValid ? 1 : 0, rightControllerID, 0 /*isMirrored*/, m_rightControllerOffset.x, m_rightControllerOffset.y, m_rightControllerOffset.z, m_rightControllerAngles.x, m_rightControllerAngles.y, m_rightControllerAngles.z, m_rightControllerVelocity.x, m_rightControllerVelocity.y, m_rightControllerVelocity.z, rightDragOn ? 1 : 0, rightFiring ? 1 : 0);
 
 	gEngfuncs.pfnClientCmd(cmdHMD);
 	gEngfuncs.pfnClientCmd(cmdLeftController);

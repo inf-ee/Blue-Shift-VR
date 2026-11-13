@@ -14,6 +14,13 @@ enum class VRControllerID : int32_t
 // Index of the muzzle attachment in VR weapon and hand models (the attachment after it gives the aim direction)
 #define VR_MUZZLE_ATTACHMENT 0
 
+// Client commands the client DLL sends to the server DLL (handled in dlls/vr/VRClientCommands.cpp)
+#define VR_CMD_UPDATE_HMD "vrupd_hmd"
+#define VR_CMD_UPDATE_CONTROLLER "vrupdctrl"
+#define VR_CMD_WEAPON_ANIM "vr_wpnanim"
+#define VR_CMD_MUZZLEFLASH "vr_muzzleflash" // also sent by EV_MuzzleFlash in cl_dll/ev_common.cpp
+#define VR_CMD_TELEPORT "vrtele"
+
 enum class VRPoseType
 {
 	LEFT_HAND,

@@ -1887,7 +1887,6 @@ void CTriggerPush::Touch(CBaseEntity* pOther)
 	}
 
 	// If noclip is enabled we don't push the player
-	extern bool VRGlobalGetNoclipMode();
 	if (pOther->IsPlayer() && VRGlobalGetNoclipMode())
 	{
 		return;

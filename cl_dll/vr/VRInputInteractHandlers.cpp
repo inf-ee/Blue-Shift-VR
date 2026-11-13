@@ -5,6 +5,7 @@
 #include "cl_util.h"
 #include "openvr.h"
 #include "VRInput.h"
+#include "vr/VRShared.h"
 
 namespace VR
 {
@@ -48,7 +49,7 @@ void Interact::HandleTeleport(const vr::InputDigitalActionData_t& data, const st
 		// A teleport held when the menu opened and let go in the menu would otherwise stay active after resume
 		else if (data.bChanged && !data.bState && g_vrInput.IsInGame())
 		{
-			ServerCmd("vrtele 0");
+			ServerCmd(VR_CMD_TELEPORT " 0");
 		}
 		// BSVR end
 		return;
@@ -57,7 +58,7 @@ void Interact::HandleTeleport(const vr::InputDigitalActionData_t& data, const st
 	if (data.bChanged)
 	{
 		bool on = data.bActive && data.bState;
-		ServerCmd(on ? "vrtele 1" : "vrtele 0");
+		ServerCmd(on ? VR_CMD_TELEPORT " 1" : VR_CMD_TELEPORT " 0");
 	}
 }
 

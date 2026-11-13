@@ -956,6 +956,9 @@
     <ClInclude Include="..\..\cl_dll\vr\VRGameClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\cl_dll\vr\VRClientHooks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\cl_dll\vr\lodepng.h">
       <Filter>Header Files</Filter>
     </ClInclude>

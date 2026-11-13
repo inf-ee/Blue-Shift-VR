@@ -20,6 +20,7 @@
 #include "vr/VRShared.h"
 #include "VROpenGLInterceptor.h"
 #include "VREngineInterceptor.h"
+#include "vr/VRHudMessages.h"
 
 #ifndef MAX_COMMAND_SIZE
 #define MAX_COMMAND_SIZE 256
@@ -249,7 +250,7 @@ void VRHelper::UpdateWorldRotation()
 		m_instantRotateYawValue = 0.f;
 
 		// Rotate with trains and platforms
-		cl_entity_t* groundEntity = gHUD.GetGroundEntity();
+		cl_entity_t* groundEntity = gVRHudState.GetGroundEntity();
 		if (groundEntity)
 		{
 			if (groundEntity != m_groundEntity)
@@ -1776,7 +1777,7 @@ int VRGetGrabbedLadder(int player)
 {
 	if (VRGetLadderMode() != VR_LADDER_MODE_LEGACY_ONLY)
 	{
-		return gHUD.m_vrGrabbedLadderEntIndex;
+		return gVRHudState.m_vrGrabbedLadderEntIndex;
 	}
 	else
 	{
@@ -1791,7 +1792,7 @@ bool VRIsPullingOnLedge(int player)
 	if (vr_ledge_pull_mode != 1.f && vr_ledge_pull_mode != 2.f)
 		return false;
 
-	return gHUD.m_vrIsPullingOnLedge;
+	return gVRHudState.m_vrIsPullingOnLedge;
 }
 
 bool VRIsAutoDuckingEnabled(int player)

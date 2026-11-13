@@ -13,6 +13,10 @@ CStudioModelRenderer
 
 ====================
 */
+// BSVR start
+struct ControllerModelData; // vr/VRControllerModelData.h
+// BSVR end
+
 class CStudioModelRenderer
 {
 public:

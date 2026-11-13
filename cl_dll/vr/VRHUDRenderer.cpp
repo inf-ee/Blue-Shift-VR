@@ -16,6 +16,7 @@
 #include "com_model.h"
 
 #include "vr_gl.h"
+#include "vr/VRHudMessages.h"
 
 
 enum class HUDRenderMode
@@ -178,6 +179,21 @@ void VRRenderer::VRHUDDrawBegin(const VRHUDRenderType renderType)
 	m_fIsFirstSprite = true;
 }
 
+void VRRenderer::VRHUDDrawBegin(const CHudBase* hudElement)
+{
+	VRHUDRenderType renderType = VRHUDRenderType::NONE;
+	if (hudElement == &gHUD.m_Battery)
+		renderType = VRHUDRenderType::BATTERY;
+	else if (hudElement == &gHUD.m_Flash)
+		renderType = VRHUDRenderType::FLASHLIGHT;
+	else if (hudElement == &gHUD.m_Train)
+		renderType = VRHUDRenderType::TRAINCONTROLS;
+	else if (hudElement == &gHUD.m_AmmoSecondary)
+		renderType = VRHUDRenderType::AMMO_SECONDARY;
+
+	VRHUDDrawBegin(renderType);
+}
+
 void VRRenderer::InterceptSPR_Set(HSPRITE hPic, int r, int g, int b)
 {
 	if (!ShouldRenderHUD(m_hudRenderType))
@@ -314,7 +330,7 @@ bool VRRenderer::GetHUDSpriteOriginAndOrientation(const VRHUDRenderType hudRende
 	case VRHUDRenderType::TRAINCONTROLS:
 	{
 		Vector angles;
-		if (gHUD.GetTrainControlsOriginAndOrientation(origin, angles))
+		if (gVRHudState.GetTrainControlsOriginAndOrientation(origin, angles))
 		{
 			AngleVectors(angles, forward, right, up);
 			return true;

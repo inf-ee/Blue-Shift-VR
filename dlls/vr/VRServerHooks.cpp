@@ -137,5 +137,6 @@ void VRClientPrecache()
 	gGlobalXenMounds.Clear();
 	g_vrRetinaScanners.clear();
 	g_vrRetinaScannerButtons.clear();
+	VRClearSpecialEntities();
 	g_vrNeedRecheckForSpecialEntities = true;
 }

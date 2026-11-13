@@ -5,6 +5,7 @@
 // (VR_GAME in linux/Makefile.hldll, the ClCompile entry in projects/vs2019/hldll.vcxproj).
 // Game data (map names, entity names, per-map hacks) belongs there, not in the shared VR files.
 
+class CBaseEntity;
 class CBasePlayer;
 
 // How a brush entity crushes a player who is stuck in it (VRCrushEntityHandler.cpp)
@@ -31,6 +32,15 @@ bool IsExcludedGroundEntity(const char* mapName, const char* targetName);
 
 // Called at the end of the player's restore from a savegame.
 void OnPlayerRestored(CBasePlayer* pPlayer);
+
+// Texture under a trigger_push that marks it as a xen jump pad (VRSpecialEntities.cpp), also used by the VR teleporter.
+const char* GetXenMoundTextureName();
+
+// Called when a trigger_push pushed an entity that touches it (the non-instant kind of push).
+void OnTriggerPushTouched(CBaseEntity* pTriggerPush, CBaseEntity* pOther);
+
+// Called after a trigger_teleport teleported the player.
+void OnPlayerTeleported(CBasePlayer* pPlayer, CBaseEntity* pTrigger);
 
 // Game name the server reports before the game rules exist (GetGameDescription in client.cpp).
 const char* GetGameDescription();

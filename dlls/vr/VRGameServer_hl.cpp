@@ -208,3 +208,45 @@ const char* VRGame::GetRestoreFailedFallbackMap()
 {
 	return "crossfire";
 }
+
+const char* VRGame::GetXenMoundTextureName()
+{
+	return "c2a5mound";
+}
+
+// From CTriggerPush::Touch in triggers.cpp (there: pev is the trigger's)
+void VRGame::OnTriggerPushTouched(CBaseEntity* pTriggerPush, CBaseEntity* pOther)
+{
+	// if (pOther->IsNetClient())
+	// {
+	// 	CBasePlayer* pPlayer = dynamic_cast<CBasePlayer*>(pOther);
+
+	// 	// player in residue processing map with all those conveyor belts interacts with
+	// 	// trigger_push that player has to pass when taking the wrong turn and coming back to start
+	// 	if (pPlayer
+	// 		&& FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a4c.bsp")
+	// 		&& FStrEq(STRING(pev->model), "*78"))
+	// 	{
+	// 		UTIL_VRGiveAchievement(pPlayer, VRAchievement::RP_MOEBIUS);
+	// 	}
+	// }
+}
+
+// From CBaseTrigger::TeleportTouch in triggers.cpp (there: pev is the trigger's)
+void VRGame::OnPlayerTeleported(CBasePlayer* pPlayer, CBaseEntity* pTrigger)
+{
+	// endgame map
+	// if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c5a1.bsp"))
+	// {
+	// 	// teleport at the exit of train to black screen (joined g-man)
+	// 	if (FStrEq(STRING(pev->target), "endroom"))
+	// 	{
+	// 		UTIL_VRGiveAchievement(pPlayer, VRAchievement::END_LIMITLESS);
+	// 	}
+	// 	// teleport in the train to grunt army (refused g-man)
+	// 	else if (FStrEq(STRING(pev->target), "loser"))
+	// 	{
+	// 		UTIL_VRGiveAchievement(pPlayer, VRAchievement::END_UNWINNABLE);
+	// 	}
+	// }
+}

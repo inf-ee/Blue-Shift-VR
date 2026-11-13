@@ -27,6 +27,10 @@
 #include "saverestore.h"
 #include "trains.h" // trigger_camera has train functionality
 #include "gamerules.h"
+// BSVR start
+#include "vr/VRHooks.h"
+#include "vr/VRGameServer.h"
+// BSVR end
 
 #define SF_TRIGGER_PUSH_START_OFF 2		   //spawnflag that makes trigger_push spawn turned OFF
 #define SF_TRIGGER_HURT_TARGETONCE 1	   // Only fire hurt target once
@@ -79,20 +83,12 @@ void CFrictionModifier::Spawn()
 void CFrictionModifier::ChangeFriction(CBaseEntity* pOther)
 {
 	// BSVR start
-	// if (pOther->pev->movetype != MOVETYPE_BOUNCEMISSILE && pOther->pev->movetype != MOVETYPE_BOUNCE) - original
-	// 	pOther->pev->friction = m_frictionFraction; - original
-	if (pOther->pev->movetype == MOVETYPE_BOUNCEMISSILE || pOther->pev->movetype == MOVETYPE_BOUNCE)
+	if (VRHandleFrictionTouch(pOther))
 		return;
-
-	// Allow disabling of func_friction in VR
-	if (pOther->IsPlayer() && CVAR_GET_FLOAT("vr_disable_func_friction") != 0.f)
-	{
-		pOther->pev->friction = 1.f;
-		return;
-	}
-
-	pOther->pev->friction = m_frictionFraction;
 	// BSVR end
+
+	if (pOther->pev->movetype != MOVETYPE_BOUNCEMISSILE && pOther->pev->movetype != MOVETYPE_BOUNCE)
+		pOther->pev->friction = m_frictionFraction;
 }
 
 
@@ -544,15 +540,8 @@ public:
 	void EXPORT CounterUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
 	void EXPORT ToggleUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
 	void InitTrigger();
-	// BSVR start
-	bool IsXenJumpTrigger() override { return m_isXenJumpTrigger; }
-	// BSVR end
 
 	int ObjectCaps() override { return CBaseToggle::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
-
-	// BSVR start
-	bool m_isXenJumpTrigger{false};
-	// BSVR end
 };
 
 LINK_ENTITY_TO_CLASS(trigger, CBaseTrigger);
@@ -1133,7 +1122,7 @@ void CTriggerOnce::Spawn()
 void CBaseTrigger::MultiTouch(CBaseEntity* pOther)
 {
 	// BSVR start
-	if (pOther->IsPlayer() && m_isXenJumpTrigger && CVAR_GET_FLOAT("vr_xenjumpthingies_teleporteronly") != 0.f)
+	if (VRBlockXenJumpTouch(this, pOther))
 		return;
 	// BSVR end
 
@@ -1553,11 +1542,7 @@ void CChangeLevel::ChangeLevelNow(CBaseEntity* pActivator)
 	}
 
 	// BSVR start
-	// Backup player VR offsets (fixes origin issues in roomscale) - Max Makes Mods, 2018-04-02
-	if (pPlayer->IsPlayer())
-	{
-		reinterpret_cast<CBasePlayer*>(pPlayer)->StoreVROffsetsForLevelchange();
-	}
+	VROnChangeLevelNow(pPlayer);
 	// BSVR end
 
 	//	ALERT( at_console, "Level touches %d levels\n", ChangeList( levels, 16 ) );
@@ -1618,15 +1603,8 @@ bool CChangeLevel::InTransitionVolume(CBaseEntity* pEntity, char* pVolumeName)
 		return true;
 
 	// BSVR start
-	// TODO: Always return 1 for players?
-	// Can't think of a situation where a player wouldn't be in the transition volume
-	// when touching a trigger_changelevel
-	if (pEntity->IsPlayer())
-	{
-		CBasePlayer* pPlayer = dynamic_cast<CBasePlayer*>(pEntity);
-		if (pPlayer && pPlayer->vr_didJustTeleportThroughChangeLevel)
-			return true;
-	}
+	if (VRForceInTransition(pEntity))
+		return true;
 	// BSVR end
 
 	// If you're following another entity, follow it through the transition (weapons follow the player)
@@ -1847,16 +1825,6 @@ class CTriggerPush : public CBaseTrigger
 public:
 	void Spawn() override;
 	void Touch(CBaseEntity* pOther) override;
-
-	// BSVR start
-	virtual bool CheckIsSpecialVREntity();
-	// BSVR end
-
-	//BSVR start
-private:
-	bool IsXenJumpPad();
-	Vector m_spawnAngles;
-	// BSVR end
 };
 LINK_ENTITY_TO_CLASS(trigger_push, CTriggerPush);
 
@@ -1864,67 +1832,13 @@ LINK_ENTITY_TO_CLASS(trigger_push, CTriggerPush);
 Pushes the player
 */
 
-// BSVR start
-// Detect xen jump pads and enable special VR controls - Max Makes Mods, 2017-09-10
-bool CTriggerPush::IsXenJumpPad()
-{
-	if (pev->spawnflags == 0 &&
-		(m_spawnAngles.x == -90 || m_spawnAngles.x == 270) &&
-		m_spawnAngles.y == 0 &&
-		m_spawnAngles.z == 0 &&
-		pev->speed > 1000)
-	{
-		Vector center = (pev->absmin + pev->absmax) * 0.5f;
-		Vector down = center;
-		down.z = pev->absmin.z - 256.0f;
-		TraceResult tr;
-		UTIL_TraceLine(center, down, ignore_monsters, edict(), &tr);
-
-		if (tr.pHit != nullptr && tr.flFraction < 1.0f)
-		{
-			const char* texture = TRACE_TEXTURE(tr.pHit, center, down);
-			if (texture != nullptr && FStrEq(texture, "c2a5mound"))
-			{
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-bool CTriggerPush::CheckIsSpecialVREntity()
-{
-	if (IsXenJumpPad())
-	{
-		// Find trigger_multiple
-		CBaseEntity* pTriggerMultiple = nullptr;
-		while ((pTriggerMultiple = UTIL_FindEntityByClassname(pTriggerMultiple, "trigger_multiple")) != nullptr)
-		{
-			if (UTIL_BBoxIntersectsBBox(pev->absmin, pev->absmax, pTriggerMultiple->pev->absmin, pTriggerMultiple->pev->absmax))
-			{
-				// Register the multi_manager for this xen mound at this position
-				gGlobalXenMounds.Add((pev->absmin + pev->absmax) * 0.5f, pTriggerMultiple->pev->target);
-
-				// Flag trigger_multiple and this trigger_push,
-				// so players can disable xen jump push in VR (then only controller beam will activate the mound)
-				m_isXenJumpTrigger = true;
-				dynamic_cast<CBaseTrigger*>(pTriggerMultiple)->m_isXenJumpTrigger = true;
-				return true;
-			}
-		}
-	}
-	SetThink(nullptr);
-	return true;
-}
-// BSVR end
-
 void CTriggerPush::Spawn()
 {
 	if (pev->angles == g_vecZero)
 		pev->angles.y = 360;
 
 	// BSVR start
-	m_spawnAngles = pev->angles;
+	VROnTriggerPushSpawn(this);
 	// BSVR end
 
 	InitTrigger();
@@ -1944,7 +1858,7 @@ void CTriggerPush::Spawn()
 void CTriggerPush::Touch(CBaseEntity* pOther)
 {
 	// BSVR start
-	if (pOther->IsPlayer() && m_isXenJumpTrigger && CVAR_GET_FLOAT("vr_xenjumpthingies_teleporteronly") != 0.f)
+	if (VRBlockXenJumpTouch(this, pOther))
 		return;
 	// BSVR end
 
@@ -2004,19 +1918,7 @@ void CTriggerPush::Touch(CBaseEntity* pOther)
 			//			ALERT( at_console, "Vel %f, base %f\n", pevToucher->velocity.z, pevToucher->basevelocity.z );
 
 			// BSVR start
-			// if (pOther->IsNetClient())
-			// {
-			// 	CBasePlayer* pPlayer = dynamic_cast<CBasePlayer*>(pOther);
-
-			// 	// player in residue processing map with all those conveyor belts interacts with
-			// 	// trigger_push that player has to pass when taking the wrong turn and coming back to start
-			// 	if (pPlayer
-			// 		&& FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a4c.bsp")
-			// 		&& FStrEq(STRING(pev->model), "*78"))
-			// 	{
-			// 		UTIL_VRGiveAchievement(pPlayer, VRAchievement::RP_MOEBIUS);
-			// 	}
-			// }
+			VRGame::OnTriggerPushTouched(this, pOther);
 			// BSVR end
 		}
 	}
@@ -2096,29 +1998,7 @@ void CBaseTrigger::TeleportTouch(CBaseEntity* pOther)
 	pevToucher->velocity = pevToucher->basevelocity = g_vecZero;
 
 	// BSVR start
-	if (pOther->IsPlayer())
-	{
-		CBasePlayer* pPlayer = dynamic_cast<CBasePlayer*>(pOther);
-		if (pPlayer)
-		{
-			pPlayer->VRJustTeleported(prevOrigin, prevAngles);
-
-			// endgame map
-			// if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c5a1.bsp"))
-			// {
-			// 	// teleport at the exit of train to black screen (joined g-man)
-			// 	if (FStrEq(STRING(pev->target), "endroom"))
-			// 	{
-			// 		UTIL_VRGiveAchievement(pPlayer, VRAchievement::END_LIMITLESS);
-			// 	}
-			// 	// teleport in the train to grunt army (refused g-man)
-			// 	else if (FStrEq(STRING(pev->target), "loser"))
-			// 	{
-			// 		UTIL_VRGiveAchievement(pPlayer, VRAchievement::END_UNWINNABLE);
-			// 	}
-			// }
-		}
-	}
+	VROnTeleported(this, pOther, prevOrigin, prevAngles);
 	// BSVR end
 }
 

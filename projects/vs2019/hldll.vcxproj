@@ -255,6 +255,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClCompile Include="..\..\dlls\vr\VRAnimation.cpp" />
     <ClCompile Include="..\..\dlls\vr\VRBreakable.cpp" />
     <ClCompile Include="..\..\dlls\vr\VRServerHooks.cpp" />
+    <ClCompile Include="..\..\dlls\vr\VRSpecialEntities.cpp" />
     <ClCompile Include="..\..\dlls\vr\VRGameServer_bs.cpp" />
   </ItemGroup>
   <ItemGroup>

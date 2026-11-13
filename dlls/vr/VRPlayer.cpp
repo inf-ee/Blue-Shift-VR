@@ -1145,43 +1145,10 @@ TYPEDESCRIPTION g_vrLevelChangeDataSaveData[] =
 
 // Hooks called from the SDK player code in player.cpp
 
-// Start of PreThink: achievement checks (disabled) and the special VR entity scan after a map load
+// Start of PreThink: per-game checks and the special VR entity scan after a map load
 void CBasePlayer::VRPreThinkStart()
 {
-	// VRAchievementsAndStatsTracker::Update(this);
-
-	if (!m_vrHasSurfacedInThatMapWithTheTank)
-	{
-		// if (pev->origin.z > 0.f && FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a5b.bsp"))
-		// {
-		// 	m_vrHasSurfacedInThatMapWithTheTank = true;
-		// 	VRAchievementsAndStatsTracker::PlayerSurfacedInThatMapWithTheTank(this);
-		// }
-	}
-
-	if (m_vrJustGotYeetedByBPTrain && FBitSet(pev->flags, FL_ONGROUND))
-	{
-		// we landed after getting yeeted by that train at the beginning of Blast Pit
-		m_vrJustGotYeetedByBPTrain = false;
-
-		// // sanity check that map is still correct
-		// if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a4.bsp"))
-		// {
-		// 	// check that player landed roughly in pipe opening
-		// 	if (pev->absmin.z > -3290.f && pev->absmin.z < -3130.f
-		// 		&& pev->origin.x > -990.f && pev->origin.x < -780.f
-		// 		&& pev->origin.y > -2610.f && pev->origin.y < -2470.f)
-		// 	{
-		// 		UTIL_VRGiveAchievement(this, VRAchievement::BP_PERFECT);
-		// 	}
-		// }
-	}
-
-	extern bool VRGlobalGetNoclipMode();
-	if (VRGlobalGetNoclipMode())
-	{
-		// VRAchievementsAndStatsTracker::PlayerUsedNoclip(this);
-	}
+	VRGame::OnPlayerPreThinkStart(this); // per-game checks (achievements)
 
 	// gets reset by ClientPrecache everytime new map is loaded (new game, changelevel, load save)
 	if (g_vrNeedRecheckForSpecialEntities)

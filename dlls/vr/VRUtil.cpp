@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <regex>
 #include "vr/VRPhysicsHelper.h"
+#include "VRGameServer.h"
 
 // Returns a path to the given file:
 // a) in the current mod directory, if a mod is loaded and the file exists in the mod directory,
@@ -316,34 +317,7 @@ float UTIL_CalculateMeleeDamage(int iId, float speed)
 	if (speed >= GetMeleeSwingSpeed())
 	{
 		float baseDamage = gSkillData.plrDmgCrowbar * speed / GetMeleeSwingSpeed();
-		switch (iId)
-		{
-		case WEAPON_CROWBAR:
-			return baseDamage;
-		case WEAPON_HORNETGUN:
-			return baseDamage * 0.05f;
-		case WEAPON_NONE:
-		case WEAPON_BAREHAND:
-		case WEAPON_SNARK:
-			return baseDamage * 0.1f;
-		case WEAPON_HANDGRENADE:
-		case WEAPON_TRIPMINE:
-		case WEAPON_SATCHEL:
-			return baseDamage * 0.2f;
-		case WEAPON_GLOCK:
-		case WEAPON_PYTHON:
-			return baseDamage * 0.3f;
-		case WEAPON_MP5:
-		case WEAPON_SHOTGUN:
-		case WEAPON_CROSSBOW:
-			return baseDamage * 0.4f;
-		case WEAPON_RPG:
-		case WEAPON_GAUSS:
-		case WEAPON_EGON:
-			return baseDamage * 0.5f;
-		default:
-			return baseDamage * 0.1f;
-		}
+		return baseDamage * VRGame::GetMeleeDamageScale(iId);
 	}
 	else
 	{
@@ -353,13 +327,7 @@ float UTIL_CalculateMeleeDamage(int iId, float speed)
 
 int UTIL_DamageTypeFromWeapon(int iId)
 {
-	switch (iId)
-	{
-	case WEAPON_CROWBAR:
-		return DMG_CLUB;
-	default:
-		return DMG_CLUB | DMG_NEVERGIB;
-	}
+	return VRGame::GetMeleeDamageType(iId);
 }
 
 // Returns the minimum speed required to do melee damage with a VR controller - Max Makes Mods, 2019-04-07

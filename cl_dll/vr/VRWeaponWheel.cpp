@@ -17,6 +17,7 @@
 #include "VRInput.h"
 #include "VRTextureHelper.h"
 #include "vr_gl.h"
+#include "VRGameClient.h"
 
 extern cl_entity_t* SaveGetLocalPlayer();
 
@@ -25,38 +26,9 @@ namespace
 // The wheel is a honeycomb of flat-top hexagons, like in the HL2 VR mod. The empty hand (holster) is in the
 // center. Six spokes of weapons go out from it in the directions of 12, 2, 4, 6, 8 and 10 o'clock, in a
 // straight line of hexagons, the first weapon of a spoke is next to the center.
-constexpr int NUM_SPOKES = 6;
-constexpr int SPOKE_LENGTH = 3;
+constexpr int NUM_SPOKES = VR_WHEEL_NUM_SPOKES;
+constexpr int SPOKE_LENGTH = VR_WHEEL_SPOKE_LENGTH;
 constexpr int MAX_CELLS = 1 + NUM_SPOKES * SPOKE_LENGTH;
-
-// Weapon ids, the same as WEAPON_* in dlls/weapons.h (not included, it needs the server headers).
-// Ids work for any alias of the weapon entity, the weapon name the client gets is the classname the map used.
-constexpr int ID_CROWBAR = 1;
-constexpr int ID_GLOCK = 2;
-constexpr int ID_PYTHON = 3;
-constexpr int ID_MP5 = 4;
-constexpr int ID_CROSSBOW = 6;
-constexpr int ID_SHOTGUN = 7;
-constexpr int ID_RPG = 8;
-constexpr int ID_GAUSS = 9;
-constexpr int ID_EGON = 10;
-constexpr int ID_HORNETGUN = 11;
-constexpr int ID_HANDGRENADE = 12;
-constexpr int ID_TRIPMINE = 13;
-constexpr int ID_SATCHEL = 14;
-constexpr int ID_SNARK = 15;
-
-// Weapons of each spoke from the center outwards, 0 is unused. Only the weapons the player has are drawn,
-// one after the other without gaps, so the spoke grows as weapons are picked up. Weapons that don't exist
-// in the game (like the crossbow in Blue Shift) never show up.
-constexpr int SPOKES[NUM_SPOKES][SPOKE_LENGTH] = {
-	{ID_GLOCK, ID_PYTHON, 0},				   // 12 o'clock: handguns
-	{ID_MP5, ID_SHOTGUN, ID_CROSSBOW},		   // 2 o'clock: long guns
-	{ID_RPG, ID_GAUSS, ID_EGON},			   // 4 o'clock: heavy
-	{ID_CROWBAR, 0, 0},						   // 6 o'clock: melee
-	{ID_SNARK, ID_HORNETGUN, 0},			   // 8 o'clock: alien
-	{ID_HANDGRENADE, ID_SATCHEL, ID_TRIPMINE}, // 10 o'clock: explosives
-};
 
 // All sizes are in HL units (37.5 units per meter). Scales the whole wheel: hexagons, icons, outlines and
 // the distance at which the hand points at a hexagon.
@@ -346,10 +318,11 @@ int BuildCells(Cell cells[MAX_CELLS])
 		int placed = 0;
 		for (int i = 0; i < SPOKE_LENGTH; i++)
 		{
-			if (SPOKES[spoke][i] == 0)
+			const int weaponId = VRGame::GetWeaponWheelWeapon(spoke, i);
+			if (weaponId == 0)
 				continue;
 
-			WEAPON* weapon = FindWeapon(SPOKES[spoke][i]);
+			WEAPON* weapon = FindWeapon(weaponId);
 			if (weapon == nullptr)
 				continue;
 

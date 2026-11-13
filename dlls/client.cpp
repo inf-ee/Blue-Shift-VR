@@ -1348,7 +1348,7 @@ int AddToFullPack(struct entity_state_s* state, int e, edict_t* ent, edict_t* ho
 	}
 
 	// BSVR start - one visibility check, also remembered for the VR code
-	const bool isInPVS = VRCheckAndRecordPVS(ent, pSet);
+	const bool isInPVS = VRCheckAndRecordPVS(e, ent, pSet);
 	// BSVR end
 
 	int i;

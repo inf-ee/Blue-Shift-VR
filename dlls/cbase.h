@@ -545,8 +545,6 @@ public:
 	// overriden by NPCs that react to the player throwing stuff at them
 	virtual void GibAttack(EHandleT<CBaseEntity> thrower, const Vector& pos, int bloodcolor) {}
 
-	// Remember if entity is in PVS this frame (last frame? doesn't matter), set in AddToFullPack in client.cpp - Max Makes Mods, 2020-03-08
-	bool m_isInPVS = false;
 
 	// So we can add or remove object caps to any entity without changing the ObjectCaps function
 	int m_objectCaps = FCAP_ACROSS_TRANSITION;

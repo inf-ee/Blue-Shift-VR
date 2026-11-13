@@ -2,6 +2,7 @@
 
 #include "VRHooks.h"
 
+#include <cstring>
 #include <iterator>
 #include <unordered_map>
 #include <unordered_set>
@@ -11,7 +12,9 @@
 #include "cbase.h"
 #include "saverestore.h"
 #include "player.h"
+#include "monsters.h"
 #include "entity_state.h"
+#include "com_model.h" // MAX_EDICTS
 
 #include "VRCommons.h"
 #include "VRGameServer.h"
@@ -48,6 +51,15 @@ bool g_didRestoreSaveGameFail_MapChangedToSafety = false;
 
 // The PVS the engine built for the player in SetupVisibility
 unsigned char* m_pvsCache = nullptr;
+
+// If each entity was in the player's PVS when the engine last built the entity list for the client (AddToFullPack),
+// by entity index. Kept here, not in the entity, as it is written for every entity in every frame.
+struct EntityPVS
+{
+	int serialnumber;
+	bool isInPVS;
+};
+EntityPVS s_entityPVS[MAX_EDICTS] = {};
 } // namespace
 
 bool VRWriteSaveMarker(CSave& save)
@@ -143,6 +155,7 @@ void VRClientPrecache()
 	g_vrRetinaScanners.clear();
 	g_vrRetinaScannerButtons.clear();
 	VRClearSpecialEntities();
+	memset(s_entityPVS, 0, sizeof(s_entityPVS));
 	g_vrNeedRecheckForSpecialEntities = true;
 }
 
@@ -151,21 +164,28 @@ void VRSetPVSCache(unsigned char* pvs)
 	m_pvsCache = pvs;
 }
 
-bool VRCheckAndRecordPVS(edict_t* ent, unsigned char* pSet)
+bool VRCheckAndRecordPVS(int e, edict_t* ent, unsigned char* pSet)
 {
 	// If pSet is nullptr, then the test will always succeed and the entity will be added to the update
 	bool isInPVS = ENGINE_CHECK_VISIBILITY(ent, pSet);
 
 	// Remember if entity is in PVS
-	if (m_pvsCache == pSet)
+	if (m_pvsCache == pSet && e >= 0 && e < MAX_EDICTS)
 	{
-		EHandleT<CBaseEntity> hEnt = CBaseEntity::SafeInstance<CBaseEntity>(ent);
-		if (hEnt)
-		{
-			hEnt->m_isInPVS = isInPVS;
-		}
+		s_entityPVS[e].serialnumber = ent->serialnumber;
+		s_entityPVS[e].isInPVS = isInPVS;
 	}
 	return isInPVS;
+}
+
+bool VRIsInPVS(CBaseEntity* pEntity)
+{
+	const int e = pEntity->entindex();
+	if (e < 0 || e >= MAX_EDICTS)
+		return false;
+
+	// The serial number tells a new entity in a reused edict from the one the flag was recorded for
+	return s_entityPVS[e].isInPVS && s_entityPVS[e].serialnumber == pEntity->edict()->serialnumber;
 }
 
 void VROverridePlayerBaseline(entity_state_s* baseline, edict_t* entity)
@@ -182,5 +202,14 @@ void VRSetClientDataOrigin(CBasePlayer* pl, clientdata_s* cd)
 	{
 		cd->origin = pl->GetClientOrigin();
 		cd->view_ofs = pl->GetClientViewOfs();
+	}
+}
+
+void CBaseMonster::VRApplyNpcScale()
+{
+	pev->scale = CVAR_GET_FLOAT("vr_npcscale");
+	if (pev->scale <= 0.f)
+	{
+		pev->scale = 1.f;
 	}
 }

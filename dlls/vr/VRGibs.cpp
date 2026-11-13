@@ -10,6 +10,7 @@
 #include "func_break.h"
 
 #include "VRGameServer.h"
+#include "VRHooks.h"
 
 int CGib::m_numGibs = 0;
 
@@ -64,7 +65,7 @@ void CGib::LimitNumberOfGibs()
 		int counter = 0;
 		while (counter < m_numGibs && (pGib = UTIL_FindEntityByClassname(pGib, "gib")))
 		{
-			if (!pGib->m_isInPVS)
+			if (!VRIsInPVS(pGib))
 			{
 				UTIL_Remove(pGib);
 				numGibs--;

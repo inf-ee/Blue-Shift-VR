@@ -8,6 +8,7 @@
 #include "monsters.h"
 #include "saverestore.h"
 #include "func_break.h"
+#include "VRHooks.h"
 
 namespace
 {
@@ -79,7 +80,7 @@ int CBreakable::VRSpawnGibs(const char* model,
 		return 0;
 
 	// Don't spawn any gibs if we aren't in the PVS
-	if (!m_isInPVS)
+	if (!VRIsInPVS(this))
 		return 0;
 
 	count = VRGetGibCount(count);

@@ -649,6 +649,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClInclude Include="..\..\cl_dll\vr\VRHelper.h" />
     <ClInclude Include="..\..\cl_dll\vr\VRTextureHelper.h" />
     <ClInclude Include="..\..\cl_dll\vr\VRGameClient.h" />
+    <ClInclude Include="..\..\cl_dll\vr\VRClientHooks.h" />
     <ClInclude Include="..\..\cl_dll\vr\lodepng.h" />
     <ClInclude Include="..\..\cl_dll\vr\VRRandom.h" />
     <ClInclude Include="..\..\cl_dll\vr\VROpenGLInterceptor.h" />

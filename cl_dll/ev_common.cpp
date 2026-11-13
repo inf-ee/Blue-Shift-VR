@@ -126,19 +126,17 @@ void EV_GetGunPosition(event_args_t* args, float* pos, float* origin)
 }
 
 // BSVR start
+#include "vr/VRClientHooks.h"
+
 // Gun position and aim vector in VR is given by special model attachments - Max Makes Mods, 2019-03-30 / 2019-04-07
 void EV_GetGunPosition(float* pos)
 {
-	// we are in include hell, so just use an external global function here :/
-	extern Vector VRGlobalGetGunPosition();
 	VRGlobalGetGunPosition().CopyToArray(pos);
 }
 
 void EV_GetGunAim(float* forward, float* right, float* up, float* angles)
 {
-	// we are in include hell, so just use an external global function here :/
 	Vector f, r, u, a;
-	extern void VRGlobalGetGunAim(Vector&, Vector&, Vector&, Vector&);
 	VRGlobalGetGunAim(f, r, u, a);
 	f.CopyToArray(forward);
 	r.CopyToArray(right);

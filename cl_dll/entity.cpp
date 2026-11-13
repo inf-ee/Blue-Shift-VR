@@ -15,7 +15,7 @@
 #include "Exports.h"
 
 // BSVR start
-#include <unordered_set>
+#include "vr/VRClientHooks.h"
 // BSVR end
 
 #include "particleman.h"
@@ -400,8 +400,6 @@ void DLLEXPORT HUD_TempEntUpdate(
 	float freq, gravity, gravitySlow, life, fastFreq;
 
 	// BSVR start
-	// USed by StudioModelRenderer to filter out temp ents when applying scale (as scale is used as a timer here) - Max Makes Mods, 2019-05-26
-	extern std::unordered_set<cl_entity_t*> g_curFrameTempEnts;
 	g_curFrameTempEnts.clear();
 	// BSVR end
 

@@ -28,6 +28,8 @@ void VROnGlobalStateReset();
 bool VRIsRestoreFailed();
 
 // triggers.cpp (VRSpecialEntities.cpp)
+// True while the VR noclip cheat is on (VRCommons.cpp; also declared for pm_shared.cpp in VRPMShared.h)
+bool VRGlobalGetNoclipMode();
 // func_friction: true if the VR code set the toucher's friction and the original code must be skipped.
 bool VRHandleFrictionTouch(CBaseEntity* pOther);
 // trigger_changelevel: called right before the level change.

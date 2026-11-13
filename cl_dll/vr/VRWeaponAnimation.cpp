@@ -5,6 +5,7 @@
 #include "event_api.h"
 
 #include <string>
+#include "vr/VRShared.h"
 
 namespace
 {
@@ -18,7 +19,7 @@ void InterCept_EV_WeaponAnimation(int sequence, int body)
 	// we simply send a message up to the server here instead of fixing all places in code
 	// where client side animations are used. - Max Makes Mods, 2019-04-13
 
-	std::string cmd = "vr_wpnanim " + std::to_string(sequence) + " " + std::to_string(body);
+	std::string cmd = VR_CMD_WEAPON_ANIM " " + std::to_string(sequence) + " " + std::to_string(body);
 	gEngfuncs.pfnClientCmd(cmd.data());
 
 	// gEngfuncs.pEventAPI->EV_WeaponAnimation(sequence, body);

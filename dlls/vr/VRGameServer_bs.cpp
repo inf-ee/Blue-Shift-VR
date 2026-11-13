@@ -56,3 +56,16 @@ const char* VRGame::GetRestoreFailedFallbackMap()
 {
 	return "crossfire";
 }
+
+const char* VRGame::GetXenMoundTextureName()
+{
+	return "c2a5mound";
+}
+
+void VRGame::OnTriggerPushTouched(CBaseEntity* pTriggerPush, CBaseEntity* pOther)
+{
+}
+
+void VRGame::OnPlayerTeleported(CBasePlayer* pPlayer, CBaseEntity* pTrigger)
+{
+}

@@ -9,6 +9,8 @@
 #include "soundent.h"
 
 #include "VRControllerTeleporter.h"
+#include "VRGameServer.h"
+#include "VRHooks.h"
 #include "VRPhysicsHelper.h"
 
 
@@ -262,7 +264,7 @@ void VRControllerTeleporter::TouchTriggersInTeleportPath(CBasePlayer* pPlayer)
 			continue;
 
 		// Don't touch xen jump triggers with the teleporter
-		if (hEntity->IsXenJumpTrigger())
+		if (VRIsXenJumpTrigger(hEntity))
 			continue;
 
 		// We handle trigger_teleport separately
@@ -395,7 +397,7 @@ VRControllerTeleporter::TeleportResult VRControllerTeleporter::CanTeleportHere(C
 			const char* texturename = TRACE_TEXTURE(tr.pHit != nullptr ? tr.pHit : INDEXENT(0), beamStartPos, beamEndPos + dir * 32.f);
 
 			// Detect Xen jump pads
-			if (FStrEq(texturename, "c2a5mound") && gGlobalXenMounds.Has(beamEndPos))
+			if (FStrEq(texturename, VRGame::GetXenMoundTextureName()) && gGlobalXenMounds.Has(beamEndPos))
 			{
 				return TeleportResult::XEN_MOUND;
 			}

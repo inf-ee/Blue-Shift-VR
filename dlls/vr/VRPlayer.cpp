@@ -18,6 +18,7 @@
 #include "vr/VRControllerModel.h"
 #include "vr/VRCommons.h"
 #include "vr/VRGameServer.h"
+#include "vr/VRHooks.h"
 #include "client.h" // respawn
 #include "trains.h"
 
@@ -1214,7 +1215,11 @@ void CBasePlayer::VRPreThinkStart()
 			EHandleT<CBaseEntity> hEntity = CBaseEntity::SafeInstance<CBaseEntity>(pent);
 			if (hEntity)
 			{
-				if (!hEntity->CheckIsSpecialVREntity())
+				if (FClassnameIs(hEntity->pev, "trigger_push"))
+				{
+					VRCheckXenJumpPad(hEntity);
+				}
+				else if (!hEntity->CheckIsSpecialVREntity())
 				{
 					g_vrNeedRecheckForSpecialEntities = true;
 				}

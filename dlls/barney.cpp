@@ -27,6 +27,9 @@
 #include "scripted.h"
 #include "weapons.h"
 #include "soundent.h"
+// BSVR start
+#include "vr/VRGameServer.h"
+// BSVR end
 
 //=========================================================
 // Monster's Anim Events Go Here
@@ -719,16 +722,7 @@ Schedule_t* CBarney::GetSchedule()
 	}
 
 	// BSVR start
-	// if (m_MonsterState != MONSTERSTATE_SCRIPT && m_MonsterState != MONSTERSTATE_PRONE && !m_pCine && IsAlive())
-	// {
-	// 	// we are the barney at the start of the first Residue Processing level, who runs into a barnacle.
-	// 	// if we are alive without a script, a player probably saved us
-	// 	if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a4a.bsp")
-	// 		&& FStrEq(STRING(pev->targetname), "barn_run_barn"))
-	// 	{
-	// 		VRAchievementsAndStatsTracker::ResidueBarneyIsAlive();
-	// 	}
-	// }
+	VRGame::OnBarneyGetSchedule(this);
 	// BSVR end
 
 	switch (m_MonsterState)

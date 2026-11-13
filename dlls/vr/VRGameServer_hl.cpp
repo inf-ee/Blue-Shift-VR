@@ -250,3 +250,259 @@ void VRGame::OnPlayerTeleported(CBasePlayer* pPlayer, CBaseEntity* pTrigger)
 	// 	}
 	// }
 }
+
+// Achievement and statistics triggers and map fixes of Half-Life: VR, disabled (commented out) as they were
+// in the files they were moved from. They need VRAchievementsAndStatsTracker and UTIL_VRGiveAchievement from Half-Life: VR.
+
+// From VRPlayer.cpp. The check was disabled there (commented out, returning false).
+bool VRGame::IsTrashCompactor(CBaseEntity* pEntity)
+{
+	// if (!pEntity)
+	// 	return false;
+
+	// std::string modelname = STRING(pEntity->pev->model);
+
+	// if (modelname.empty() || modelname[0] != '*')
+	// 	return false;
+
+	// std::string mapname = STRING(INDEXENT(0)->v.model);
+
+	// if (mapname != std::string{ "maps/c2a3e.bsp" })
+	// 	return false;
+
+	// return modelname == "*6" || modelname == "*13";
+	return false;
+}
+
+// From CHeadCrab::BaseBalled in headcrab.cpp (there: pev is the headcrab's)
+void VRGame::OnHeadcrabBaseBalled(CBaseEntity* pHeadcrab, CBaseEntity* pPlayer)
+{
+	// if baseballed by player in mid-air, give achievement
+	// if (!FBitSet(pev->flags, FL_ONGROUND) && pPlayer && pPlayer->IsNetClient())
+	// {
+	// 	UTIL_VRGiveAchievement(pPlayer, VRAchievement::GEN_BASEBALLED);
+	// }
+}
+
+// From CBaseButton::TriggerAndWait in buttons.cpp (there: pev is the button's, m_hActivator is pActivator)
+void VRGame::OnButtonTriggered(CBaseEntity* pButton, CBaseEntity* pActivator)
+{
+	// // used by player
+	// if (m_hActivator && m_hActivator->IsNetClient())
+	// {
+	// 	// entrance map
+	// 	if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a0.bsp"))
+	// 	{
+	// 		// button for that laptop with "important messages"
+	// 		if (FStrEq(STRING(pev->target), "introroomgizmomm"))
+	// 		{
+	// 			UTIL_VRGiveAchievement(m_hActivator, VRAchievement::AM_IMPORTANTMSG);
+	// 		}
+	// 		// alarm button on barney's desk
+	// 		else if (FStrEq(STRING(pev->target), "buzzerlightsonmm"))
+	// 		{
+	// 			UTIL_VRGiveAchievement(m_hActivator, VRAchievement::AM_TROUBLE);
+	// 		}
+	// 		// light switch in that one office
+	// 		else if (FStrEq(STRING(pev->target), "office1mm"))
+	// 		{
+	// 			UTIL_VRGiveAchievement(m_hActivator, VRAchievement::AM_LIGHTSOFF);
+	// 		}
+	// 	}
+	// 	// rocket map
+	// 	else if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a2h.bsp"))
+	// 	{
+	// 		// button that launches rocket
+	// 		if (FStrEq(STRING(pev->target), "launch_countdownmm"))
+	// 		{
+	// 			UTIL_VRGiveAchievement(m_hActivator, VRAchievement::OAR_INFINITY);
+	// 		}
+	// 	}
+	// 	// blast pit map
+	// 	else if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a4i.bsp"))
+	// 	{
+	// 		// button that launches rocket
+	// 		if (FStrEq(STRING(pev->target), "init_rocket_fire"))
+	// 		{
+	// 			VRAchievementsAndStatsTracker::PlayerLaunchedTentacleRocketFire(m_hActivator);
+	// 		}
+	// 	}
+	// }
+}
+
+// From CBasePlayer::TakeDamage in player.cpp (there: this is the player)
+void VRGame::OnPlayerTakeDamage(CBasePlayer* pPlayer, entvars_s* pevInflictor)
+{
+	// //  start of office complex
+	// if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a2.bsp"))
+	// {
+	// 	// ceiling light that zaps the player
+	// 	if (FStrEq(STRING(pevInflictor->classname), "trigger_hurt") && FStrEq(STRING(pevInflictor->targetname), "kill_player_zap"))
+	// 	{
+	// 		UTIL_VRGiveAchievement(this, VRAchievement::OC_OSHAVIOLATION);
+	// 	}
+	// 	// fan that kills player in vents if not ducked
+	// 	else if (FStrEq(STRING(pevInflictor->classname), "func_rotating") && FStrEq(STRING(pevInflictor->model), "*76"))
+	// 	{
+	// 		UTIL_VRGiveAchievement(this, VRAchievement::OC_DUCK);
+	// 	}
+	// }
+}
+
+// From CBasePlayer::PlayerUse in player.cpp, after the tank and train checks (there: this is the player)
+void VRGame::OnPlayerUsePressed(CBasePlayer* pPlayer)
+{
+	// // Check if player tries to use the trash compactors as train (which is possible in vanilla halflife)
+	// CBaseEntity* pMaybeTrash = CBaseEntity::InstanceOrWorld(pev->groundentity);
+	// if (IsTrashCompactor(pMaybeTrash))
+	// {
+	// 	UTIL_VRGiveAchievement(this, VRAchievement::HID_NOTTRAINS);
+	// }
+}
+
+// From CBarnacle::BarnacleThink in barnacle.cpp, when the tongue has grabbed pTouchEnt
+void VRGame::OnBarnacleTongueTouch(CBaseEntity* pBarnacle, CBaseEntity* pTouchEnt)
+{
+	// // check if a scientist walked into the barnacle tongue while following a player, or after being pushed by the player
+	// if (FClassnameIs(pTouchEnt->pev, "monster_scientist"))
+	// {
+	// 	CBaseMonster* pMonster = dynamic_cast<CBaseMonster*>(pTouchEnt);
+	// 	if (pMonster)
+	// 	{
+	// 		// scientists use bits_COND_SPECIAL1 as bits_COND_CLIENT_PUSH
+	// 		if (pMonster->HasConditions(bits_COND_SPECIAL1) || pMonster->IsFollowing())
+	// 		{
+	// 			UTIL_VRGiveAchievementAll(VRAchievement::HID_ROPES);
+	// 		}
+	// 	}
+	// }
+}
+
+// From CItemSoda::Drink in effects.cpp
+void VRGame::OnSodaDrunk(CBaseEntity* pDrinker)
+{
+	// if (pDrinker && pDrinker->IsNetClient())
+	// {
+	// 	UTIL_VRGiveAchievement(pDrinker, VRAchievement::GEN_REFRESHING);
+	// }
+}
+
+// From CBarney::GetSchedule in barney.cpp (there: this is the barney)
+void VRGame::OnBarneyGetSchedule(CBaseMonster* pBarney)
+{
+	// if (m_MonsterState != MONSTERSTATE_SCRIPT && m_MonsterState != MONSTERSTATE_PRONE && !m_pCine && IsAlive())
+	// {
+	// 	// we are the barney at the start of the first Residue Processing level, who runs into a barnacle.
+	// 	// if we are alive without a script, a player probably saved us
+	// 	if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a4a.bsp")
+	// 		&& FStrEq(STRING(pev->targetname), "barn_run_barn"))
+	// 	{
+	// 		VRAchievementsAndStatsTracker::ResidueBarneyIsAlive();
+	// 	}
+	// }
+}
+
+// From CBreakable::Die in func_break.cpp (there: pev is the breakable's, killedByTrigger is m_killMethod == KillMethod::TRIGGER)
+void VRGame::OnBreakableDie(CBaseEntity* pBreakable, bool killedByTrigger)
+{
+	// destroyed by trigger
+	// if (m_killMethod == KillMethod::TRIGGER)
+	// {
+	// 	// map with kitchen
+	// 	if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a0d.bsp"))
+	// 	{
+	// 		// microwave stew
+	// 		if (FStrEq(STRING(pev->targetname), "stewgibs"))
+	// 		{
+	// 			UTIL_VRGiveAchievementAll(VRAchievement::AM_MAGNUSSON);
+	// 		}
+	// 	}
+	// }
+
+	// // Blast Pit map outside tentacles/rocket silo
+	// if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a4b.bsp"))
+	// {
+	// 	if (FStrEq(STRING(pev->targetname), "barrel_explosion_1")
+	// 		|| FStrEq(STRING(pev->targetname), "barrel_explosion_1d")
+	// 		|| FStrEq(STRING(pev->targetname), "barrel_explosion_1e"))
+	// 	{
+	// 		VRAchievementsAndStatsTracker::PlayerDestroyedBlastPitBridge();
+	// 	}
+	// }
+	// // Blast Pit map with that big fan
+	// else if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a4e.bsp"))
+	// {
+	// 	// grate above big fan, if this breaks, player solved puzzle or cheated
+	// 	if (FStrEq(STRING(pev->model), "*24"))
+	// 	{
+	// 		VRAchievementsAndStatsTracker::PlayerSolvedBlastPitFan();
+	// 	}
+	// }
+}
+
+// From CBasePlayer::Restore in player.cpp, the else branch of "landmark isn't present" (there: this is the player)
+void VRGame::OnPlayerRestoredWithLandmark(CBasePlayer* pPlayer)
+{
+	// else
+	// {
+	// 	// Fix weird bug that puts players slightly too low under the actual spawn location in c4a1f
+	// 	if (STRING(INDEXENT(0)->v.model) == std::string{ "maps/c4a1f.bsp" })
+	// 	{
+	// 		edict_t* pentLandmark = UTIL_FindLandmark("c4a1f");
+	// 		if (pentLandmark)
+	// 		{
+	// 			pev->origin = VARS(pentLandmark)->origin + Vector(0, 0, 1);
+	// 		}
+	// 	}
+	// }
+}
+
+// From CBasePlayer::PlayerUse in player.cpp and VRPreThinkControllersAndTrain in VRPlayer.cpp, when the player starts controlling a train
+void VRGame::OnPlayerUsedTrain(CBasePlayer* pPlayer)
+{
+	// VRAchievementsAndStatsTracker::PlayerUsedTrain(this);
+}
+
+// From CTalkMonster::GibAttack in VRGibs.cpp
+void VRGame::OnGibCaught(CBaseEntity* pMonster, CBaseEntity* thrower)
+{
+	// if (thrower->IsNetClient())
+	// {
+	// 	UTIL_VRGiveAchievement(thrower, VRAchievement::GEN_CATCH);
+	// }
+}
+
+// From VRControllerInteractionManager::CheckAndPressButtons; the hook is called when the bare hand touches an entity while the grip is held and nothing is dragged
+void VRGame::OnBareHandPetting(CBasePlayer* pPlayer, CBaseEntity* pEntity)
+{
+	// The rest of the original condition is checked by the caller:
+	// && !controller.HasDraggedEntity() && isTouching && (isDragging || controller.IsDragging()) && controller.GetWeaponId() == WEAPON_BAREHAND
+	if (FClassnameIs(pEntity->pev, "monster_houndeye"))
+	{
+		// UTIL_VRGiveAchievement(pPlayer, VRAchievement::GEN_PETDOGGO);
+	}
+}
+
+// From VRCrushEntityHandler::CheckEntAndMaybeCrushPlayer (there: dmg is pEntity->pev->dmg)
+void VRGame::OnPlayerTakeNegativeCrushDamage(CBaseEntity* pPlayer, float dmg)
+{
+	// VRAchievementsAndStatsTracker::PlayerTakeNegativeCrushDamage(pPlayer, pEntity->pev->dmg);
+}
+
+// From VRGroundEntityHandler::DetectAndSetGroundEntity, when the player is outside the intro train more than 2 seconds after spawning
+void VRGame::OnPlayerOutsideIntroTrain(CBasePlayer* pPlayer)
+{
+	// UTIL_VRGiveAchievement(m_pPlayer, VRAchievement::HID_HOW);
+}
+
+// From CBasePlayer::VRKilled in VRPlayer.cpp (there: this is the player)
+void VRGame::OnPlayerKilled(CBasePlayer* pPlayer, entvars_s* pevAttacker)
+{
+	// if (pevAttacker
+	// 	&& FClassnameIs(pevAttacker, "func_tank")
+	// 	&& (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a5c.bsp") || FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a5e.bsp") || FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a2g.bsp"))
+	// 	&& (FStrEq(STRING(pevAttacker->targetname), "sniper1") || FStrEq(STRING(pevAttacker->targetname), "sniper2")))
+	// {
+	// 	UTIL_VRGiveAchievement(this, VRAchievement::GEN_SNIPED);
+	// }
+}

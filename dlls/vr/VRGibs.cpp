@@ -9,6 +9,8 @@
 #include "talkmonster.h"
 #include "func_break.h"
 
+#include "VRGameServer.h"
+
 int CGib::m_numGibs = 0;
 
 // CGib::Spawn: called first, removes old gibs if there are too many and counts the new one
@@ -124,8 +126,5 @@ void CTalkMonster::GibAttack(EHandleT<CBaseEntity> thrower, const Vector& pos, i
 	IdleHeadTurn(thrower->pev->origin);
 
 
-	// if (thrower->IsNetClient())
-	// {
-	// 	UTIL_VRGiveAchievement(thrower, VRAchievement::GEN_CATCH);
-	// }
+	VRGame::OnGibCaught(this, thrower);
 }

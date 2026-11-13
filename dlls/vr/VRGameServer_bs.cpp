@@ -69,3 +69,70 @@ void VRGame::OnTriggerPushTouched(CBaseEntity* pTriggerPush, CBaseEntity* pOther
 void VRGame::OnPlayerTeleported(CBasePlayer* pPlayer, CBaseEntity* pTrigger)
 {
 }
+
+bool VRGame::IsTrashCompactor(CBaseEntity* pEntity)
+{
+	return false;
+}
+
+// Blue Shift has no achievements and none of the Half-Life map fixes
+
+void VRGame::OnHeadcrabBaseBalled(CBaseEntity* pHeadcrab, CBaseEntity* pPlayer)
+{
+}
+
+void VRGame::OnButtonTriggered(CBaseEntity* pButton, CBaseEntity* pActivator)
+{
+}
+
+void VRGame::OnPlayerTakeDamage(CBasePlayer* pPlayer, entvars_s* pevInflictor)
+{
+}
+
+void VRGame::OnPlayerUsePressed(CBasePlayer* pPlayer)
+{
+}
+
+void VRGame::OnBarnacleTongueTouch(CBaseEntity* pBarnacle, CBaseEntity* pTouchEnt)
+{
+}
+
+void VRGame::OnSodaDrunk(CBaseEntity* pDrinker)
+{
+}
+
+void VRGame::OnBarneyGetSchedule(CBaseMonster* pBarney)
+{
+}
+
+void VRGame::OnBreakableDie(CBaseEntity* pBreakable, bool killedByTrigger)
+{
+}
+
+void VRGame::OnPlayerRestoredWithLandmark(CBasePlayer* pPlayer)
+{
+}
+
+void VRGame::OnPlayerUsedTrain(CBasePlayer* pPlayer)
+{
+}
+
+void VRGame::OnGibCaught(CBaseEntity* pMonster, CBaseEntity* thrower)
+{
+}
+
+void VRGame::OnBareHandPetting(CBasePlayer* pPlayer, CBaseEntity* pEntity)
+{
+}
+
+void VRGame::OnPlayerTakeNegativeCrushDamage(CBaseEntity* pPlayer, float dmg)
+{
+}
+
+void VRGame::OnPlayerOutsideIntroTrain(CBasePlayer* pPlayer)
+{
+}
+
+void VRGame::OnPlayerKilled(CBasePlayer* pPlayer, entvars_s* pevAttacker)
+{
+}

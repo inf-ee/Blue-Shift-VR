@@ -25,6 +25,7 @@
 
 // BSVR start
 #include "vr/VRPhysicsHelper.h"
+#include "vr/VRGameServer.h"
 // BSVR end
 
 //=========================================================
@@ -582,11 +583,9 @@ void CHeadCrab::BaseBalled(CBaseEntity* pPlayer, const Vector& velocity)
 		m_flNextAttack = gpGlobals->time + 2.f;
 
 
-		// if baseballed by player in mid-air, give achievement
-		// if (!FBitSet(pev->flags, FL_ONGROUND) && pPlayer && pPlayer->IsNetClient())
-		// {
-		// 	UTIL_VRGiveAchievement(pPlayer, VRAchievement::GEN_BASEBALLED);
-		// }
+		// BSVR start
+		VRGame::OnHeadcrabBaseBalled(this, pPlayer);
+		// BSVR end
 	}
 
 	// take off ground

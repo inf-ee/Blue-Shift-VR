@@ -57,7 +57,31 @@ static bool pm_shared_initialized = false;
 
 playermove_t* pmove = NULL;
 
-// BSVR start
+// BSVR start - these types come from com_model.h - original:
+// typedef struct
+// {
+// 	int planenum;
+// 	short children[2]; // negative numbers are contents
+// } dclipnode_t;
+//
+// typedef struct mplane_s
+// {
+// 	Vector normal; // surface normal
+// 	float dist;	   // closest appoach to origin
+// 	byte type;	   // for texture axis selection and fast side tests
+// 	byte signbits; // signx + signy<<1 + signz<<1
+// 	byte pad[2];
+// } mplane_t;
+//
+// typedef struct hull_s
+// {
+// 	dclipnode_t* clipnodes;
+// 	mplane_t* planes;
+// 	int firstclipnode;
+// 	int lastclipnode;
+// 	Vector clip_mins;
+// 	Vector clip_maxs;
+// } hull_t;
 #include "vr/VRPMShared.h"
 // BSVR end
 
@@ -1672,8 +1696,10 @@ void PM_CatagorizePosition()
 	point[1] = pmove->origin[1];
 	point[2] = pmove->origin[2] - 2;
 
-	// BSVR updated to 90
+	// BSVR start - updated to 90
+	// if (pmove->velocity[2] > 180) // Shooting up really fast.  Definitely not on ground. - original
 	if (pmove->velocity[2] > 90) // Shooting up really fast.  Definitely not on ground.
+	// BSVR end
 	{
 		pmove->onground = -1;
 	}
@@ -2149,9 +2175,15 @@ void PM_Duck()
 		pmove->cmd.upmove *= PLAYER_DUCKING_MULTIPLIER;
 	}
 
-	if ((pmove->cmd.buttons & IN_DUCK) != 0 || (pmove->cmd.buttons_ex & X_IN_VRDUCK) != 0 || (0 != pmove->bInDuck) || (pmove->flags & FL_DUCKING) != 0) // BSVR: X_IN_VRDUCK added (physical crouch in VR)
+	// BSVR start - X_IN_VRDUCK added (physical crouch in VR)
+	// if ((pmove->cmd.buttons & IN_DUCK) != 0 || (0 != pmove->bInDuck) || (pmove->flags & FL_DUCKING) != 0) - original
+	if ((pmove->cmd.buttons & IN_DUCK) != 0 || (pmove->cmd.buttons_ex & X_IN_VRDUCK) != 0 || (0 != pmove->bInDuck) || (pmove->flags & FL_DUCKING) != 0)
+	// BSVR end
 	{
-		if ((pmove->cmd.buttons & IN_DUCK) != 0 || (pmove->cmd.buttons_ex & X_IN_VRDUCK) != 0) // BSVR: X_IN_VRDUCK added
+		// BSVR start - X_IN_VRDUCK added
+		// if ((pmove->cmd.buttons & IN_DUCK) != 0) - original
+		if ((pmove->cmd.buttons & IN_DUCK) != 0 || (pmove->cmd.buttons_ex & X_IN_VRDUCK) != 0)
+		// BSVR end
 		{
 			// BSVR start
 			bool switchToDuck = false;
@@ -2170,6 +2202,7 @@ void PM_Duck()
 			time = V_max(0.0, (1.0 - (float)pmove->flDuckTime / 1000.0));
 
 			// BSVR start changed body
+			// if (0 != pmove->bInDuck) - original
 			if (0 != pmove->bInDuck && ((float)pmove->flDuckTime / 1000.0 <= (1.0 - TIME_TO_DUCK)) || (pmove->onground == -1) || ((pmove->cmd.buttons_ex & X_IN_VRDUCK) != 0 && (pmove->flags & FL_DUCKING) == 0)) // BSVR: VR crouch ducks immediately (as in Half-Life-VR)
 			{
 				pmove->bInDuck = 0;
@@ -2184,7 +2217,7 @@ void PM_Duck()
 				// Finish ducking immediately if duck time is over or not on ground
 				// BSVR start commented out
 				// if (((float)pmove->flDuckTime / 1000.0 <= (1.0 - TIME_TO_DUCK)) ||
-				// 	(pmove->onground == -1) || ((pmove->cmd.buttons_ex & X_IN_VRDUCK) != 0 && (pmove->flags & FL_DUCKING) == 0)) // BSVR: VR crouch
+				// 	(pmove->onground == -1))
 				// BSVR end
 				pmove->usehull = 1;
 				// pmove->view_ofs = VEC_DUCK_VIEW; // BSVR: view_ofs is driven by the HMD (UpdateVRHeadset), removed as in Half-Life-VR
@@ -3078,7 +3111,10 @@ void PM_CheckParamters()
 	}
 
 	if ((pmove->flags & FL_FROZEN) != 0 ||
-		(pmove->flags & FL_STUCK_ONTRAIN) != 0 || // BSVR: Renamed from FL_ONTRAIN
+		// BSVR start - renamed from FL_ONTRAIN
+		// (pmove->flags & FL_ONTRAIN) != 0 || - original
+		(pmove->flags & FL_STUCK_ONTRAIN) != 0 ||
+		// BSVR end
 		0 != pmove->dead)
 	{
 		pmove->cmd.forwardmove = 0;
@@ -3225,7 +3261,10 @@ void PM_PlayerMove(qboolean server)
 
 	g_onladder = false;
 	// Don't run ladder code if dead or on a train
-	if (0 == pmove->dead && (pmove->flags & FL_STUCK_ONTRAIN) == 0 && !pmoveIgnoreLadders) // BSVR: added pmoveIgnoreLadders check // BSVR: Renamed from FL_ONTRAIN
+	// BSVR start - added pmoveIgnoreLadders check, renamed from FL_ONTRAIN
+	// if (0 == pmove->dead && (pmove->flags & FL_ONTRAIN) == 0) - original
+	if (0 == pmove->dead && (pmove->flags & FL_STUCK_ONTRAIN) == 0 && !pmoveIgnoreLadders)
+	// BSVR end
 	{
 		pLadder = PM_Ladder();
 		if (pLadder)
@@ -3239,7 +3278,10 @@ void PM_PlayerMove(qboolean server)
 	PM_Duck();
 
 	// Don't run ladder code if dead or on a train
-	if (0 == pmove->dead && (pmove->flags & FL_STUCK_ONTRAIN) == 0) // BSVR: Renamed from FL_ONTRAIN
+	// BSVR start - renamed from FL_ONTRAIN
+	// if (0 == pmove->dead && (pmove->flags & FL_ONTRAIN) == 0) - original
+	if (0 == pmove->dead && (pmove->flags & FL_STUCK_ONTRAIN) == 0)
+	// BSVR end
 	{
 		// BSVR start
 		// Old code

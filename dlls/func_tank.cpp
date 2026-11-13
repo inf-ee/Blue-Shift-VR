@@ -191,6 +191,7 @@ void CFuncTank::Spawn()
 	pev->movetype = MOVETYPE_PUSH; // so it doesn't get pushed by anything
 
 	// BSVR start - only else is upstream
+	// pev->solid = SOLID_BSP; - original
 	if (FBitSet(pev->spawnflags, SF_TANK_CANCONTROL) && CVAR_GET_FLOAT("vr_make_mountedguns_nonsolid") != 0.f)
 	{
 		pev->solid = SOLID_NOT;
@@ -426,6 +427,7 @@ void CFuncTank::ControllerPostFrame()
 		return;
 
 	// BSVR start added additional checks
+	// if ((m_pController->pev->button & IN_ATTACK) != 0) - original
 	if (((m_pController->pev->button & IN_ATTACK) != 0) || m_pController->IsAnyControllerFiringAndHoldingThisTank(this))
 	// BSVR end
 	{

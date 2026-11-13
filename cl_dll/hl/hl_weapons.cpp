@@ -712,6 +712,8 @@ void HUD_WeaponsPostThink(local_state_s* from, local_state_s* to, usercmd_t* cmd
 	// BSVR start
 	// Or if the weapon is blocked (e.g. player is using a mounted gun) - Max Makes Mods, 2018-02-04
 	extern bool GetHUDWeaponBlocked();
+	// if ((player.pev->deadflag != (DEAD_DISCARDBODY + 1)) && - original
+	// 	!CL_IsDead() && 0 != player.pev->viewmodel && 0 == g_iUser1)
 	if ((player.pev->deadflag != (DEAD_DISCARDBODY + 1)) &&
 		!CL_IsDead() && 0 != player.pev->viewmodel && 0 == g_iUser1 && !GetHUDWeaponBlocked())
 	// BSVR end

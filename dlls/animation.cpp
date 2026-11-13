@@ -323,6 +323,7 @@ int GetSequenceFlags(void* pmodel, entvars_t* pev)
 
 
 // BSVR start
+// int GetAnimationEvent(void* pmodel, entvars_t* pev, MonsterEvent_t* pMonsterEvent, float flStart, float flEnd, int index) - original
 int GetAnimationEvent(void* pmodel, entvars_t* pev, MonsterEvent_t* pMonsterEvent, float flStart, float flEnd, int index, ClientAnimEvent_t* pClientAnimEvent)
 // BSVR end
 {

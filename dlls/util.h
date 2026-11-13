@@ -219,6 +219,7 @@ typedef enum
 inline bool FStrEq(const char* sz1, const char* sz2)
 {
 	// BSVR start - null-safe comparison from Half-Life-VR (VR code passes results of TRACE_TEXTURE etc. that may be nullptr)
+	// return (strcmp(sz1, sz2) == 0); - original
 	return (sz1 == sz2 || (sz1 != nullptr && sz2 != nullptr && strcmp(sz1, sz2) == 0));
 	// BSVR end
 }

@@ -29,11 +29,6 @@ This file contains "stubs" of class member implementations so that we can predic
 #include "nodes.h"
 #include "soundent.h"
 #include "skill.h"
-// BSVR start
-#include "cl_dll.h"
-#include "vr/VRHelper.h"
-#include "vr/VRRenderer.h"
-// BSVR end
 
 void EMIT_SOUND_DYN(edict_t* entity, int channel, const char* sample, float volume, float attenuation, int flags, int pitch) {}
 
@@ -52,9 +47,6 @@ bool CBaseEntity::ShouldToggle(USE_TYPE useType, bool currentState) { return fal
 int CBaseEntity::DamageDecal(int bitsDamageType) { return -1; }
 CBaseEntity* CBaseEntity::Create(const char* szName, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner) { return NULL; }
 void CBaseEntity::SUB_Remove() {}
-// BSVR start
-void CBaseEntity::UpdateOnRemove() {}
-// BSVR end
 
 // CBaseDelay Stubs
 bool CBaseDelay::KeyValue(struct KeyValueData_s*) { return false; }
@@ -77,9 +69,6 @@ void UTIL_GunshotDecalTrace(TraceResult* pTrace, int decalNumber) {}
 void UTIL_MakeVectors(const Vector& vecAngles) {}
 bool UTIL_IsValidEntity(edict_t* pent) { return true; }
 void UTIL_SetOrigin(entvars_t*, const Vector& org) {}
-// BSVR start
-// bool UTIL_GetNextBestWeapon(CBasePlayer* pPlayer, CBasePlayerItem* pCurrentWeapon) { return true; }
-// BSVR end
 void UTIL_LogPrintf(char*, ...) {}
 void UTIL_ClientPrintAll(int, char const*, char const*, char const*, char const*, char const*) {}
 void ClientPrint(entvars_t* client, int msg_dest, const char* msg_name, const char* param1, const char* param2, const char* param3, const char* param4) {}
@@ -102,13 +91,6 @@ void CGrenade::Spawn() {}
 CGrenade* CGrenade::ShootTimed(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, float time) { return 0; }
 CGrenade* CGrenade::ShootContact(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity) { return 0; }
 void CGrenade::DetonateUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value) {}
-// BSVR start
-bool CGrenade::IsDraggable() { return false; }
-void CGrenade::HandleDragStart() {}
-void CGrenade::HandleDragStop() {}
-void CGrenade::HandleDragUpdate(const Vector& origin, const Vector& velocity, const Vector& angles) {}
-void CGrenade::BaseBalled(CBaseEntity* pPlayer, const Vector& velocity) {}
-// BSVR end
 
 void UTIL_Remove(CBaseEntity* pEntity) {}
 void UTIL_SetSize(entvars_t* pev, const Vector& vecMin, const Vector& vecMax) {}
@@ -117,6 +99,8 @@ CBaseEntity* UTIL_FindEntityInSphere(CBaseEntity* pStartEntity, const Vector& ve
 Vector UTIL_VecToAngles(const Vector& vec) { return 0; }
 CSprite* CSprite::SpriteCreate(const char* pSpriteName, const Vector& origin, bool animate) { return 0; }
 void CBeam::PointEntInit(const Vector& start, int endIndex) {}
+const Vector& CBeam::GetStartPos() { return g_vecZero; }
+const Vector& CBeam::GetEndPos() { return g_vecZero; }
 CBeam* CBeam::BeamCreate(const char* pSpriteName, int width) { return NULL; }
 void CSprite::Expand(float scaleSpeed, float fadeSpeed) {}
 
@@ -296,7 +280,7 @@ void CBasePlayer::BarnacleVictimBitten(entvars_t* pevBarnacle) {}
 void CBasePlayer::BarnacleVictimReleased() {}
 int CBasePlayer::Illumination() { return 0; }
 void CBasePlayer::EnableControl(bool fControl) {}
-// BSVR start
+// BSVR start - implemented in vr/VRClientPlayer.cpp
 // Vector CBasePlayer::GetAutoaimVector(float flDelta) { return g_vecZero; }
 // BSVR end
 Vector CBasePlayer::AutoaimDeflection(Vector& vecSrc, float flDist, float flDelta) { return g_vecZero; }
@@ -306,7 +290,7 @@ int CBasePlayer::GetCustomDecalFrames() { return -1; }
 void CBasePlayer::DropPlayerItem(char* pszItemName) {}
 bool CBasePlayer::HasPlayerItem(CBasePlayerItem* pCheckItem) { return false; }
 bool CBasePlayer::SwitchWeapon(CBasePlayerItem* pWeapon) { return false; }
-// BSVR start
+// BSVR start - implemented in vr/VRClientPlayer.cpp
 // Vector CBasePlayer::GetGunPosition() { return g_vecZero; }
 // BSVR end
 const char* CBasePlayer::TeamID() { return ""; }
@@ -314,17 +298,6 @@ int CBasePlayer::GiveAmmo(int iCount, const char* szName, int iMax) { return 0; 
 void CBasePlayer::AddPoints(int score, bool bAllowNegativeScore) {}
 void CBasePlayer::AddPointsToTeam(int score, bool bAllowNegativeScore) {}
 void CBasePlayer::TabulateAmmo() {}
-
-// BSVR start
-Vector CBasePlayer::GetGunPosition(void)
-{
-	return gVRRenderer.GetHelper()->GetGunPosition();
-}
-Vector CBasePlayer::GetAutoaimVector(float flDelta)
-{
-	return gVRRenderer.GetHelper()->GetAutoaimVector();
-}
-// BSVR end
 
 void ClearMultiDamage() {}
 void ApplyMultiDamage(entvars_t* pevInflictor, entvars_t* pevAttacker) {}

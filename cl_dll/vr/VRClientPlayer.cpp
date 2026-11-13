@@ -1,4 +1,5 @@
-// VR weapon pose functions of the client-side CBasePlayer, moved from hl/hl_baseentity.cpp
+// VR weapon pose functions of the client-side CBasePlayer, and client stubs of the VR methods of server classes
+// (the SDK's own stubs are in hl/hl_baseentity.cpp)
 
 #include "extdll.h"
 #include "util.h"
@@ -38,3 +39,20 @@ bool CBasePlayer::VRCanAttack()
 {
 	return gVRRenderer.GetHelper()->CanAttack();
 }
+
+Vector CBasePlayer::GetGunPosition(void)
+{
+	return gVRRenderer.GetHelper()->GetGunPosition();
+}
+Vector CBasePlayer::GetAutoaimVector(float flDelta)
+{
+	return gVRRenderer.GetHelper()->GetAutoaimVector();
+}
+
+// Stubs
+void CBaseEntity::UpdateOnRemove() {}
+bool CGrenade::IsDraggable() { return false; }
+void CGrenade::HandleDragStart() {}
+void CGrenade::HandleDragStop() {}
+void CGrenade::HandleDragUpdate(const Vector& origin, const Vector& velocity, const Vector& angles) {}
+void CGrenade::BaseBalled(CBaseEntity* pPlayer, const Vector& velocity) {}

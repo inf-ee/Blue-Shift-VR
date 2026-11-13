@@ -21,6 +21,7 @@
 #include "VROpenGLInterceptor.h"
 #include "VREngineInterceptor.h"
 #include "vr/VRHudMessages.h"
+#include "VRGameClient.h"
 
 #ifndef MAX_COMMAND_SIZE
 #define MAX_COMMAND_SIZE 256
@@ -315,7 +316,7 @@ std::string GetHLVRModVersion()
 {
 	try
 	{
-		auto path = std::string("./valve/liblist.gam");
+		auto path = std::string(VRGame::GetVersionFilePath());
 		if (std::filesystem::exists(path))
 		{
 			std::ifstream liblistgam(path);
@@ -363,18 +364,18 @@ void VRHelper::Init()
 	std::string version = GetHLVRModVersion();
 	if (gEngfuncs.pfnGetGameDirectory() != std::string("valve"))
 	{
-		gEngfuncs.Con_DPrintf("[Half-Life: VR Initializing. Version: %s, with mod %s]\n", version.c_str(), gEngfuncs.pfnGetGameDirectory());
+		gEngfuncs.Con_DPrintf("[%s Initializing. Version: %s, with mod %s]\n", VRGame::GetModTitle(), version.c_str(), gEngfuncs.pfnGetGameDirectory());
 	}
 	else
 	{
-		gEngfuncs.Con_DPrintf("[Half-Life: VR Initializing. Version: %s]\n", version.c_str());
+		gEngfuncs.Con_DPrintf("[%s Initializing. Version: %s]\n", VRGame::GetModTitle(), version.c_str());
 	}
 
 	g_vrSettings.Init();
 
 	if (0 == IEngineStudio.IsHardware())
 	{
-		Exit("Software mode not supported. Please start this game with OpenGL renderer. (Start Half-Life, open the Options menu, select Video, chose OpenGL as Renderer, save, quit Half-Life, then start Half-Life: VR)");
+		Exit((std::string("Software mode not supported. Please start this game with OpenGL renderer. (Start Half-Life, open the Options menu, select Video, chose OpenGL as Renderer, save, quit Half-Life, then start ") + VRGame::GetModTitle() + ")").c_str());
 	}
 	else if (!InitAdditionalGLFunctions())
 	{
@@ -439,8 +440,8 @@ void VRHelper::Exit(const char* lpErrorMessage)
 	vrCompositor = nullptr;
 	if (lpErrorMessage != nullptr)
 	{
-		gEngfuncs.Con_DPrintf("Error starting Half-Life: VR: %s\n", lpErrorMessage);
-		std::cerr << "Error starting Half-Life: VR: " << lpErrorMessage << std::endl
+		gEngfuncs.Con_DPrintf("Error starting %s: %s\n", VRGame::GetModTitle(), lpErrorMessage);
+		std::cerr << "Error starting " << VRGame::GetModTitle() << ": " << lpErrorMessage << std::endl
 				  << std::flush;
 		g_vrInput.DisplayErrorPopup(lpErrorMessage);
 	}

@@ -559,3 +559,113 @@ bool VRGame::ReplaceSpecialWall(CBaseEntity* pWall)
 	}
 	return false;
 }
+
+const VRAllyInfo* VRGame::GetAllyInfo(const char* classname)
+{
+	static const VRAllyInfo barney{"BA_GUN_ONE", "BA_GUN_TWO", "BA_GUN_THR", "BA_GUN_ATT", true, "Barney Disarm"};
+	static const VRAllyInfo scientist{"SC_GUN_ONE", "SC_GUN_TWO", "SC_GUN_THR", "SC_GUN_RUN", false, nullptr};
+
+	if (strcmp(classname, "monster_barney") == 0)
+		return &barney;
+	if (strcmp(classname, "monster_scientist") == 0)
+		return &scientist;
+	return nullptr;
+}
+
+bool VRGame::IsSoftWeapon(int weaponId)
+{
+	switch (weaponId)
+	{
+	case WEAPON_HORNETGUN:
+	case WEAPON_NONE:
+	case WEAPON_BAREHAND:
+	case WEAPON_SNARK:
+		return true;
+	default:
+		return false;
+	}
+}
+
+float VRGame::GetMeleeDamageScale(int iId)
+{
+	switch (iId)
+	{
+	case WEAPON_CROWBAR:
+		return 1.f;
+	case WEAPON_HORNETGUN:
+		return 0.05f;
+	case WEAPON_NONE:
+	case WEAPON_BAREHAND:
+	case WEAPON_SNARK:
+		return 0.1f;
+	case WEAPON_HANDGRENADE:
+	case WEAPON_TRIPMINE:
+	case WEAPON_SATCHEL:
+		return 0.2f;
+	case WEAPON_GLOCK:
+	case WEAPON_PYTHON:
+		return 0.3f;
+	case WEAPON_MP5:
+	case WEAPON_SHOTGUN:
+	case WEAPON_CROSSBOW:
+		return 0.4f;
+	case WEAPON_RPG:
+	case WEAPON_GAUSS:
+	case WEAPON_EGON:
+		return 0.5f;
+	default:
+		return 0.1f;
+	}
+}
+
+int VRGame::GetMeleeDamageType(int iId)
+{
+	switch (iId)
+	{
+	case WEAPON_CROWBAR:
+		return DMG_CLUB;
+	default:
+		return DMG_CLUB | DMG_NEVERGIB;
+	}
+}
+
+// From CBasePlayer::VRPreThinkStart in VRPlayer.cpp (there: this is the player). The code that was live there is
+// commented out here as well: it uses the private members m_vrHasSurfacedInThatMapWithTheTank and
+// m_vrJustGotYeetedByBPTrain of CBasePlayer, which nothing sets while the achievements are disabled.
+void VRGame::OnPlayerPreThinkStart(CBasePlayer* pPlayer)
+{
+	// VRAchievementsAndStatsTracker::Update(this);
+
+	// if (!m_vrHasSurfacedInThatMapWithTheTank)
+	// {
+		// if (pev->origin.z > 0.f && FStrEq(STRING(INDEXENT(0)->v.model), "maps/c2a5b.bsp"))
+		// {
+		// 	m_vrHasSurfacedInThatMapWithTheTank = true;
+		// 	VRAchievementsAndStatsTracker::PlayerSurfacedInThatMapWithTheTank(this);
+		// }
+	// }
+
+	// if (m_vrJustGotYeetedByBPTrain && FBitSet(pev->flags, FL_ONGROUND))
+	// {
+		// we landed after getting yeeted by that train at the beginning of Blast Pit
+	// 	m_vrJustGotYeetedByBPTrain = false;
+
+		// // sanity check that map is still correct
+		// if (FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a4.bsp"))
+		// {
+		// 	// check that player landed roughly in pipe opening
+		// 	if (pev->absmin.z > -3290.f && pev->absmin.z < -3130.f
+		// 		&& pev->origin.x > -990.f && pev->origin.x < -780.f
+		// 		&& pev->origin.y > -2610.f && pev->origin.y < -2470.f)
+		// 	{
+		// 		UTIL_VRGiveAchievement(this, VRAchievement::BP_PERFECT);
+		// 	}
+		// }
+	// }
+
+	// extern bool VRGlobalGetNoclipMode();
+	// if (VRGlobalGetNoclipMode())
+	// {
+		// VRAchievementsAndStatsTracker::PlayerUsedNoclip(this);
+	// }
+}

@@ -15,6 +15,8 @@
 #undef HSPRITE
 #else
 #include <SDL2/SDL_messagebox.h>
+#include <string>
+#include "VRGameClient.h"
 #endif
 
 #ifdef _WIN32
@@ -66,7 +68,7 @@ void VRForceWindowToForeground()
 void VRDisplayErrorPopup(const char* errorMessage)
 {
 	VRFindHLWindow();
-	MessageBoxA(hlWindow, errorMessage, "Error starting Half-Life: VR", MB_OK);
+	MessageBoxA(hlWindow, errorMessage, (std::string("Error starting ") + VRGame::GetModTitle()).c_str(), MB_OK);
 }
 } // namespace
 #endif
@@ -157,7 +159,7 @@ void VRInput::DisplayErrorPopup(const char* errorMessage)
 #ifdef _WIN32
 	VRDisplayErrorPopup(errorMessage);
 #else
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error starting Half-Life: VR", errorMessage, nullptr);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, (std::string("Error starting ") + VRGame::GetModTitle()).c_str(), errorMessage, nullptr);
 #endif
 }
 

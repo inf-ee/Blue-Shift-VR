@@ -545,20 +545,6 @@ void VRControllerInteractionManager::CheckAndPressButtons(CBasePlayer* pPlayer, 
 	HitWorld(pPlayer, controller);
 }
 
-bool IsSoftWeapon(int weaponId)
-{
-	switch (weaponId)
-	{
-	case WEAPON_HORNETGUN:
-	case WEAPON_NONE:
-	case WEAPON_BAREHAND:
-	case WEAPON_SNARK:
-		return true;
-	default:
-		return false;
-	}
-}
-
 bool CheckIntersectsWorld(VRController& controller, VRPhysicsHelperModelBBoxIntersectResult* result)
 {
 	// Check each hitbox of current weapon
@@ -628,7 +614,7 @@ void VRControllerInteractionManager::HitWorld(CBasePlayer* pPlayer, VRController
 	if (volume > 1.f)
 		volume = 1.f;
 
-	if (IsSoftWeapon(controller.GetWeaponId()))
+	if (VRGame::IsSoftWeapon(controller.GetWeaponId()))
 	{
 		switch (RANDOM_LONG(0, 6))
 		{
@@ -725,7 +711,7 @@ float VRControllerInteractionManager::DoDamage(CBasePlayer* pPlayer, CBaseEntity
 		pPlayer->PlayMeleeSmackSound(pEntity, controller.GetWeaponId(), impactPosition, controllerSwingVelocity);
 
 		// Slapping with soft things (hands, snarks or hornetgun) just causes damage, but no blood or decals
-		g_vrSuppressBlood = IsSoftWeapon(controller.GetWeaponId());
+		g_vrSuppressBlood = VRGame::IsSoftWeapon(controller.GetWeaponId());
 		TraceResult fakeTrace = {0};
 		fakeTrace.pHit = pEntity->edict();
 		fakeTrace.vecEndPos = impactPosition;
@@ -1200,9 +1186,8 @@ bool VRControllerInteractionManager::HandleTossables(CBasePlayer* pPlayer, CBase
 
 bool VRControllerInteractionManager::HandleAlliedMonsters(CBasePlayer* pPlayer, CBaseEntity* pEntity, const VRController& controller, const Interaction& interaction)
 {
-	// Special handling of barneys and scientists that don't hate us (yet)
-	// BSVR: Rosenberg is a following scientist too (gunpoint lines fall back to the SC_GUN_* groups)
-	if ((FClassnameIs(pEntity->pev, "monster_barney") || FClassnameIs(pEntity->pev, "monster_scientist") || FClassnameIs(pEntity->pev, "monster_rosenberg")))
+	// Special handling of allies (barneys, scientists, ...) that don't hate us (yet)
+	if (VRGame::GetAllyInfo(STRING(pEntity->pev->classname)) != nullptr)
 	{
 		CTalkMonster* pMonster = dynamic_cast<CTalkMonster*>(pEntity);
 		if (pMonster && !pMonster->HasMemory(bits_MEMORY_PROVOKED))
@@ -1249,6 +1234,10 @@ void VRControllerInteractionManager::GetAngryIfAtGunpoint(CBasePlayer* pPlayer, 
 	if (vr_npc_gunpoint == 0.f)
 		return;
 
+	const VRAllyInfo* ally = VRGame::GetAllyInfo(STRING(pMonster->pev->classname));
+	if (ally == nullptr)
+		return;
+
 	// if we already hate the player, no need to react to guns
 	if (pMonster->HasMemory(bits_MEMORY_PROVOKED) || pMonster->HasMemory(bits_MEMORY_GUNPOINT_ATTACK))
 		return;
@@ -1266,54 +1255,29 @@ void VRControllerInteractionManager::GetAngryIfAtGunpoint(CBasePlayer* pPlayer, 
 			pMonster->MakeIdealYaw(pPlayer->pev->origin);
 			if (pMonster->HasMemory(bits_MEMORY_GUNPOINT_THREE) && vr_npc_gunpoint > 1.f)
 			{
-				if (FClassnameIs(pMonster->pev, "monster_barney"))
-				{
-					pMonster->PlaySentence("BA_GUN_ATT", 4, VOL_NORM, ATTN_NORM);
-				}
-				else
-				{
-					pMonster->PlaySentence("SC_GUN_RUN", 4, VOL_NORM, ATTN_NORM);
-				}
+				pMonster->PlaySentence(ally->gunpointAttack, 4, VOL_NORM, ATTN_NORM);
 				pMonster->StopFollowing(true);
 				pMonster->Remember(bits_MEMORY_PROVOKED);
 				pMonster->Remember(bits_MEMORY_GUNPOINT_ATTACK);
 			}
 			else if (pMonster->HasMemory(bits_MEMORY_GUNPOINT_TWO))
 			{
-				if (FClassnameIs(pMonster->pev, "monster_barney"))
+				pMonster->PlaySentence(ally->gunpointThree, 4, VOL_NORM, ATTN_NORM);
+				if (ally->isArmed)
 				{
-					pMonster->PlaySentence("BA_GUN_THR", 4, VOL_NORM, ATTN_NORM);
 					pMonster->m_MonsterState = MONSTERSTATE_COMBAT; // Make barneys draw their gun and point at player
-				}
-				else
-				{
-					pMonster->PlaySentence("SC_GUN_THR", 4, VOL_NORM, ATTN_NORM);
 				}
 				pMonster->Remember(bits_MEMORY_SUSPICIOUS);
 				pMonster->Remember(bits_MEMORY_GUNPOINT_THREE);
 			}
 			else if (pMonster->HasMemory(bits_MEMORY_GUNPOINT_ONE))
 			{
-				if (FClassnameIs(pMonster->pev, "monster_barney"))
-				{
-					pMonster->PlaySentence("BA_GUN_TWO", 4, VOL_NORM, ATTN_NORM);
-				}
-				else
-				{
-					pMonster->PlaySentence("SC_GUN_TWO", 4, VOL_NORM, ATTN_NORM);
-				}
+				pMonster->PlaySentence(ally->gunpointTwo, 4, VOL_NORM, ATTN_NORM);
 				pMonster->Remember(bits_MEMORY_GUNPOINT_TWO);
 			}
 			else
 			{
-				if (FClassnameIs(pMonster->pev, "monster_barney"))
-				{
-					pMonster->PlaySentence("BA_GUN_ONE", 4, VOL_NORM, ATTN_NORM);
-				}
-				else
-				{
-					pMonster->PlaySentence("SC_GUN_ONE", 4, VOL_NORM, ATTN_NORM);
-				}
+				pMonster->PlaySentence(ally->gunpointOne, 4, VOL_NORM, ATTN_NORM);
 				pMonster->Remember(bits_MEMORY_GUNPOINT_ONE);
 			}
 			pMonster->vr_flGunPointTime = gpGlobals->time + RANDOM_FLOAT(VR_MIN_ANGRY_GUNPOINT_TIME, VR_MAX_ANGRY_GUNPOINT_TIME);
@@ -1321,10 +1285,10 @@ void VRControllerInteractionManager::GetAngryIfAtGunpoint(CBasePlayer* pPlayer, 
 	}
 	else
 	{
-		if (!pMonster->m_hEnemy && pMonster->HasMemory(bits_MEMORY_GUNPOINT_THREE) && FClassnameIs(pMonster->pev, "monster_barney"))
+		if (!pMonster->m_hEnemy && pMonster->HasMemory(bits_MEMORY_GUNPOINT_THREE) && ally->disarmScheduleName != nullptr)
 		{
 			pMonster->m_MonsterState = MONSTERSTATE_ALERT;
-			pMonster->ChangeSchedule(pMonster->ScheduleFromName("Barney Disarm"));
+			pMonster->ChangeSchedule(pMonster->ScheduleFromName(ally->disarmScheduleName));
 		}
 		pMonster->vr_flGunPointTime = 0;
 		pMonster->Forget(bits_MEMORY_GUNPOINT_ONE);

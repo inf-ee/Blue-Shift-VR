@@ -22,6 +22,20 @@ enum class VRCrushMode
 	HEALING_EXPLOIT
 };
 
+// A friendly NPC that reacts to the player's gestures and to being held at gunpoint (VRControllerInteractionManager.cpp)
+struct VRAllyInfo
+{
+	// Sentence groups for a gun pointed at the NPC: first, second and third warning, then the NPC turns on the player
+	const char* gunpointOne;
+	const char* gunpointTwo;
+	const char* gunpointThree;
+	const char* gunpointAttack;
+	// An armed NPC goes into combat state at the third warning (it draws its weapon)...
+	bool isArmed;
+	// ...and runs this schedule when the player stops aiming at it. nullptr if it has none.
+	const char* disarmScheduleName;
+};
+
 namespace VRGame
 {
 // Crush mode of a brush model ("*63") on a map ("maps/c1a0c.bsp"). VRCrushMode::NEVER if not listed.
@@ -53,6 +67,9 @@ void OnTriggerPushTouched(CBaseEntity* pTriggerPush, CBaseEntity* pOther);
 // Called after a trigger_teleport teleported the player.
 void OnPlayerTeleported(CBasePlayer* pPlayer, CBaseEntity* pTrigger);
 
+// The ally data for an entity classname, nullptr if entities of this class are not allies.
+const VRAllyInfo* GetAllyInfo(const char* classname);
+
 // Weapon sets, by weapon id (WEAPON_*)
 // Weapons that shoot: NPCs react when one is pointed at them
 bool IsWeaponWithRange(int iId);
@@ -60,6 +77,15 @@ bool IsWeaponWithRange(int iId);
 bool IsWeapon(int iId);
 bool IsExplosiveWeapon(int iId);
 bool IsWeaponWithVRLaserSpot(int iId);
+// Weapons that do no visible harm when the player hits something with them (no blood)
+bool IsSoftWeapon(int iId);
+// Damage of hitting something with the weapon in the hand, as a factor of the crowbar's damage
+float GetMeleeDamageScale(int iId);
+// Damage type (DMG_*) of hitting something with the weapon in the hand
+int GetMeleeDamageType(int iId);
+
+// Called at the start of the player's PreThink.
+void OnPlayerPreThinkStart(CBasePlayer* pPlayer);
 
 // True for brush entities that look like a controllable train but must not be usable as one
 // (the trash compactors in Half-Life, which the vanilla game lets the player "drive").

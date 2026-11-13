@@ -124,11 +124,7 @@ void CGMan::Spawn()
 	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 
 	// BSVR start
-	pev->scale = CVAR_GET_FLOAT("vr_npcscale");
-	if (pev->scale <= 0.f)
-	{
-		pev->scale = 1.f;
-	}
+	VRApplyNpcScale();
 	// BSVR end
 
 	pev->solid = SOLID_SLIDEBOX;

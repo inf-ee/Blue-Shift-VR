@@ -367,5 +367,8 @@ public:
 
 	// Remember time when player holds flat hand in front of our face (stop-command for more immersive VR experience) - Max Makes Mods, 2018-01-02
 	float vr_flStopSignalTime = 0;
+
+	// Spawn of human-sized NPCs: model scale from the vr_npcscale cvar (vr/VRServerHooks.cpp)
+	void VRApplyNpcScale();
 	// BSVR end
 };

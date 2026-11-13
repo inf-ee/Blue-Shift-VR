@@ -21,7 +21,9 @@ bool VRStartFrame();
 void VRClientPrecache();
 // SetupVisibility / AddToFullPack: remembers for every entity if it is in the player's PVS (used by the gib limit).
 void VRSetPVSCache(unsigned char* pvs);
-bool VRCheckAndRecordPVS(edict_s* ent, unsigned char* pSet);
+bool VRCheckAndRecordPVS(int e, edict_s* ent, unsigned char* pSet);
+// True if the entity was in the player's PVS when the engine last asked (false for an entity it hasn't asked about yet).
+bool VRIsInPVS(CBaseEntity* pEntity);
 // CreateBaseline: the VR player is a noclip entity without gravity, with its real bounds.
 void VROverridePlayerBaseline(entity_state_s* baseline, edict_s* entity);
 // UpdateClientData: the client gets the origin and view offset of the headset.

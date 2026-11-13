@@ -8,6 +8,7 @@
 #include "weapons.h"
 
 #include "VRGameServer.h"
+#include "vr/VRShared.h"
 
 VRCrushMode VRGame::GetCrushMode(const char* mapName, const char* brushModelName)
 {

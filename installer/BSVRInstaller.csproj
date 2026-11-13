@@ -36,7 +36,7 @@
       for them next to hl.exe, not in cl_dlls\. "halflife/" resources are installed into the Half-Life folder.
     -->
     <EmbeddedResource Include="..\lib\public\openvr_api.dll" LogicalName="halflife/openvr_api.dll" />
-    <EmbeddedResource Include="..\cl_dll\EasyHook\bin\EasyHook32.dll" LogicalName="halflife/EasyHook32.dll" />
+    <EmbeddedResource Include="..\external\EasyHook\bin\EasyHook32.dll" LogicalName="halflife/EasyHook32.dll" />
     <!--
       Linux client.so links against libopenvr_api.so, which hl.sh finds via LD_LIBRARY_PATH in the Half-Life folder.
       The file is not tracked, so it is embedded only when present.

@@ -183,3 +183,28 @@ void VRGame::OnPlayerRestored(CBasePlayer* pPlayer)
 		}
 	}
 }
+
+const char* VRGame::GetGameDescription()
+{
+	return "Half-Life";
+}
+
+int VRGame::GetSaveMagic()
+{
+	return 'HLVR';
+}
+
+int VRGame::GetSaveVersion()
+{
+	return 1;
+}
+
+const char* VRGame::GetSaveIncompatibleMessage()
+{
+	return "COULDN'T LOAD SAVEGAME, SAVE FILE IS INCOMPATIBLE WITH HALF-LIFE: VR!\n";
+}
+
+const char* VRGame::GetRestoreFailedFallbackMap()
+{
+	return "crossfire";
+}

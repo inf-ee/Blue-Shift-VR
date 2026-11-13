@@ -22,6 +22,9 @@
 #include "gamerules.h"
 #include "game.h"
 #include "pm_shared.h"
+// BSVR start
+#include "vr/VRHooks.h"
+// BSVR end
 
 void EntvarsKeyvalue(entvars_t* pev, KeyValueData* pkvd);
 
@@ -144,9 +147,7 @@ int GetNewDLLFunctions(NEW_DLL_FUNCTIONS* pFunctionTable, int* interfaceVersion)
 int DispatchSpawn(edict_t* pent)
 {
 	// BSVR start
-	// Don't spawn entities in game loaded from invalid savegame (see world.cpp RestoreGlobalState)
-	extern bool g_didRestoreSaveGameFail;
-	if (g_didRestoreSaveGameFail)
+	if (VRIsRestoreFailed()) // don't spawn entities in a game loaded from an invalid savegame
 		return -1;
 	// BSVR end
 
@@ -332,9 +333,7 @@ CBaseEntity* FindGlobalEntity(string_t classname, string_t globalname)
 int DispatchRestore(edict_t* pent, SAVERESTOREDATA* pSaveData, int globalEntity)
 {
 	// BSVR start
-	// Don't restore entities in game loaded from invalid savegame (see world.cpp RestoreGlobalState)
-	extern bool g_didRestoreSaveGameFail;
-	if (g_didRestoreSaveGameFail)
+	if (VRIsRestoreFailed()) // don't restore entities in a game loaded from an invalid savegame
 		return -1;
 	// BSVR end
 

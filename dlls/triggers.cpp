@@ -2068,33 +2068,22 @@ void CBaseTrigger::TeleportTouch(CBaseEntity* pOther)
 		return;
 
 	// BSVR start
-	// Vector tmp = VARS(pentTarget)->origin; - original
 	Vector prevOrigin = pOther->pev->origin;
 	Vector prevAngles = pOther->pev->angles;
-
-	Vector newOrigin = VARS(pentTarget)->origin;
 	// BSVR end
+
+	Vector tmp = VARS(pentTarget)->origin;
 
 	if (pOther->IsPlayer())
 	{
-		// BSVR start
-		// tmp.z -= pOther->pev->mins.z; // make origin adjustments in case the teleportee is a player. (origin in center, not at feet) - original
-		newOrigin.z -= pOther->pev->mins.z; // make origin adjustments in case the teleportee is a player. (origin in center, not at feet)
-
-		// BSVR end
+		tmp.z -= pOther->pev->mins.z; // make origin adjustments in case the teleportee is a player. (origin in center, not at feet)
 	}
 
-	// BSVR start
-	// tmp.z++; - original
-	newOrigin.z++;
-	// BSVR end
+	tmp.z++;
 
 	pevToucher->flags &= ~FL_ONGROUND;
 
-	// BSVR start
-	// UTIL_SetOrigin(pevToucher, tmp); - original
-	UTIL_SetOrigin(pevToucher, newOrigin);
-	// BSVR end
+	UTIL_SetOrigin(pevToucher, tmp);
 
 	pevToucher->angles = pentTarget->v.angles;
 

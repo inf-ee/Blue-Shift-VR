@@ -90,7 +90,7 @@ public:
 	// BSVR start - const added so const float arrays convert to Vector
 	// constexpr Vector(float rgfl[3]) - original
 	constexpr Vector(const float rgfl[3])
-	// BSVR end
+		// BSVR end
 		: x(rgfl[0]), y(rgfl[1]), z(rgfl[2])
 	{
 	}

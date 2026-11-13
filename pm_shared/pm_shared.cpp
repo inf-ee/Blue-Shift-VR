@@ -33,7 +33,6 @@
 #include <stdlib.h> // atoi
 #include <ctype.h>	// isspace
 
-
 #ifdef CLIENT_DLL
 // Spectator Mode
 bool iJumpSpectator;
@@ -1807,10 +1806,6 @@ bool PM_TryToUnstuck(Vector base)
 	return true;
 }
 
-// BSVR start
-#define PM_CHECKSTUCK_MINTIME 0.05  // Don't check again too quickly.
-// BSVR end
-
 bool PM_CheckStuck()
 {
 	Vector base;
@@ -3111,10 +3106,7 @@ void PM_CheckParamters()
 	}
 
 	if ((pmove->flags & FL_FROZEN) != 0 ||
-		// BSVR start - renamed from FL_ONTRAIN
-		// (pmove->flags & FL_ONTRAIN) != 0 || - original
-		(pmove->flags & FL_STUCK_ONTRAIN) != 0 ||
-		// BSVR end
+		(pmove->flags & FL_ONTRAIN) != 0 ||
 		0 != pmove->dead)
 	{
 		pmove->cmd.forwardmove = 0;
@@ -3261,9 +3253,9 @@ void PM_PlayerMove(qboolean server)
 
 	g_onladder = false;
 	// Don't run ladder code if dead or on a train
-	// BSVR start - added pmoveIgnoreLadders check, renamed from FL_ONTRAIN
+	// BSVR start - added pmoveIgnoreLadders check
 	// if (0 == pmove->dead && (pmove->flags & FL_ONTRAIN) == 0) - original
-	if (0 == pmove->dead && (pmove->flags & FL_STUCK_ONTRAIN) == 0 && !pmoveIgnoreLadders)
+	if (0 == pmove->dead && (pmove->flags & FL_ONTRAIN) == 0 && !pmoveIgnoreLadders)
 	// BSVR end
 	{
 		pLadder = PM_Ladder();
@@ -3278,10 +3270,7 @@ void PM_PlayerMove(qboolean server)
 	PM_Duck();
 
 	// Don't run ladder code if dead or on a train
-	// BSVR start - renamed from FL_ONTRAIN
-	// if (0 == pmove->dead && (pmove->flags & FL_ONTRAIN) == 0) - original
-	if (0 == pmove->dead && (pmove->flags & FL_STUCK_ONTRAIN) == 0)
-	// BSVR end
+	if (0 == pmove->dead && (pmove->flags & FL_ONTRAIN) == 0)
 	{
 		// BSVR start
 		// Old code

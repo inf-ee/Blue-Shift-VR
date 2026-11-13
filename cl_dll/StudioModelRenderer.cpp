@@ -22,9 +22,7 @@
 #include "GameStudioModelRenderer.h"
 
 // BSVR start
-#include <unordered_set>
 #include "vr/VRRenderer.h"
-#include <math.h>
 bool IsDraggedEntity(cl_entity_t* ent); // vr/VRStudioModelRenderer.cpp
 // BSVR end
 
@@ -1152,9 +1150,6 @@ StudioDrawModel
 
 ====================
 */
-// BSVR start
-#define VR_MUZZLE_ATTACHMENT 0
-// BSVR end
 bool CStudioModelRenderer::StudioDrawModel(int flags)
 {
 	// BSVR start

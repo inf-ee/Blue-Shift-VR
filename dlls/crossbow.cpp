@@ -297,15 +297,17 @@ void CCrossbow::PrimaryAttack()
 {
 	// BSVR start
 	// no zoom in VR!
-	// #ifdef CLIENT_DLL
-	// 	if (m_pPlayer->m_iFOV != 0 && bIsMultiplayer())
-	// #else
-	// 	if (m_pPlayer->m_iFOV != 0 && g_pGameRules->IsMultiplayer())
-	// #endif
-	// 	{
-	// 		FireSniperBolt();
-	// 		return;
-	// 	}
+#ifdef VR_SDK_ORIGINAL
+#ifdef CLIENT_DLL
+	if (m_pPlayer->m_iFOV != 0 && bIsMultiplayer())
+#else
+	if (m_pPlayer->m_iFOV != 0 && g_pGameRules->IsMultiplayer())
+#endif
+	{
+		FireSniperBolt();
+		return;
+	}
+#endif
 	// BSVR end
 
 	FireBolt();
@@ -340,10 +342,12 @@ void CCrossbow::FireSniperBolt()
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
 	// BSVR start
-	// Vector anglesAim = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle; - original
-	// UTIL_MakeVectors(anglesAim); - original
-	// Vector vecSrc = m_pPlayer->GetGunPosition() - gpGlobals->v_up * 2; - original
-	// Vector vecDir = gpGlobals->v_forward; - original
+#ifdef VR_SDK_ORIGINAL
+	Vector anglesAim = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle;
+	UTIL_MakeVectors(anglesAim);
+	Vector vecSrc = m_pPlayer->GetGunPosition() - gpGlobals->v_up * 2;
+	Vector vecDir = gpGlobals->v_forward;
+#endif
 	UTIL_MakeVectors(m_pPlayer->GetWeaponViewAngles());
 	Vector vecSrc = m_pPlayer->GetGunPosition();   // -gpGlobals->v_up * 2;
 	Vector vecDir = m_pPlayer->GetAutoaimVector(); //gpGlobals->v_forward;
@@ -388,12 +392,14 @@ void CCrossbow::FireBolt()
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
 	// BSVR start
-	// Vector anglesAim = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle; - original
-	// UTIL_MakeVectors(anglesAim); - original
+#ifdef VR_SDK_ORIGINAL
+	Vector anglesAim = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle;
+	UTIL_MakeVectors(anglesAim);
 
-	// anglesAim.x = -anglesAim.x; - original
-	// Vector vecSrc = m_pPlayer->GetGunPosition() - gpGlobals->v_up * 2; - original
-	// Vector vecDir = gpGlobals->v_forward; - original
+	anglesAim.x = -anglesAim.x;
+	Vector vecSrc = m_pPlayer->GetGunPosition() - gpGlobals->v_up * 2;
+	Vector vecDir = gpGlobals->v_forward;
+#endif
 	UTIL_MakeVectors(m_pPlayer->GetWeaponViewAngles());
 
 	Vector vecSrc = m_pPlayer->GetGunPosition();   // -gpGlobals->v_up * 2;
@@ -445,17 +451,19 @@ void CCrossbow::SecondaryAttack()
 {
 	// BSVR start
 	// no zoom in VR!
-	// if (m_pPlayer->m_iFOV != 0)
-	// {
-	// 	m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
-	// }
-	// else if (m_pPlayer->m_iFOV != 20)
-	// {
-	// 	m_pPlayer->m_iFOV = 20;
-	// }
+#ifdef VR_SDK_ORIGINAL
+	if (m_pPlayer->m_iFOV != 0)
+	{
+		m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
+	}
+	else if (m_pPlayer->m_iFOV != 20)
+	{
+		m_pPlayer->m_iFOV = 20;
+	}
 
-	// pev->nextthink = UTIL_WeaponTimeBase() + 0.1;
-	// m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0;
+	pev->nextthink = UTIL_WeaponTimeBase() + 0.1;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0;
+#endif
 
 	FireSniperBolt();
 	// BSVR end

@@ -971,10 +971,12 @@ void CRotButton::Spawn()
 		m_flWait = 1;
 
 	// BSVR start - moved up
-	// if (pev->health > 0)
-	// {
-	// 	pev->takedamage = DAMAGE_YES;
-	// }
+#ifdef VR_SDK_ORIGINAL
+	if (pev->health > 0)
+	{
+		pev->takedamage = DAMAGE_YES;
+	}
+#endif
 	// BSVR end
 
 	m_toggle_state = TS_AT_BOTTOM;
@@ -1231,10 +1233,12 @@ void CMomentaryRotButton::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE
 	// BSVR end
 
 	// BSVR start - commented out upstream
-	// // Calculate destination angle and use it to predict value, this prevents sending target in wrong direction on retriggering
-	// Vector dest = pev->angles + pev->avelocity * (pev->nextthink - pev->ltime);
-	// float value1 = CBaseToggle::AxisDelta(pev->spawnflags, dest, m_start) / m_flMoveDistance;
-	// UpdateTarget(value1);
+#ifdef VR_SDK_ORIGINAL
+	// Calculate destination angle and use it to predict value, this prevents sending target in wrong direction on retriggering
+	Vector dest = pev->angles + pev->avelocity * (pev->nextthink - pev->ltime);
+	float value1 = CBaseToggle::AxisDelta(pev->spawnflags, dest, m_start) / m_flMoveDistance;
+	UpdateTarget(value1);
+#endif
 	UpdateTarget(pev->ideal_yaw);
 	// BSVR end
 }

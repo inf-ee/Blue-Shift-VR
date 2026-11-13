@@ -129,9 +129,11 @@ void CRpgRocket::Spawn()
 	SetTouch(&CRpgRocket::ExplodeTouch);
 
 	// BSVR start
-	// pev->angles.x -= 30; - original
-	// UTIL_MakeVectors(pev->angles); - original
-	// pev->angles.x = -(pev->angles.x + 30); - original
+#ifdef VR_SDK_ORIGINAL
+	pev->angles.x -= 30;
+	UTIL_MakeVectors(pev->angles);
+	pev->angles.x = -(pev->angles.x + 30);
+#endif
 	Vector vecAiming = pev->angles;
 	vecAiming.x = -vecAiming.x - 30;
 	UTIL_MakeVectors(vecAiming);
@@ -440,13 +442,15 @@ void CRpg::PrimaryAttack()
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
 		// BSVR start
-		// UTIL_MakeVectors(m_pPlayer->pev->v_angle); - original
-		// Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 16 + gpGlobals->v_right * 8 + gpGlobals->v_up * -8; - original
+#ifdef VR_SDK_ORIGINAL
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+		Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 16 + gpGlobals->v_right * 8 + gpGlobals->v_up * -8;
 
-		// CRpgRocket* pRocket = CRpgRocket::CreateRpgRocket(vecSrc, m_pPlayer->pev->v_angle, m_pPlayer, this); - original
+		CRpgRocket* pRocket = CRpgRocket::CreateRpgRocket(vecSrc, m_pPlayer->pev->v_angle, m_pPlayer, this);
 
-		// UTIL_MakeVectors(m_pPlayer->pev->v_angle); // RpgRocket::Create stomps on globals, so remake.
-		// pRocket->pev->velocity = pRocket->pev->velocity + gpGlobals->v_forward * DotProduct(m_pPlayer->pev->velocity, gpGlobals->v_forward); - original
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle); // RpgRocket::Create stomps on globals, so remake.
+		pRocket->pev->velocity = pRocket->pev->velocity + gpGlobals->v_forward * DotProduct(m_pPlayer->pev->velocity, gpGlobals->v_forward);
+#endif
 		UTIL_MakeVectors(m_pPlayer->GetWeaponViewAngles());
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 

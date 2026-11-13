@@ -97,9 +97,11 @@ void CHornet::Spawn()
 	SetThink(&CHornet::StartTrack);
 
 	// BSVR start - commented out
-	// edict_t* pSoundEnt = pev->owner;
-	// if (!pSoundEnt)
-	// 	pSoundEnt = edict();
+#ifdef VR_SDK_ORIGINAL
+	edict_t* pSoundEnt = pev->owner;
+	if (!pSoundEnt)
+		pSoundEnt = edict();
+#endif
 	// BSVR end
 
 	if (!FNullEnt(pev->owner) && (pev->owner->v.flags & FL_CLIENT) != 0)

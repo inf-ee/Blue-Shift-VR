@@ -121,10 +121,12 @@ void CHgun::PrimaryAttack()
 
 #ifndef CLIENT_DLL
 	// BSVR start
-	// UTIL_MakeVectors(m_pPlayer->pev->v_angle); - original
+#ifdef VR_SDK_ORIGINAL
+	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 
-	// CBaseEntity* pHornet = CBaseEntity::Create("hornet", m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 16 + gpGlobals->v_right * 8 + gpGlobals->v_up * -12, m_pPlayer->pev->v_angle, m_pPlayer->edict()); - original
-	// pHornet->pev->velocity = gpGlobals->v_forward * 300; - original
+	CBaseEntity* pHornet = CBaseEntity::Create("hornet", m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 16 + gpGlobals->v_right * 8 + gpGlobals->v_up * -12, m_pPlayer->pev->v_angle, m_pPlayer->edict());
+	pHornet->pev->velocity = gpGlobals->v_forward * 300;
+#endif
 	UTIL_MakeVectors(m_pPlayer->GetWeaponViewAngles());
 
 	CBaseEntity* pHornet = CBaseEntity::Create<CBaseEntity>("hornet", m_pPlayer->GetGunPosition(), m_pPlayer->GetAimAngles(), m_pPlayer->edict());
@@ -230,9 +232,11 @@ void CHgun::SecondaryAttack()
 	}
 
 	// BSVR start
-	// pHornet = CBaseEntity::Create("hornet", vecSrc, m_pPlayer->pev->v_angle, m_pPlayer->edict()); - original
-	// pHornet->pev->velocity = gpGlobals->v_forward * 1200; - original
-	// pHornet->pev->angles = UTIL_VecToAngles(pHornet->pev->velocity); - original
+#ifdef VR_SDK_ORIGINAL
+	pHornet = CBaseEntity::Create("hornet", vecSrc, m_pPlayer->pev->v_angle, m_pPlayer->edict());
+	pHornet->pev->velocity = gpGlobals->v_forward * 1200;
+	pHornet->pev->angles = UTIL_VecToAngles(pHornet->pev->velocity);
+#endif
 	pHornet = CBaseEntity::Create<CBaseEntity>("hornet", vecSrc, m_pPlayer->GetAimAngles(), m_pPlayer->edict());
 	pHornet->pev->velocity = m_pPlayer->GetAutoaimVector() * 1200;
 	// BSVR end

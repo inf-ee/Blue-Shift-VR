@@ -201,9 +201,11 @@ void CMP5::SecondaryAttack()
 	// UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle); - original
 
 	// we don't add in player velocity anymore.
-	// CGrenade::ShootContact(m_pPlayer->pev,
-	// 	m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16,
-	// 	gpGlobals->v_forward * 800);
+#ifdef VR_SDK_ORIGINAL
+	CGrenade::ShootContact(m_pPlayer->pev,
+		m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16,
+		gpGlobals->v_forward * 800);
+#endif
 	CGrenade::ShootContact(m_pPlayer->pev, m_pPlayer->GetGunPosition(), m_pPlayer->GetAutoaimVector() * 800);
 	// BSVR end
 

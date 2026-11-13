@@ -1139,21 +1139,23 @@ void EV_Crowbar(event_args_t* args)
 	gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/cbar_miss1.wav", 1, ATTN_NORM, 0, PITCH_NORM);
 
 	// BSVR start - upstream commented out
-	// if (EV_IsLocal(idx))
-	// {
-	// 	switch ((g_iSwing++) % 3)
-	// 	{
-	// 	case 0:
-	// 		gEngfuncs.pEventAPI->EV_WeaponAnimation(CROWBAR_ATTACK1MISS, 0);
-	// 		break;
-	// 	case 1:
-	// 		gEngfuncs.pEventAPI->EV_WeaponAnimation(CROWBAR_ATTACK2MISS, 0);
-	// 		break;
-	// 	case 2:
-	// 		gEngfuncs.pEventAPI->EV_WeaponAnimation(CROWBAR_ATTACK3MISS, 0);
-	// 		break;
-	// 	}
-	// }
+#ifdef VR_SDK_ORIGINAL
+	if (EV_IsLocal(idx))
+	{
+		switch ((g_iSwing++) % 3)
+		{
+		case 0:
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(CROWBAR_ATTACK1MISS, 0);
+			break;
+		case 1:
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(CROWBAR_ATTACK2MISS, 0);
+			break;
+		case 2:
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(CROWBAR_ATTACK3MISS, 0);
+			break;
+		}
+	}
+#endif
 	// BSVR end
 }
 //======================

@@ -40,10 +40,12 @@ void UpdateBeams()
 
 	// BSVR start
 	// Get our exact viewangles from engine
-	// gEngfuncs.GetViewAngles((float*)angles); - original
+#ifdef VR_SDK_ORIGINAL
+	gEngfuncs.GetViewAngles((float*)angles);
 
-	// // Determine our last predicted origin
-	// HUD_GetLastOrg((float*)&origin); - original
+	// Determine our last predicted origin
+	HUD_GetLastOrg((float*)&origin);
+#endif
 	cl_entity_s* viewModel = gEngfuncs.GetViewModel();
 	if (viewModel == nullptr)
 		return;

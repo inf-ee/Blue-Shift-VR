@@ -116,13 +116,15 @@ bool ExtractBbox(void* pmodel, int sequence, float* mins, float* maxs)
 	// BSVR end
 
 	// BSVR start - original code
-	// mins[0] = pseqdesc[sequence].bbmin[0];
-	// mins[1] = pseqdesc[sequence].bbmin[1];
-	// mins[2] = pseqdesc[sequence].bbmin[2];
+#ifdef VR_SDK_ORIGINAL
+	mins[0] = pseqdesc[sequence].bbmin[0];
+	mins[1] = pseqdesc[sequence].bbmin[1];
+	mins[2] = pseqdesc[sequence].bbmin[2];
 
-	// maxs[0] = pseqdesc[sequence].bbmax[0];
-	// maxs[1] = pseqdesc[sequence].bbmax[1];
-	// maxs[2] = pseqdesc[sequence].bbmax[2];
+	maxs[0] = pseqdesc[sequence].bbmax[0];
+	maxs[1] = pseqdesc[sequence].bbmax[1];
+	maxs[2] = pseqdesc[sequence].bbmax[2];
+#endif
 	// BSVR end
 
 	return true;
@@ -358,9 +360,11 @@ int GetAnimationEvent(void* pmodel, entvars_t* pev, MonsterEvent_t* pMonsterEven
 	for (; index < pseqdesc->numevents; index++)
 	{
 		// BSVR start - client-side events are checked below and passed to pClientAnimEvent
-		// // Don't send client-side events to the server AI
-		// if (pevent[index].event >= EVENT_CLIENT)
-		// 	continue;
+#ifdef VR_SDK_ORIGINAL
+		// Don't send client-side events to the server AI
+		if (pevent[index].event >= EVENT_CLIENT)
+			continue;
+#endif
 		// BSVR end
 
 		if ((pevent[index].frame >= flStart && pevent[index].frame < flEnd) ||

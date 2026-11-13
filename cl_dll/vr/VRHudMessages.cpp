@@ -6,6 +6,9 @@
 #include "parsemsg.h"
 
 #include "vr/VRRenderer.h"
+#include "vr/VRHudMessages.h"
+
+VRHudState gVRHudState;
 
 int __MsgFunc_VRRstrYaw(const char* pszName, int iSize, void* pbuf)
 {
@@ -58,32 +61,32 @@ int __MsgFunc_VRAchvmnt(const char* pszName, int iSize, void* pbuf)
 // Sends index of current grund entity
 int __MsgFunc_GroundEnt(const char* pszName, int iSize, void* pbuf)
 {
-	return static_cast<int>(gHUD.MsgFunc_GroundEnt(pszName, iSize, pbuf));
+	return static_cast<int>(gVRHudState.MsgFunc_GroundEnt(pszName, iSize, pbuf));
 }
 
 int __MsgFunc_VRCtrlEnt(const char* pszName, int iSize, void* pbuf)
 {
-	return static_cast<int>(gHUD.MsgFunc_VRCtrlEnt(pszName, iSize, pbuf));
+	return static_cast<int>(gVRHudState.MsgFunc_VRCtrlEnt(pszName, iSize, pbuf));
 }
 
 int __MsgFunc_TrainCtrl(const char* pszName, int iSize, void* pbuf)
 {
-	return static_cast<int>(gHUD.MsgFunc_TrainCtrl(pszName, iSize, pbuf));
+	return static_cast<int>(gVRHudState.MsgFunc_TrainCtrl(pszName, iSize, pbuf));
 }
 
 int __MsgFunc_VRScrnShke(const char* pszName, int iSize, void* pbuf)
 {
-	return static_cast<int>(gHUD.MsgFunc_VRScrnShke(pszName, iSize, pbuf));
+	return static_cast<int>(gVRHudState.MsgFunc_VRScrnShke(pszName, iSize, pbuf));
 }
 
 int __MsgFunc_GrbdLddr(const char* pszName, int iSize, void* pbuf)
 {
-	return static_cast<int>(gHUD.MsgFunc_GrbdLddr(pszName, iSize, pbuf));
+	return static_cast<int>(gVRHudState.MsgFunc_GrbdLddr(pszName, iSize, pbuf));
 }
 
 int __MsgFunc_PullLdg(const char* pszName, int iSize, void* pbuf)
 {
-	return static_cast<int>(gHUD.MsgFunc_PullLdg(pszName, iSize, pbuf));
+	return static_cast<int>(gVRHudState.MsgFunc_PullLdg(pszName, iSize, pbuf));
 }
 
 int __MsgFunc_VRUpdEgon(const char* pszName, int iSize, void* pbuf)
@@ -100,7 +103,7 @@ int __MsgFunc_VRUpdEgon(const char* pszName, int iSize, void* pbuf)
 
 int __MsgFunc_VRTouch(const char* pszName, int iSize, void* pbuf)
 {
-	return static_cast<int>(gHUD.MsgFunc_VRTouch(pszName, iSize, pbuf));
+	return static_cast<int>(gVRHudState.MsgFunc_VRTouch(pszName, iSize, pbuf));
 }
 
 // Registers the VR messages; called from CHud::Init
@@ -121,14 +124,14 @@ void VRHookHudMessages()
 	HOOK_MESSAGE(VRAchvmnt);
 }
 
-bool CHud::MsgFunc_GroundEnt(const char* pszName, int iSize, void* pbuf)
+bool VRHudState::MsgFunc_GroundEnt(const char* pszName, int iSize, void* pbuf)
 {
 	BEGIN_READ(pbuf, iSize);
 	m_iGroundEntIndex = READ_SHORT();
 	return true;
 }
 
-bool CHud::MsgFunc_VRCtrlEnt(const char* pszName, int iSize, void* pbuf)
+bool VRHudState::MsgFunc_VRCtrlEnt(const char* pszName, int iSize, void* pbuf)
 {
 	BEGIN_READ(pbuf, iSize);
 
@@ -177,7 +180,7 @@ bool CHud::MsgFunc_VRCtrlEnt(const char* pszName, int iSize, void* pbuf)
 	return true;
 }
 
-bool CHud::MsgFunc_TrainCtrl(const char* pszName, int iSize, void* pbuf)
+bool VRHudState::MsgFunc_TrainCtrl(const char* pszName, int iSize, void* pbuf)
 {
 	BEGIN_READ(pbuf, iSize);
 	m_trainControlPosition.x = READ_COORD();
@@ -187,7 +190,7 @@ bool CHud::MsgFunc_TrainCtrl(const char* pszName, int iSize, void* pbuf)
 	return true;
 }
 
-bool CHud::MsgFunc_VRScrnShke(const char* pszName, int iSize, void* pbuf)
+bool VRHudState::MsgFunc_VRScrnShke(const char* pszName, int iSize, void* pbuf)
 {
 	BEGIN_READ(pbuf, iSize);
 	m_screenShakeAmplitude = READ_FLOAT();
@@ -197,21 +200,21 @@ bool CHud::MsgFunc_VRScrnShke(const char* pszName, int iSize, void* pbuf)
 	return true;
 }
 
-bool CHud::MsgFunc_GrbdLddr(const char* pszName, int iSize, void* pbuf)
+bool VRHudState::MsgFunc_GrbdLddr(const char* pszName, int iSize, void* pbuf)
 {
 	BEGIN_READ(pbuf, iSize);
 	m_vrGrabbedLadderEntIndex = READ_SHORT();
 	return true;
 }
 
-bool CHud::MsgFunc_PullLdg(const char* pszName, int iSize, void* pbuf)
+bool VRHudState::MsgFunc_PullLdg(const char* pszName, int iSize, void* pbuf)
 {
 	BEGIN_READ(pbuf, iSize);
 	m_vrIsPullingOnLedge = READ_BYTE() != 0;
 	return true;
 }
 
-bool CHud::MsgFunc_VRTouch(const char* pszName, int iSize, void* pbuf)
+bool VRHudState::MsgFunc_VRTouch(const char* pszName, int iSize, void* pbuf)
 {
 	BEGIN_READ(pbuf, iSize);
 	bool isLeftHand = READ_BYTE() != 0;
@@ -227,7 +230,7 @@ bool CHud::MsgFunc_VRTouch(const char* pszName, int iSize, void* pbuf)
 }
 
 // Ground entity for rotating with them in VR (since player rotation is done client side completely) - Max Makes Mods, 2019-04-09
-cl_entity_t* CHud::GetGroundEntity()
+cl_entity_t* VRHudState::GetGroundEntity()
 {
 	if (m_iGroundEntIndex > 0)
 	{
@@ -239,9 +242,10 @@ cl_entity_t* CHud::GetGroundEntity()
 	}
 }
 
-bool CHud::GetTrainControlsOriginAndOrientation(Vector& origin, Vector& angles)
+bool VRHudState::GetTrainControlsOriginAndOrientation(Vector& origin, Vector& angles)
 {
-	if (0 != m_Train.m_iPos)
+	// The train HUD is active exactly while it has a control position to show (CHudTrain::MsgFunc_Train)
+	if ((gHUD.m_Train.m_iFlags & HUD_ACTIVE) != 0)
 	{
 		origin = m_trainControlPosition;
 		angles.x = -20.f;

@@ -57,6 +57,8 @@ public:
 
 	// Called by HUD draw code
 	void VRHUDDrawBegin(const VRHUDRenderType renderType);
+	// For CHud::Redraw: begins the HUD element's render type, or none if the element sets its own (health, ammo) or has no place on the VR HUD
+	void VRHUDDrawBegin(const class CHudBase* hudElement);
 	void InterceptSPR_Set(HSPRITE hPic, int r, int g, int b);
 	void InterceptSPR_DrawAdditive(int frame, int x, int y, const Rect* prc);
 	void VRHUDDrawFinished();

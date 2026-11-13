@@ -20,6 +20,7 @@
 #include "vr/VRShared.h"
 #include "vr/VRRenderer.h"
 #include <math.h>
+#include "vr/VRHudMessages.h"
 
 // Defined in StudioModelRenderer.cpp
 extern engine_studio_api_t IEngineStudio;
@@ -564,7 +565,7 @@ void CStudioModelRenderer::StudioDrawVRHand(const ControllerModelData& controlle
 
 bool IsDraggedEntity(cl_entity_t* ent)
 {
-	return (gVRRenderer.HasValidLeftController() && gHUD.m_leftControllerModelData.hasDraggedEnt && ent->index == gHUD.m_leftControllerModelData.draggedEntIndex) || (gVRRenderer.HasValidRightController() && gHUD.m_rightControllerModelData.hasDraggedEnt && ent->index == gHUD.m_rightControllerModelData.draggedEntIndex);
+	return (gVRRenderer.HasValidLeftController() && gVRHudState.m_leftControllerModelData.hasDraggedEnt && ent->index == gVRHudState.m_leftControllerModelData.draggedEntIndex) || (gVRRenderer.HasValidRightController() && gVRHudState.m_rightControllerModelData.hasDraggedEnt && ent->index == gVRHudState.m_rightControllerModelData.draggedEntIndex);
 }
 
 int VRGlobalNumAttachmentsForEntity(cl_entity_t* ent)

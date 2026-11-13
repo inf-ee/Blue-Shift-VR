@@ -1,14 +1,17 @@
-// VR weapon slot helpers of CHudAmmo, moved from ammo.cpp
+// VR weapon slot helpers for the HUD's weapon list, moved from ammo.cpp
 
 #include "hud.h"
+#include "cl_util.h"
+
+#include "VRHudAmmo.h"
 
 #include "ammohistory.h"
 
-int CHudAmmo::FirstSlotWithWeapon()
+int VRFirstSlotWithWeapon()
 {
 	for (int slot = 0; slot < MAX_WEAPON_SLOTS; slot++)
 	{
-		if (FirstSlotPosWithWeapon(slot) >= 0)
+		if (VRFirstSlotPosWithWeapon(slot) >= 0)
 		{
 			return slot;
 		}
@@ -16,7 +19,7 @@ int CHudAmmo::FirstSlotWithWeapon()
 	return -1;
 }
 
-int CHudAmmo::FirstSlotPosWithWeapon(const int slot)
+int VRFirstSlotPosWithWeapon(const int slot)
 {
 	for (int pos = 0; pos < MAX_WEAPON_POSITIONS; pos++)
 	{
@@ -29,11 +32,11 @@ int CHudAmmo::FirstSlotPosWithWeapon(const int slot)
 	return -1;
 }
 
-int CHudAmmo::LastSlotWithWeapon()
+int VRLastSlotWithWeapon()
 {
 	for (int slot = MAX_WEAPON_SLOTS - 1; slot >= 0; slot--)
 	{
-		if (FirstSlotPosWithWeapon(slot) >= 0)
+		if (VRFirstSlotPosWithWeapon(slot) >= 0)
 		{
 			return slot;
 		}
@@ -41,7 +44,7 @@ int CHudAmmo::LastSlotWithWeapon()
 	return -1;
 }
 
-int CHudAmmo::LastSlotPosWithWeapon(const int slot)
+int VRLastSlotPosWithWeapon(const int slot)
 {
 	for (int pos = MAX_WEAPON_POSITIONS - 1; pos >= 0; pos--)
 	{
@@ -54,14 +57,16 @@ int CHudAmmo::LastSlotPosWithWeapon(const int slot)
 	return -1;
 }
 
-bool CHudAmmo::IsCurrentWeaponFirstWeapon()
+bool VRIsCurrentWeaponFirstWeapon()
 {
-	return m_pWeapon != nullptr && m_pWeapon->iSlot <= FirstSlotWithWeapon() && m_pWeapon->iSlotPos <= FirstSlotPosWithWeapon(m_pWeapon->iSlot);
+	const WEAPON* m_pWeapon = gHUD.m_Ammo.m_pWeapon;
+	return m_pWeapon != nullptr && m_pWeapon->iSlot <= VRFirstSlotWithWeapon() && m_pWeapon->iSlotPos <= VRFirstSlotPosWithWeapon(m_pWeapon->iSlot);
 }
 
-bool CHudAmmo::IsCurrentWeaponLastWeapon()
+bool VRIsCurrentWeaponLastWeapon()
 {
-	return m_pWeapon != nullptr && m_pWeapon->iSlot >= LastSlotWithWeapon() && m_pWeapon->iSlotPos >= LastSlotPosWithWeapon(m_pWeapon->iSlot);
+	const WEAPON* m_pWeapon = gHUD.m_Ammo.m_pWeapon;
+	return m_pWeapon != nullptr && m_pWeapon->iSlot >= VRLastSlotWithWeapon() && m_pWeapon->iSlotPos >= VRLastSlotPosWithWeapon(m_pWeapon->iSlot);
 }
 
 // For weapons_shared.cpp and hl_weapons.cpp - Max Makes Mods, 2018-02-04

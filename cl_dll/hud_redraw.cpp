@@ -19,6 +19,9 @@
 #include "cl_util.h"
 
 #include "vgui_TeamFortressViewport.h"
+// BSVR start
+#include "vr/VRRenderer.h"
+// BSVR end
 
 #define MAX_LOGO_FRAMES 56
 
@@ -144,6 +147,10 @@ bool CHud::Redraw(float flTime, bool intermission)
 
 		while (pList)
 		{
+			// BSVR start - the sprites this element draws go to its place on the VR HUD
+			gVRRenderer.VRHUDDrawBegin(pList->p);
+			// BSVR end
+
 			if (!intermission)
 			{
 				if ((pList->p->m_iFlags & HUD_ACTIVE) != 0 && (m_iHideHUDDisplay & HIDEHUD_ALL) == 0)
@@ -154,6 +161,10 @@ bool CHud::Redraw(float flTime, bool intermission)
 				if ((pList->p->m_iFlags & HUD_INTERMISSION) != 0)
 					pList->p->Draw(flTime);
 			}
+
+			// BSVR start
+			gVRRenderer.VRHUDDrawFinished();
+			// BSVR end
 
 			pList = pList->pNext;
 		}

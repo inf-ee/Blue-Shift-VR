@@ -30,6 +30,7 @@
 #include "VRWeaponWheel.h"
 
 #include "vr_gl.h"
+#include "vr/VRHudMessages.h"
 
 
 // set by hud message from server
@@ -155,14 +156,14 @@ void VRRenderer::Frame()
 			pmove->cmd.buttons_ex = 0;
 		}
 
-		gHUD.m_vrGrabbedLadderEntIndex = 0;
+		gVRHudState.m_vrGrabbedLadderEntIndex = 0;
 
 		ResetOffsetThingies();
 	}
 
 	if (!IsInGame())
 	{
-		gHUD.m_vrGrabbedLadderEntIndex = 0;
+		gVRHudState.m_vrGrabbedLadderEntIndex = 0;
 		ResetOffsetThingies();
 	}
 
@@ -345,15 +346,15 @@ void VRRenderer::RenderVRHandsAndHUDAndStuff()
 	};
 	ControllerModelData rightEmptyHand;
 	ControllerModelData leftEmptyHand;
-	const ControllerModelData& rightModel = getShownModel(gHUD.m_rightControllerModelData, gHUD.m_leftControllerModelData, rightEmptyHand);
-	const ControllerModelData& leftModel = getShownModel(gHUD.m_leftControllerModelData, gHUD.m_rightControllerModelData, leftEmptyHand);
+	const ControllerModelData& rightModel = getShownModel(gVRHudState.m_rightControllerModelData, gVRHudState.m_leftControllerModelData, rightEmptyHand);
+	const ControllerModelData& leftModel = getShownModel(gVRHudState.m_leftControllerModelData, gVRHudState.m_rightControllerModelData, leftEmptyHand);
 	// BSVR end
 
 	m_numRightControllerAttachments = 0;
 	if (drawHandsAndHUD && vrHelper->HasValidRightController())
 	{
 		g_StudioRenderer.StudioDrawVRHand(
-			rightModel, // BSVR: gHUD.m_rightControllerModelData - original
+			rightModel, // BSVR: gVRHudState.m_rightControllerModelData - original
 			vrHelper->GetRightControllerPosition(),
 			vrHelper->GetRightControllerAngles(),
 			false,
@@ -365,7 +366,7 @@ void VRRenderer::RenderVRHandsAndHUDAndStuff()
 	if (drawHandsAndHUD && vrHelper->HasValidLeftController())
 	{
 		g_StudioRenderer.StudioDrawVRHand(
-			leftModel, // BSVR: gHUD.m_leftControllerModelData - original
+			leftModel, // BSVR: gVRHudState.m_leftControllerModelData - original
 			vrHelper->GetLeftControllerPosition(),
 			vrHelper->GetLeftControllerAngles(),
 			true,

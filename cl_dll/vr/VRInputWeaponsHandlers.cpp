@@ -7,6 +7,7 @@
 #include "VRInput.h"
 
 #include "VRWeaponWheel.h"
+#include "VRHudAmmo.h"
 
 extern WEAPON* gpActiveSel;
 
@@ -145,7 +146,7 @@ void Weapons::HandleNext(const vr::InputDigitalActionData_t& data, const std::st
 {
 	if (data.bActive && data.bState && data.bChanged)
 	{
-		if (gHUD.m_Ammo.IsCurrentWeaponLastWeapon())
+		if (VRIsCurrentWeaponLastWeapon())
 		{
 			// Select hand when current weapon is last weapon
 			ServerCmd("weapon_barehand");
@@ -165,7 +166,7 @@ void Weapons::HandlePrevious(const vr::InputDigitalActionData_t& data, const std
 {
 	if (data.bActive && data.bState && data.bChanged)
 	{
-		if (gHUD.m_Ammo.IsCurrentWeaponFirstWeapon())
+		if (VRIsCurrentWeaponFirstWeapon())
 		{
 			// Select hand when current weapon is first weapon
 			ServerCmd("weapon_barehand");

@@ -22,8 +22,6 @@
 #include "cl_util.h"
 #include "parsemsg.h"
 
-#include "vr/VRRenderer.h" // BSVR: VR HUD rendering (VRHUDDrawBegin / VRHUDDrawFinished)
-
 #include <string.h>
 #include <stdio.h>
 
@@ -117,10 +115,6 @@ bool CHudBattery::Draw(float flTime)
 	y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2;
 	x = ScreenWidth / 4;
 
-	// BSVR start
-	gVRRenderer.VRHUDDrawBegin(VRHUDRenderType::BATTERY);
-	// BSVR end
-
 	// make sure we have the right sprite handles
 	if (0 == m_hSprite1)
 		m_hSprite1 = gHUD.GetSprite(gHUD.GetSpriteIndex("suit_empty"));
@@ -144,8 +138,6 @@ bool CHudBattery::Draw(float flTime)
 
 	x += (m_prc1->right - m_prc1->left);
 	x = gHUD.DrawHudNumber(x, y, DHN_3DIGITS | DHN_DRAWZERO, m_iBat, r, g, b);
-
-	gVRRenderer.VRHUDDrawFinished(); // BSVR
 
 	return true;
 }

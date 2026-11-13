@@ -42,6 +42,7 @@ static inline void TrimString(std::string& s)
 #include "VRRenderer.h"
 #include "VRHelper.h"
 #include "VRWeaponWheel.h"
+#include "vr/VRHudMessages.h"
 
 VRInput g_vrInput;
 
@@ -322,17 +323,17 @@ void VRInput::FireFeedbacks()
 	extern playermove_t* pmove;
 
 	// LEFTTOUCH
-	if (gHUD.m_vrLeftHandTouchVibrateIntensity > 0.f)
+	if (gVRHudState.m_vrLeftHandTouchVibrateIntensity > 0.f)
 	{
-		FireFeedback(FeedbackType::LEFTTOUCH, 0, 0.1f, 1.f * (std::max)(1.f, gHUD.m_vrLeftHandTouchVibrateIntensity), (std::min)(1.f, gHUD.m_vrLeftHandTouchVibrateIntensity));
-		gHUD.m_vrLeftHandTouchVibrateIntensity = 0.f;
+		FireFeedback(FeedbackType::LEFTTOUCH, 0, 0.1f, 1.f * (std::max)(1.f, gVRHudState.m_vrLeftHandTouchVibrateIntensity), (std::min)(1.f, gVRHudState.m_vrLeftHandTouchVibrateIntensity));
+		gVRHudState.m_vrLeftHandTouchVibrateIntensity = 0.f;
 	}
 
 	// RIGHTTOUCH
-	if (gHUD.m_vrRightHandTouchVibrateIntensity > 0.f)
+	if (gVRHudState.m_vrRightHandTouchVibrateIntensity > 0.f)
 	{
-		FireFeedback(FeedbackType::LEFTTOUCH, 0, 0.1f, 1.f * (std::max)(1.f, gHUD.m_vrRightHandTouchVibrateIntensity), (std::min)(1.f, gHUD.m_vrRightHandTouchVibrateIntensity));
-		gHUD.m_vrRightHandTouchVibrateIntensity = 0.f;
+		FireFeedback(FeedbackType::LEFTTOUCH, 0, 0.1f, 1.f * (std::max)(1.f, gVRHudState.m_vrRightHandTouchVibrateIntensity), (std::min)(1.f, gVRHudState.m_vrRightHandTouchVibrateIntensity));
+		gVRHudState.m_vrRightHandTouchVibrateIntensity = 0.f;
 	}
 
 	// RECOIL
@@ -343,10 +344,10 @@ void VRInput::FireFeedbacks()
 	}
 
 	// EARTHQUAKE
-	if (gHUD.m_hasScreenShake)
+	if (gVRHudState.m_hasScreenShake)
 	{
-		FireFeedback(FeedbackType::EARTHQUAKE, 0, gHUD.m_screenShakeDuration, gHUD.m_screenShakeFrequency, (std::min)(1.f, gHUD.m_screenShakeAmplitude));
-		gHUD.m_hasScreenShake = false;
+		FireFeedback(FeedbackType::EARTHQUAKE, 0, gVRHudState.m_screenShakeDuration, gVRHudState.m_screenShakeFrequency, (std::min)(1.f, gVRHudState.m_screenShakeAmplitude));
+		gVRHudState.m_hasScreenShake = false;
 	}
 
 	if (pmove)
@@ -690,11 +691,11 @@ bool VRInput::IsWeapon(vr::ETrackedControllerRole role)
 
 	if (leftHandMode && role == vr::TrackedControllerRole_LeftHand)
 	{
-		return !gVRRenderer.IsHandModel(gHUD.m_leftControllerModelData.controller.modelname) && !gVRRenderer.IsHandSkeletalModel(gHUD.m_leftControllerModelData.controller.modelname);
+		return !gVRRenderer.IsHandModel(gVRHudState.m_leftControllerModelData.controller.modelname) && !gVRRenderer.IsHandSkeletalModel(gVRHudState.m_leftControllerModelData.controller.modelname);
 	}
 	else if (!leftHandMode && role == vr::TrackedControllerRole_RightHand)
 	{
-		return !gVRRenderer.IsHandModel(gHUD.m_rightControllerModelData.controller.modelname) && !gVRRenderer.IsHandSkeletalModel(gHUD.m_rightControllerModelData.controller.modelname);
+		return !gVRRenderer.IsHandModel(gVRHudState.m_rightControllerModelData.controller.modelname) && !gVRRenderer.IsHandSkeletalModel(gVRHudState.m_rightControllerModelData.controller.modelname);
 	}
 
 	return false;

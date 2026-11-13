@@ -441,6 +441,9 @@
     <ClCompile Include="..\..\dlls\vr\VRBreakable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dlls\vr\VRGameServer_bs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dlls\doors.h">
@@ -711,6 +714,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\vr\VRCommons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\vr\VRGameServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\vr\VREHandle.h">

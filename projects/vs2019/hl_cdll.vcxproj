@@ -221,6 +221,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClCompile Include="..\..\cl_dll\vr\VRWeaponAnimation.cpp" />
     <ClCompile Include="..\..\cl_dll\vr\VRRenderer.cpp" />
     <ClCompile Include="..\..\cl_dll\vr\VRTextureHelper.cpp" />
+    <ClCompile Include="..\..\cl_dll\vr\VRGameClient_bs.cpp" />
     <ClCompile Include="..\..\cl_dll\vr\lodepng.cpp" />
     <ClCompile Include="..\..\cl_dll\vr\vr_gl.cpp" />
     <ClCompile Include="..\..\common\mathlib.cpp" />
@@ -647,6 +648,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClInclude Include="..\..\cl_dll\vr\VREngineInterceptor.h" />
     <ClInclude Include="..\..\cl_dll\vr\VRHelper.h" />
     <ClInclude Include="..\..\cl_dll\vr\VRTextureHelper.h" />
+    <ClInclude Include="..\..\cl_dll\vr\VRGameClient.h" />
     <ClInclude Include="..\..\cl_dll\vr\lodepng.h" />
     <ClInclude Include="..\..\cl_dll\vr\VRRandom.h" />
     <ClInclude Include="..\..\cl_dll\vr\VROpenGLInterceptor.h" />

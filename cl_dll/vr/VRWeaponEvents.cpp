@@ -1,13 +1,17 @@
 // Runs before the SDK's client side weapon events (ev_hldm.cpp and the like) and gives them the VR weapon's
 // position instead of the player's, so the event functions themselves can stay SDK code.
+// Also gives the controller its recoil feedback when the weapon code plays a weapon's fire event.
 
 #include <array>
 #include <cstring>
+#include <iterator>
 #include <utility>
 
 #include "hud.h"
 #include "cl_util.h"
 #include "event_args.h"
+
+#include "VRClientHooks.h"
 
 namespace
 {
@@ -94,8 +98,82 @@ void VRHookEvent(const char* name, EventFunc pfnEvent)
 }
 } // namespace
 
+// Controller recoil feedback for fire events, by event script name.
+// A weapon whose attacks share one event (hornet gun), or whose recoil isn't tied to its event (egon),
+// calls VRRegisterRecoil in its own code instead.
+namespace
+{
+struct RecoilEvent
+{
+	const char* name;
+	// Fixed intensity, used if fparam1Divisor is 0
+	float intensity;
+	// Otherwise the intensity is the event's fparam1 divided by this, and an event with bparam2 set is ignored
+	// (gauss: fparam1 is the damage, bparam2 marks the stop event)
+	float fparam1Divisor;
+};
+
+const RecoilEvent s_recoilEvents[] = {
+	{"events/glock1.sc", 0.2f, 0.f},
+	{"events/glock2.sc", 0.2f, 0.f},
+	{"events/python.sc", 0.4f, 0.f},
+	{"events/mp5.sc", 0.4f, 0.f},
+	{"events/mp52.sc", 0.8f, 0.f},
+	{"events/shotgun1.sc", 0.4f, 0.f},
+	{"events/shotgun2.sc", 0.8f, 0.f},
+	{"events/crossbow1.sc", 0.5f, 0.f},
+	{"events/crossbow2.sc", 0.25f, 0.f},
+	{"events/rpg.sc", 1.f, 0.f},
+	{"events/tripfire.sc", 0.1f, 0.f},
+	{"events/gauss.sc", 0.f, 200.f},
+};
+
+// Index the engine gave to each event above when the weapon code precached it, 0 if it wasn't precached
+unsigned short s_recoilEventIndices[std::size(s_recoilEvents)] = {};
+
+unsigned short (*s_enginePrecacheEvent)(int type, const char* psz) = nullptr;
+
+unsigned short VRPrecacheEvent(int type, const char* psz)
+{
+	const unsigned short eventindex = s_enginePrecacheEvent(type, psz);
+	for (size_t i = 0; i < std::size(s_recoilEvents); i++)
+	{
+		if (strcmp(psz, s_recoilEvents[i].name) == 0)
+		{
+			s_recoilEventIndices[i] = eventindex;
+		}
+	}
+	return eventindex;
+}
+} // namespace
+
+void VROnClientWeaponEvent(unsigned short eventindex, float fparam1, int bparam2)
+{
+	if (eventindex == 0)
+		return;
+
+	for (size_t i = 0; i < std::size(s_recoilEvents); i++)
+	{
+		if (s_recoilEventIndices[i] != eventindex)
+			continue;
+
+		if (s_recoilEvents[i].fparam1Divisor == 0.f)
+		{
+			VRRegisterRecoil(s_recoilEvents[i].intensity);
+		}
+		else if (0 == bparam2)
+		{
+			VRRegisterRecoil(fparam1 / s_recoilEvents[i].fparam1Divisor);
+		}
+		return;
+	}
+}
+
 void VRSwapWeaponEventFuncs()
 {
 	s_engineHookEvent = gEngfuncs.pfnHookEvent;
 	gEngfuncs.pfnHookEvent = VRHookEvent;
+
+	s_enginePrecacheEvent = gEngfuncs.pfnPrecacheEvent;
+	gEngfuncs.pfnPrecacheEvent = VRPrecacheEvent;
 }

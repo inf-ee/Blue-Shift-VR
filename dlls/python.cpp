@@ -196,12 +196,6 @@ void CPython::PrimaryAttack()
 
 	m_flNextPrimaryAttack = 0.75;
 	m_flTimeWeaponIdle = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
-
-// BSVR start
-#ifdef CLIENT_DLL
-	VRRegisterRecoil(0.4f);
-#endif
-	// BSVR end
 }
 
 

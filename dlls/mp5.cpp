@@ -163,12 +163,6 @@ void CMP5::PrimaryAttack()
 		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.1;
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
-
-// BSVR start
-#ifdef CLIENT_DLL
-	VRRegisterRecoil(0.4f);
-#endif
-	// BSVR end
 }
 
 
@@ -229,12 +223,6 @@ void CMP5::SecondaryAttack()
 	if (0 == m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType])
 		// HEV suit - indicate out of ammo condition
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", false, 0);
-
-// BSVR start
-#ifdef CLIENT_DLL
-	VRRegisterRecoil(0.8f);
-#endif
-	// BSVR end
 }
 
 void CMP5::Reload()

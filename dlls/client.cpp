@@ -1307,10 +1307,12 @@ void SetupVisibility(edict_t* pViewEntity, edict_t* pClient, unsigned char** pvs
 
 	org = pView->v.origin + pView->v.view_ofs;
 	// BSVR start
-	// if ((pView->v.flags & FL_DUCKING) != 0)
-	// {
-	// 	org = org + (VEC_HULL_MIN - VEC_DUCK_HULL_MIN);
-	// }
+#ifdef VR_SDK_ORIGINAL
+	if ((pView->v.flags & FL_DUCKING) != 0)
+	{
+		org = org + (VEC_HULL_MIN - VEC_DUCK_HULL_MIN);
+	}
+#endif
 	// BSVR end
 
 	*pvs = ENGINE_SET_PVS((float*)&org);

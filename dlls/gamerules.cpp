@@ -135,9 +135,11 @@ edict_t* CGameRules::GetPlayerSpawnSpot(CBasePlayer* pPlayer)
 	// BSVR end
 	pPlayer->pev->velocity = g_vecZero;
 	// BSVR start
-	// pPlayer->pev->angles = VARS(pentSpawnSpot)->angles; - original
-	// pPlayer->pev->punchangle = g_vecZero; - original
-	// pPlayer->pev->fixangle = 1; - original
+#ifdef VR_SDK_ORIGINAL
+	pPlayer->pev->angles = VARS(pentSpawnSpot)->angles;
+	pPlayer->pev->punchangle = g_vecZero;
+	pPlayer->pev->fixangle = 1;
+#endif
 
 	// Remember spawn yaw to send down to client
 	pPlayer->vr_spawnYaw = VARS(pentSpawnSpot)->angles.y;

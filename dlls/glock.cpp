@@ -134,16 +134,18 @@ void CGlock::GlockFire(float flSpread, float flCycleTime, bool fUseAutoAim)
 	// Always aim along the weapon controller (v_forward is the HMD direction)
 	Vector vecAiming = m_pPlayer->GetAutoaimVector();
 
-	// Vector vecAiming;
-	//
-	// if (fUseAutoAim)
-	// {
-	// 	vecAiming = m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
-	// }
-	// else
-	// {
-	// 	vecAiming = gpGlobals->v_forward;
-	// }
+#ifdef VR_SDK_ORIGINAL
+	Vector vecAiming;
+
+	if (fUseAutoAim)
+	{
+		vecAiming = m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
+	}
+	else
+	{
+		vecAiming = gpGlobals->v_forward;
+	}
+#endif
 	// BSVR end
 
 	Vector vecDir;

@@ -142,10 +142,12 @@ void CTripmineGrenade::Spawn()
 	}
 
 	// BSVR start - original commented out
-	// UTIL_MakeAimVectors(pev->angles);
+#ifdef VR_SDK_ORIGINAL
+	UTIL_MakeAimVectors(pev->angles);
 
-	// m_vecDir = gpGlobals->v_forward;
-	// m_vecEnd = pev->origin + m_vecDir * 2048;
+	m_vecDir = gpGlobals->v_forward;
+	m_vecEnd = pev->origin + m_vecDir * 2048;
+#endif
 	// BSVR end
 }
 
@@ -276,17 +278,21 @@ void CTripmineGrenade::MakeBeam()
 	pev->nextthink = gpGlobals->time + 0.1;
 
 	// BSVR start - commented out originals
-	// Vector vecTmpEnd = pev->origin + m_vecDir * 2048 * m_flBeamLength;
+#ifdef VR_SDK_ORIGINAL
+	Vector vecTmpEnd = pev->origin + m_vecDir * 2048 * m_flBeamLength;
 
-	// m_pBeam = CBeam::BeamCreate(g_pModelNameLaser, 10);
-	// //Mark as temporary so the beam will be recreated on save game load and level transitions.
+	m_pBeam = CBeam::BeamCreate(g_pModelNameLaser, 10);
+	//Mark as temporary so the beam will be recreated on save game load and level transitions.
+#endif
 	m_pBeam->pev->spawnflags |= SF_BEAM_TEMPORARY;
-	// //PointEntInit causes clients to use the position of whatever the previous entity to use this edict had until the server updates them.
-	// //m_pBeam->PointEntInit(vecTmpEnd, entindex());
-	// m_pBeam->PointsInit(pev->origin, vecTmpEnd);
-	// m_pBeam->SetColor(0, 214, 198);
-	// m_pBeam->SetScrollRate(255);
-	// m_pBeam->SetBrightness(64);
+#ifdef VR_SDK_ORIGINAL
+	//PointEntInit causes clients to use the position of whatever the previous entity to use this edict had until the server updates them.
+	//m_pBeam->PointEntInit(vecTmpEnd, entindex());
+	m_pBeam->PointsInit(pev->origin, vecTmpEnd);
+	m_pBeam->SetColor(0, 214, 198);
+	m_pBeam->SetScrollRate(255);
+	m_pBeam->SetBrightness(64);
+#endif
 	// BSVR end
 }
 
@@ -501,13 +507,15 @@ void CTripmine::PrimaryAttack()
 		return;
 
 	// BSVR start - commented out original
-	// UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-	// Vector vecSrc = m_pPlayer->GetGunPosition();
-	// Vector vecAiming = gpGlobals->v_forward;
+#ifdef VR_SDK_ORIGINAL
+	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+	Vector vecSrc = m_pPlayer->GetGunPosition();
+	Vector vecAiming = gpGlobals->v_forward;
 
-	// TraceResult tr;
+	TraceResult tr;
 
-	// UTIL_TraceLine(vecSrc, vecSrc + vecAiming * 128, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
+	UTIL_TraceLine(vecSrc, vecSrc + vecAiming * 128, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
+#endif
 	// BSVR end
 
 	int flags;

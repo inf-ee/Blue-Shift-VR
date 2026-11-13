@@ -773,45 +773,47 @@ void CBreakable::Die()
 	// BSVR start
 	VRSpawnBreakModels(vecSpot, pev->size, vecVelocity, 10, 2.5f, 0, STRING(m_iszGibModel), m_idShard, m_Material, 0, m_numGibBodies, cFlag);
 	// original code:
-	// MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecSpot);
-	// WRITE_BYTE(TE_BREAKMODEL);
+#ifdef VR_SDK_ORIGINAL
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecSpot);
+	WRITE_BYTE(TE_BREAKMODEL);
 
-	// // position
-	// WRITE_COORD(vecSpot.x);
-	// WRITE_COORD(vecSpot.y);
-	// WRITE_COORD(vecSpot.z);
+	// position
+	WRITE_COORD(vecSpot.x);
+	WRITE_COORD(vecSpot.y);
+	WRITE_COORD(vecSpot.z);
 
-	// // size
-	// WRITE_COORD(pev->size.x);
-	// WRITE_COORD(pev->size.y);
-	// WRITE_COORD(pev->size.z);
+	// size
+	WRITE_COORD(pev->size.x);
+	WRITE_COORD(pev->size.y);
+	WRITE_COORD(pev->size.z);
 
-	// // velocity
-	// WRITE_COORD(vecVelocity.x);
-	// WRITE_COORD(vecVelocity.y);
-	// WRITE_COORD(vecVelocity.z);
+	// velocity
+	WRITE_COORD(vecVelocity.x);
+	WRITE_COORD(vecVelocity.y);
+	WRITE_COORD(vecVelocity.z);
 
-	// // randomization
-	// WRITE_BYTE(10);
+	// randomization
+	WRITE_BYTE(10);
 
-	// // Model
-	// WRITE_SHORT(m_idShard); //model id#
+	// Model
+	WRITE_SHORT(m_idShard); //model id#
 
-	// // # of shards
-	// WRITE_BYTE(0); // let client decide
+	// # of shards
+	WRITE_BYTE(0); // let client decide
 
-	// // duration
-	// WRITE_BYTE(25); // 2.5 seconds
+	// duration
+	WRITE_BYTE(25); // 2.5 seconds
 
-	// // flags
-	// WRITE_BYTE(cFlag);
-	// MESSAGE_END();
+	// flags
+	WRITE_BYTE(cFlag);
+	MESSAGE_END();
 
-	// float size = pev->size.x;
-	// if (size < pev->size.y)
-	// 	size = pev->size.y;
-	// if (size < pev->size.z)
-	// 	size = pev->size.z;
+	float size = pev->size.x;
+	if (size < pev->size.y)
+		size = pev->size.y;
+	if (size < pev->size.z)
+		size = pev->size.z;
+#endif
 	// BSVR end
 
 	// !!! HACK  This should work!
@@ -883,36 +885,38 @@ int CBreakable::DamageDecal(int bitsDamageType)
 
 // BSVR start
 // CPushable class declaration moved to func_break.h so VR controller code can dynamic_cast to it - original:
-// class CPushable : public CBreakable
-// {
-// public:
-// 	void Spawn() override;
-// 	void Precache() override;
-// 	void Touch(CBaseEntity* pOther) override;
-// 	void Move(CBaseEntity* pMover, bool push);
-// 	bool KeyValue(KeyValueData* pkvd) override;
-// 	void Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value) override;
-// 	void EXPORT StopSound();
-// 	//	virtual void	SetActivator( CBaseEntity *pActivator ) { m_pPusher = pActivator; }
-//
-// 	int ObjectCaps() override { return (CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION) | FCAP_CONTINUOUS_USE; }
-// 	bool Save(CSave& save) override;
-// 	bool Restore(CRestore& restore) override;
-//
-// 	inline float MaxSpeed() { return m_maxSpeed; }
-//
-// 	// breakables use an overridden takedamage
-// 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
-//
-// 	int DamageDecal(int bitsDamageType) override;
-//
-// 	static TYPEDESCRIPTION m_SaveData[];
-//
-// 	static const char* m_soundNames[3];
-// 	int m_lastSound; // no need to save/restore, just keeps the same sound from playing twice in a row
-// 	float m_maxSpeed;
-// 	float m_soundTime;
-// };
+#ifdef VR_SDK_ORIGINAL
+class CPushable : public CBreakable
+{
+public:
+	void Spawn() override;
+	void Precache() override;
+	void Touch(CBaseEntity* pOther) override;
+	void Move(CBaseEntity* pMover, bool push);
+	bool KeyValue(KeyValueData* pkvd) override;
+	void Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value) override;
+	void EXPORT StopSound();
+	//	virtual void	SetActivator( CBaseEntity *pActivator ) { m_pPusher = pActivator; }
+
+	int ObjectCaps() override { return (CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION) | FCAP_CONTINUOUS_USE; }
+	bool Save(CSave& save) override;
+	bool Restore(CRestore& restore) override;
+
+	inline float MaxSpeed() { return m_maxSpeed; }
+
+	// breakables use an overridden takedamage
+	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+
+	int DamageDecal(int bitsDamageType) override;
+
+	static TYPEDESCRIPTION m_SaveData[];
+
+	static const char* m_soundNames[3];
+	int m_lastSound; // no need to save/restore, just keeps the same sound from playing twice in a row
+	float m_maxSpeed;
+	float m_soundTime;
+};
+#endif
 // BSVR end
 
 TYPEDESCRIPTION CPushable::m_SaveData[] =
@@ -1108,19 +1112,21 @@ void CPushable::Move(CBaseEntity* pOther, bool push)
 		EmitPushSound(length);
 
 		// original:
-		// if ((gpGlobals->time - m_soundTime) > 0.7)
-		// {
-		// 	m_soundTime = gpGlobals->time;
-		// 	if (length > 0 && FBitSet(pev->flags, FL_ONGROUND))
-		// 	{
-		// 		m_lastSound = RANDOM_LONG(0, 2);
-		// 		EMIT_SOUND(ENT(pev), CHAN_WEAPON, m_soundNames[m_lastSound], 0.5, ATTN_NORM);
-		// 		//			SetThink( StopSound );
-		// 		//			pev->nextthink = pev->ltime + 0.1;
-		// 	}
-		// 	else
-		// 		STOP_SOUND(ENT(pev), CHAN_WEAPON, m_soundNames[m_lastSound]);
-		// }
+#ifdef VR_SDK_ORIGINAL
+		if ((gpGlobals->time - m_soundTime) > 0.7)
+		{
+			m_soundTime = gpGlobals->time;
+			if (length > 0 && FBitSet(pev->flags, FL_ONGROUND))
+			{
+				m_lastSound = RANDOM_LONG(0, 2);
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, m_soundNames[m_lastSound], 0.5, ATTN_NORM);
+				//			SetThink( StopSound );
+				//			pev->nextthink = pev->ltime + 0.1;
+			}
+			else
+				STOP_SOUND(ENT(pev), CHAN_WEAPON, m_soundNames[m_lastSound]);
+		}
+#endif
 		// BSVR end
 	}
 }

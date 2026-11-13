@@ -907,10 +907,12 @@ bool CBaseMonster::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, f
 	// BSVR start
 	// if this is a player, move him around!
 	//  - nope - Max Makes Mods, 2018-01-21
-	// if ((!FNullEnt(pevInflictor)) && (pev->movetype == MOVETYPE_WALK) && (!pevAttacker || pevAttacker->solid != SOLID_TRIGGER))
-	// {
-	// 	pev->velocity = pev->velocity + vecDir * -DamageForce(flDamage);
-	// }
+#ifdef VR_SDK_ORIGINAL
+	if ((!FNullEnt(pevInflictor)) && (pev->movetype == MOVETYPE_WALK) && (!pevAttacker || pevAttacker->solid != SOLID_TRIGGER))
+	{
+		pev->velocity = pev->velocity + vecDir * -DamageForce(flDamage);
+	}
+#endif
 	// BSVR end
 
 	// do the damage

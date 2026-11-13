@@ -729,10 +729,12 @@ void CBasePlayerWeapon::SendWeaponAnim(int iAnim, int body)
 #endif
 
 	// BSVR start - commented out original
-	// MESSAGE_BEGIN(MSG_ONE, SVC_WEAPONANIM, NULL, m_pPlayer->pev);
-	// WRITE_BYTE(iAnim);	   // sequence number
-	// WRITE_BYTE(pev->body); // weaponmodel bodygroup.
-	// MESSAGE_END();
+#ifdef VR_SDK_ORIGINAL
+	MESSAGE_BEGIN(MSG_ONE, SVC_WEAPONANIM, NULL, m_pPlayer->pev);
+	WRITE_BYTE(iAnim);	   // sequence number
+	WRITE_BYTE(pev->body); // weaponmodel bodygroup.
+	MESSAGE_END();
+#endif
 	// BSVR end
 }
 

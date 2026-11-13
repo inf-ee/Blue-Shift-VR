@@ -169,18 +169,20 @@ void CHandGrenade::WeaponIdle()
 #endif
 
 		// commented out original
-		// if (flVel < 500)
-		// {
-		// 	SendWeaponAnim(HANDGRENADE_THROW1);
-		// }
-		// else if (flVel < 1000)
-		// {
-		// 	SendWeaponAnim(HANDGRENADE_THROW2);
-		// }
-		// else
-		// {
-		// 	SendWeaponAnim(HANDGRENADE_THROW3);
-		// }
+#ifdef VR_SDK_ORIGINAL
+		if (flVel < 500)
+		{
+			SendWeaponAnim(HANDGRENADE_THROW1);
+		}
+		else if (flVel < 1000)
+		{
+			SendWeaponAnim(HANDGRENADE_THROW2);
+		}
+		else
+		{
+			SendWeaponAnim(HANDGRENADE_THROW3);
+		}
+#endif
 		// BSVR end
 
 		// player "shoot" animation

@@ -302,9 +302,11 @@ void CGauss::StartFire()
 	m_pPlayer->m_flStartCharge = V_min(m_pPlayer->m_flStartCharge, gpGlobals->time);
 
 	// BSVR start
-	// UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle); - original
-	// Vector vecAiming = gpGlobals->v_forward; - original
-	// Vector vecSrc = m_pPlayer->GetGunPosition(); // + gpGlobals->v_up * -8 + gpGlobals->v_right * 8; - original
+#ifdef VR_SDK_ORIGINAL
+	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+	Vector vecAiming = gpGlobals->v_forward;
+	Vector vecSrc = m_pPlayer->GetGunPosition(); // + gpGlobals->v_up * -8 + gpGlobals->v_right * 8;
+#endif
 	UTIL_MakeVectors(m_pPlayer->GetWeaponViewAngles());
 	Vector vecAiming = m_pPlayer->GetAutoaimVector(); //gpGlobals->v_forward;
 	Vector vecSrc = m_pPlayer->GetGunPosition();	  // + gpGlobals->v_up * -8 + gpGlobals->v_right * 8;

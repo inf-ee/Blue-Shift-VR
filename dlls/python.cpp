@@ -98,10 +98,12 @@ void CPython::Holster()
 
 	// BSVR start
 	// No zoom in VR
-	// if (m_pPlayer->m_iFOV != 0)
-	// {
-	// 	SecondaryAttack();
-	// }
+#ifdef VR_SDK_ORIGINAL
+	if (m_pPlayer->m_iFOV != 0)
+	{
+		SecondaryAttack();
+	}
+#endif
 	// BSVR end
 
 	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.0;
@@ -122,16 +124,18 @@ void CPython::SecondaryAttack()
 
 	// BSVR start
 	// No zoom in VR
-	// if (m_pPlayer->m_iFOV != 0)
-	// {
-	// 	m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
-	// }
-	// else if (m_pPlayer->m_iFOV != 40)
-	// {
-	// 	m_pPlayer->m_iFOV = 40;
-	// }
+#ifdef VR_SDK_ORIGINAL
+	if (m_pPlayer->m_iFOV != 0)
+	{
+		m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
+	}
+	else if (m_pPlayer->m_iFOV != 40)
+	{
+		m_pPlayer->m_iFOV = 40;
+	}
 
-	// m_flNextSecondaryAttack = 0.5;
+	m_flNextSecondaryAttack = 0.5;
+#endif
 	// BSVR end
 }
 

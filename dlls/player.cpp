@@ -1481,25 +1481,27 @@ void CBasePlayer::PlayerUse()
 		{
 			// BSVR start - wrapped into VR train controls
 			// original:
-			// if ((m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)
-			// {
-			// 	m_afPhysicsFlags &= ~PFLAG_ONTRAIN;
-			// 	m_iTrain = TRAIN_NEW | TRAIN_OFF;
-			// 	return;
-			// }
-			// else
-			// { // Start controlling the train!
-			// 	CBaseEntity* pTrain = CBaseEntity::Instance(pev->groundentity);
-			//
-			// 	if (pTrain && (pev->button & IN_JUMP) == 0 && FBitSet(pev->flags, FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) != 0 && pTrain->OnControls(pev))
-			// 	{
-			// 		m_afPhysicsFlags |= PFLAG_ONTRAIN;
-			// 		m_iTrain = TrainSpeed(pTrain->pev->speed, pTrain->pev->impulse);
-			// 		m_iTrain |= TRAIN_NEW;
-			// 		EMIT_SOUND(ENT(pev), CHAN_ITEM, "plats/train_use1.wav", 0.8, ATTN_NORM);
-			// 		return;
-			// 	}
-			// }
+#ifdef VR_SDK_ORIGINAL
+			if ((m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)
+			{
+				m_afPhysicsFlags &= ~PFLAG_ONTRAIN;
+				m_iTrain = TRAIN_NEW | TRAIN_OFF;
+				return;
+			}
+			else
+			{ // Start controlling the train!
+				CBaseEntity* pTrain = CBaseEntity::Instance(pev->groundentity);
+
+				if (pTrain && (pev->button & IN_JUMP) == 0 && FBitSet(pev->flags, FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) != 0 && pTrain->OnControls(pev))
+				{
+					m_afPhysicsFlags |= PFLAG_ONTRAIN;
+					m_iTrain = TrainSpeed(pTrain->pev->speed, pTrain->pev->impulse);
+					m_iTrain |= TRAIN_NEW;
+					EMIT_SOUND(ENT(pev), CHAN_ITEM, "plats/train_use1.wav", 0.8, ATTN_NORM);
+					return;
+				}
+			}
+#endif
 			if (CVAR_GET_FLOAT("vr_train_controls") != 0.f)
 			{
 				if ((m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)
@@ -1687,13 +1689,15 @@ void CBasePlayer::Duck()
 {
 	// BSVR start
 	// Disable ducking in VR (ducking is realized by real "ducking")
-	// if ((pev->button & IN_DUCK) != 0)
-	// {
-	// 	if (m_IdealActivity != ACT_LEAP)
-	// 	{
-	// 		SetAnimation(PLAYER_WALK);
-	// 	}
-	// }
+#ifdef VR_SDK_ORIGINAL
+	if ((pev->button & IN_DUCK) != 0)
+	{
+		if (m_IdealActivity != ACT_LEAP)
+		{
+			SetAnimation(PLAYER_WALK);
+		}
+	}
+#endif
 	// BSVR end
 }
 
@@ -1958,71 +1962,75 @@ void CBasePlayer::PreThink()
 	}
 
 	// BSVR start
-	VRPreThinkControllersAndTrain(); // vr/VRPlayer.cpp
+	VRPreThinkControllersAndTrain();
 	// BSVR end
 
 	// BSVR start - commented out
 	// So the correct flags get sent to client asap.
 	//
-	// if ((m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)
-	// 	pev->flags |= FL_ONTRAIN;
-	// else
-	// 	pev->flags &= ~FL_ONTRAIN;
+#ifdef VR_SDK_ORIGINAL
+	if ((m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)
+		pev->flags |= FL_ONTRAIN;
+	else
+		pev->flags &= ~FL_ONTRAIN;
+#endif
 
 	// Train speed control
-	// if ((m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)
-	// {
-	// 	CBaseEntity* pTrain = CBaseEntity::Instance(pev->groundentity);
-	// 	float vel;
+#ifdef VR_SDK_ORIGINAL
+	if ((m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)
+	{
+		CBaseEntity* pTrain = CBaseEntity::Instance(pev->groundentity);
+		float vel;
 
-	// 	if (!pTrain)
-	// 	{
-	// 		TraceResult trainTrace;
-	// 		// Maybe this is on the other side of a level transition
-	// 		UTIL_TraceLine(pev->origin, pev->origin + Vector(0, 0, -38), ignore_monsters, ENT(pev), &trainTrace);
+		if (!pTrain)
+		{
+			TraceResult trainTrace;
+			// Maybe this is on the other side of a level transition
+			UTIL_TraceLine(pev->origin, pev->origin + Vector(0, 0, -38), ignore_monsters, ENT(pev), &trainTrace);
 
-	// 		// HACKHACK - Just look for the func_tracktrain classname
-	// 		if (trainTrace.flFraction != 1.0 && trainTrace.pHit)
-	// 			pTrain = CBaseEntity::Instance(trainTrace.pHit);
+			// HACKHACK - Just look for the func_tracktrain classname
+			if (trainTrace.flFraction != 1.0 && trainTrace.pHit)
+				pTrain = CBaseEntity::Instance(trainTrace.pHit);
 
 
-	// 		if (!pTrain || (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) == 0 || !pTrain->OnControls(pev))
-	// 		{
-	// 			//ALERT( at_error, "In train mode with no train!\n" );
-	// 			m_afPhysicsFlags &= ~PFLAG_ONTRAIN;
-	// 			m_iTrain = TRAIN_NEW | TRAIN_OFF;
-	// 			return;
-	// 		}
-	// 	}
-	// 	else if (!FBitSet(pev->flags, FL_ONGROUND) || FBitSet(pTrain->pev->spawnflags, SF_TRACKTRAIN_NOCONTROL) || (pev->button & (IN_MOVELEFT | IN_MOVERIGHT)) != 0)
-	// 	{
-	// 		// Turn off the train if you jump, strafe, or the train controls go dead
-	// 		m_afPhysicsFlags &= ~PFLAG_ONTRAIN;
-	// 		m_iTrain = TRAIN_NEW | TRAIN_OFF;
-	// 		return;
-	// 	}
+			if (!pTrain || (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) == 0 || !pTrain->OnControls(pev))
+			{
+				//ALERT( at_error, "In train mode with no train!\n" );
+				m_afPhysicsFlags &= ~PFLAG_ONTRAIN;
+				m_iTrain = TRAIN_NEW | TRAIN_OFF;
+				return;
+			}
+		}
+		else if (!FBitSet(pev->flags, FL_ONGROUND) || FBitSet(pTrain->pev->spawnflags, SF_TRACKTRAIN_NOCONTROL) || (pev->button & (IN_MOVELEFT | IN_MOVERIGHT)) != 0)
+		{
+			// Turn off the train if you jump, strafe, or the train controls go dead
+			m_afPhysicsFlags &= ~PFLAG_ONTRAIN;
+			m_iTrain = TRAIN_NEW | TRAIN_OFF;
+			return;
+		}
 
-	// 	pev->velocity = g_vecZero;
-	// 	vel = 0;
-	// 	if ((m_afButtonPressed & IN_FORWARD) != 0)
-	// 	{
-	// 		vel = 1;
-	// 		pTrain->Use(this, this, USE_SET, (float)vel);
-	// 	}
-	// 	else if ((m_afButtonPressed & IN_BACK) != 0)
-	// 	{
-	// 		vel = -1;
-	// 		pTrain->Use(this, this, USE_SET, (float)vel);
-	// 	}
+		pev->velocity = g_vecZero;
+		vel = 0;
+		if ((m_afButtonPressed & IN_FORWARD) != 0)
+		{
+			vel = 1;
+			pTrain->Use(this, this, USE_SET, (float)vel);
+		}
+		else if ((m_afButtonPressed & IN_BACK) != 0)
+		{
+			vel = -1;
+			pTrain->Use(this, this, USE_SET, (float)vel);
+		}
 
-	// 	if (0 != vel)
-	// 	{
-	// 		m_iTrain = TrainSpeed(pTrain->pev->speed, pTrain->pev->impulse);
-	// 		m_iTrain |= TRAIN_ACTIVE | TRAIN_NEW;
-	// 	}
-	// }
-	// else if ((m_iTrain & TRAIN_ACTIVE) != 0)
-	// 	m_iTrain = TRAIN_NEW; // turn off train
+		if (0 != vel)
+		{
+			m_iTrain = TrainSpeed(pTrain->pev->speed, pTrain->pev->impulse);
+			m_iTrain |= TRAIN_ACTIVE | TRAIN_NEW;
+		}
+	}
+	else if ((m_iTrain & TRAIN_ACTIVE) != 0)
+		m_iTrain = TRAIN_NEW; // turn off train
+#endif
 	// BSVR end - commented out
 
 	if ((pev->button & IN_JUMP) != 0)
@@ -2034,9 +2042,11 @@ void CBasePlayer::PreThink()
 
 
 	// BSVR start - real VR ducking
-	// // If trying to duck, already ducked, or in the process of ducking
-	// if ((pev->button & IN_DUCK) != 0 || FBitSet(pev->flags, FL_DUCKING) || (m_afPhysicsFlags & PFLAG_DUCKING) != 0)
-	// 	Duck();
+#ifdef VR_SDK_ORIGINAL
+	// If trying to duck, already ducked, or in the process of ducking
+	if ((pev->button & IN_DUCK) != 0 || FBitSet(pev->flags, FL_DUCKING) || (m_afPhysicsFlags & PFLAG_DUCKING) != 0)
+		Duck();
+#endif
 	// BSVR end
 
 	if (!FBitSet(pev->flags, FL_ONGROUND))
@@ -2553,10 +2563,12 @@ void CBasePlayer::UpdatePlayerSound()
 	}
 
 	// BSVR start - original
-	// if ((pev->button & IN_JUMP) != 0)
-	// {
-	// 	iBodyVolume += 100;
-	// }
+#ifdef VR_SDK_ORIGINAL
+	if ((pev->button & IN_JUMP) != 0)
+	{
+		iBodyVolume += 100;
+	}
+#endif
 	// BSVR end
 
 	// convert player move speed and actions into sound audible by monsters.
@@ -2647,18 +2659,20 @@ void CBasePlayer::PostThink()
 	VRPostThinkStart(); // vr/VRPlayer.cpp
 
 	// Handle Tank controlling
-	// if (m_pTank != NULL)
-	// { // if they've moved too far from the gun,  or selected a weapon, unuse the gun
-	// 	if (m_pTank->OnControls(pev) && 0 == pev->weaponmodel)
-	// 	{
-	// 		m_pTank->Use(this, this, USE_SET, 2); // try fire the gun
-	// 	}
-	// 	else
-	// 	{ // they've moved off the platform
-	// 		m_pTank->Use(this, this, USE_OFF, 0);
-	// 		m_pTank = NULL;
-	// 	}
-	// }
+#ifdef VR_SDK_ORIGINAL
+	if (m_pTank != NULL)
+	{ // if they've moved too far from the gun,  or selected a weapon, unuse the gun
+		if (m_pTank->OnControls(pev) && 0 == pev->weaponmodel)
+		{
+			m_pTank->Use(this, this, USE_SET, 2); // try fire the gun
+		}
+		else
+		{ // they've moved off the platform
+			m_pTank->Use(this, this, USE_OFF, 0);
+			m_pTank = NULL;
+		}
+	}
+#endif
 	// BSVR end
 
 	// do weapon stuff

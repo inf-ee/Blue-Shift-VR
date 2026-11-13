@@ -775,32 +775,34 @@ bool CBaseEntity::IsInWorld()
 	// BSVR end
 
 	// BSVR start original
-	// // position
-	// if (pev->origin.x >= 4096)
-	// 	return false;
-	// if (pev->origin.y >= 4096)
-	// 	return false;
-	// if (pev->origin.z >= 4096)
-	// 	return false;
-	// if (pev->origin.x <= -4096)
-	// 	return false;
-	// if (pev->origin.y <= -4096)
-	// 	return false;
-	// if (pev->origin.z <= -4096)
-	// 	return false;
-	// // speed
-	// if (pev->velocity.x >= 2000)
-	// 	return false;
-	// if (pev->velocity.y >= 2000)
-	// 	return false;
-	// if (pev->velocity.z >= 2000)
-	// 	return false;
-	// if (pev->velocity.x <= -2000)
-	// 	return false;
-	// if (pev->velocity.y <= -2000)
-	// 	return false;
-	// if (pev->velocity.z <= -2000)
-	// 	return false;
+#ifdef VR_SDK_ORIGINAL
+	// position
+	if (pev->origin.x >= 4096)
+		return false;
+	if (pev->origin.y >= 4096)
+		return false;
+	if (pev->origin.z >= 4096)
+		return false;
+	if (pev->origin.x <= -4096)
+		return false;
+	if (pev->origin.y <= -4096)
+		return false;
+	if (pev->origin.z <= -4096)
+		return false;
+	// speed
+	if (pev->velocity.x >= 2000)
+		return false;
+	if (pev->velocity.y >= 2000)
+		return false;
+	if (pev->velocity.z >= 2000)
+		return false;
+	if (pev->velocity.x <= -2000)
+		return false;
+	if (pev->velocity.y <= -2000)
+		return false;
+	if (pev->velocity.z <= -2000)
+		return false;
+#endif
 	// BSVR end
 
 	return true;

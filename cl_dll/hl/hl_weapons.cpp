@@ -784,14 +784,16 @@ void HUD_WeaponsPostThink(local_state_s* from, local_state_s* to, usercmd_t* cmd
 	// Make sure that weapon animation matches what the game .dll is telling us
 	//  over the wire ( fixes some animation glitches )
 	// BSVR start
-	// if (g_runfuncs && (HUD_GetWeaponAnim() != to->client.weaponanim))
-	// {
-	// 	//Make sure the 357 has the right body
-	// 	g_Python.pev->body = bIsMultiplayer() ? 1 : 0;
+#ifdef VR_SDK_ORIGINAL
+	if (g_runfuncs && (HUD_GetWeaponAnim() != to->client.weaponanim))
+	{
+		//Make sure the 357 has the right body
+		g_Python.pev->body = bIsMultiplayer() ? 1 : 0;
 
-	// 	// Force a fixed anim down to viewmodel
-	// 	HUD_SendWeaponAnim(to->client.weaponanim, pWeapon->pev->body, true);
-	// }
+		// Force a fixed anim down to viewmodel
+		HUD_SendWeaponAnim(to->client.weaponanim, pWeapon->pev->body, true);
+	}
+#endif
 	// BSVR end
 
 	for (i = 0; i < MAX_WEAPONS; i++)

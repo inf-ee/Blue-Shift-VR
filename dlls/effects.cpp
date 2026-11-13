@@ -1507,12 +1507,14 @@ void CGibShooter::ShootThink()
 		float thinkTime = pGib->pev->nextthink - gpGlobals->time;
 
 		// BSVR start
-		// pGib->m_lifeTime = (m_flGibLife * RANDOM_FLOAT(0.95, 1.05)); // +/- 5%
-		// if (pGib->m_lifeTime < thinkTime)
-		// {
-		// 	pGib->pev->nextthink = gpGlobals->time + pGib->m_lifeTime;
-		// 	pGib->m_lifeTime = 0;
-		// }
+#ifdef VR_SDK_ORIGINAL
+		pGib->m_lifeTime = (m_flGibLife * RANDOM_FLOAT(0.95, 1.05)); // +/- 5%
+		if (pGib->m_lifeTime < thinkTime)
+		{
+			pGib->pev->nextthink = gpGlobals->time + pGib->m_lifeTime;
+			pGib->m_lifeTime = 0;
+		}
+#endif
 		// BSVR end
 	}
 
@@ -2245,9 +2247,11 @@ class CItemSoda : public CGib
 public:
 	void Spawn() override;
 	// BSVR start
-	// void Precache() override; - original
-	// void EXPORT CanThink(); - original
-	// void EXPORT CanTouch(CBaseEntity* pOther); - original
+#ifdef VR_SDK_ORIGINAL
+	void Precache() override;
+	void EXPORT CanThink();
+	void EXPORT CanTouch(CBaseEntity* pOther);
+#endif
 	virtual void HandleDragUpdate(const Vector& origin, const Vector& velocity, const Vector& angles) override;
 	virtual bool IsDraggable() override { return (pev->effects & EF_NODRAW) == 0 && CGib::IsDraggable(); }
 	virtual void HandleDragStart() override;
@@ -2259,9 +2263,11 @@ private:
 };
 
 // BSVR start
-// void CItemSoda::Precache()
-// {
-// }
+#ifdef VR_SDK_ORIGINAL
+void CItemSoda::Precache()
+{
+}
+#endif
 // BSVR end
 
 LINK_ENTITY_TO_CLASS(item_sodacan, CItemSoda);
@@ -2269,11 +2275,13 @@ LINK_ENTITY_TO_CLASS(item_sodacan, CItemSoda);
 void CItemSoda::Spawn()
 {
 	// BSVR start
-	// Precache(); - original
-	// pev->solid = SOLID_NOT; - original
-	// pev->movetype = MOVETYPE_TOSS; - original
+#ifdef VR_SDK_ORIGINAL
+	Precache();
+	pev->solid = SOLID_NOT;
+	pev->movetype = MOVETYPE_TOSS;
 
-	// SET_MODEL(ENT(pev), "models/can.mdl"); - original
+	SET_MODEL(ENT(pev), "models/can.mdl");
+#endif
 
 	// cans are frickin huge in VR!
 	pev->scale = 0.5f;
@@ -2352,40 +2360,42 @@ void CItemSoda::Drink(CBaseEntity* pDrinker)
 }
 
 // commented out originals
-// void CItemSoda::CanThink()
-// {
-// 	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/g_bounce3.wav", 1, ATTN_NORM);
+#ifdef VR_SDK_ORIGINAL
+void CItemSoda::CanThink()
+{
+	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/g_bounce3.wav", 1, ATTN_NORM);
 
-// 	pev->solid = SOLID_TRIGGER;
-// 	UTIL_SetSize(pev, Vector(-8, -8, 0), Vector(8, 8, 8));
-// 	SetThink(NULL);
-// 	SetTouch(&CItemSoda::CanTouch);
-// }
+	pev->solid = SOLID_TRIGGER;
+	UTIL_SetSize(pev, Vector(-8, -8, 0), Vector(8, 8, 8));
+	SetThink(NULL);
+	SetTouch(&CItemSoda::CanTouch);
+}
 
-// void CItemSoda::CanTouch(CBaseEntity* pOther)
-// {
-// 	if (!pOther->IsPlayer())
-// 	{
-// 		return;
-// 	}
+void CItemSoda::CanTouch(CBaseEntity* pOther)
+{
+	if (!pOther->IsPlayer())
+	{
+		return;
+	}
 
-// 	// spoit sound here
+	// spoit sound here
 
-// 	pOther->TakeHealth(1, DMG_GENERIC); // a bit of health.
+	pOther->TakeHealth(1, DMG_GENERIC); // a bit of health.
 
-// 	if (!FNullEnt(pev->owner))
-// 	{
-// 		// tell the machine the can was taken
-// 		pev->owner->v.frags = 0;
-// 	}
+	if (!FNullEnt(pev->owner))
+	{
+		// tell the machine the can was taken
+		pev->owner->v.frags = 0;
+	}
 
-// 	pev->solid = SOLID_NOT;
-// 	pev->movetype = MOVETYPE_NONE;
-// 	pev->effects = EF_NODRAW;
-// 	SetTouch(NULL);
-// 	SetThink(&CItemSoda::SUB_Remove);
-// 	pev->nextthink = gpGlobals->time;
-// }
+	pev->solid = SOLID_NOT;
+	pev->movetype = MOVETYPE_NONE;
+	pev->effects = EF_NODRAW;
+	SetTouch(NULL);
+	SetThink(&CItemSoda::SUB_Remove);
+	pev->nextthink = gpGlobals->time;
+}
+#endif
 // BSVR end
 
 const int SF_WARPBALL_FIRE_ONCE = 1 << 0;

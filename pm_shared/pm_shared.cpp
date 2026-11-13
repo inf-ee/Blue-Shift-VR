@@ -45,42 +45,46 @@ static bool pm_shared_initialized = false;
 #pragma warning(disable : 4305)
 
 // BSVR start - used from com_model.h
-// typedef enum
-// {
-// 	mod_brush,
-// 	mod_sprite,
-// 	mod_alias,
-// 	mod_studio
-// } modtype_t;
+#ifdef VR_SDK_ORIGINAL
+typedef enum
+{
+	mod_brush,
+	mod_sprite,
+	mod_alias,
+	mod_studio
+} modtype_t;
+#endif
 // BSVR end
 
 playermove_t* pmove = NULL;
 
 // BSVR start - these types come from com_model.h - original:
-// typedef struct
-// {
-// 	int planenum;
-// 	short children[2]; // negative numbers are contents
-// } dclipnode_t;
-//
-// typedef struct mplane_s
-// {
-// 	Vector normal; // surface normal
-// 	float dist;	   // closest appoach to origin
-// 	byte type;	   // for texture axis selection and fast side tests
-// 	byte signbits; // signx + signy<<1 + signz<<1
-// 	byte pad[2];
-// } mplane_t;
-//
-// typedef struct hull_s
-// {
-// 	dclipnode_t* clipnodes;
-// 	mplane_t* planes;
-// 	int firstclipnode;
-// 	int lastclipnode;
-// 	Vector clip_mins;
-// 	Vector clip_maxs;
-// } hull_t;
+#ifdef VR_SDK_ORIGINAL
+typedef struct
+{
+	int planenum;
+	short children[2]; // negative numbers are contents
+} dclipnode_t;
+
+typedef struct mplane_s
+{
+	Vector normal; // surface normal
+	float dist;	   // closest appoach to origin
+	byte type;	   // for texture axis selection and fast side tests
+	byte signbits; // signx + signy<<1 + signz<<1
+	byte pad[2];
+} mplane_t;
+
+typedef struct hull_s
+{
+	dclipnode_t* clipnodes;
+	mplane_t* planes;
+	int firstclipnode;
+	int lastclipnode;
+	Vector clip_mins;
+	Vector clip_maxs;
+} hull_t;
+#endif
 #include "vr/VRPMShared.h"
 // BSVR end
 
@@ -932,9 +936,11 @@ int PM_FlyMove()
 			PM_VR_MoveAwayFromStuckEntityIfPossible(end, trace);
 			// original commented code
 			// // entity is trapped in another solid
-			// VectorCopy(vec3_origin, pmove->velocity);
-			// //Con_DPrintf("Trapped 4\n");
-			// return 4;
+#ifdef VR_SDK_ORIGINAL
+			VectorCopy(vec3_origin, pmove->velocity);
+			//Con_DPrintf("Trapped 4\n");
+			return 4;
+#endif
 			// BSVR end
 		}
 
@@ -1467,10 +1473,12 @@ void PM_WaterMove()
 
 	// Sinking after no other movement occurs
 	// BSVR start
-	// if (0 == pmove->cmd.forwardmove && 0 == pmove->cmd.sidemove && 0 == pmove->cmd.upmove) - original
-	// 	wishvel[2] -= 60; // drift towards bottom - original
-	// else				  // Go straight up by upmove amount. - original
-	// 	wishvel[2] += pmove->cmd.upmove; - original
+#ifdef VR_SDK_ORIGINAL
+	if (0 == pmove->cmd.forwardmove && 0 == pmove->cmd.sidemove && 0 == pmove->cmd.upmove)
+		wishvel[2] -= 60; // drift towards bottom
+	else				  // Go straight up by upmove amount.
+		wishvel[2] += pmove->cmd.upmove;
+#endif
 	PM_VRWaterWishVelocity(wishvel); // vr/VRPMShared.cpp
 	// BSVR end
 
@@ -3119,27 +3127,29 @@ void PM_CheckParamters()
 
 	// BSVR start
 	VectorCopy(pmove->cmd.viewangles, pmove->angles);
-	// // Take angles from command.
-	// if (0 == pmove->dead)
-	// {
-	// 	VectorCopy(pmove->cmd.viewangles, v_angle);
-	// 	VectorAdd(v_angle, pmove->punchangle, v_angle);
+#ifdef VR_SDK_ORIGINAL
+	// Take angles from command.
+	if (0 == pmove->dead)
+	{
+		VectorCopy(pmove->cmd.viewangles, v_angle);
+		VectorAdd(v_angle, pmove->punchangle, v_angle);
 
-	// 	// Set up view angles.
-	// 	pmove->angles[ROLL] = PM_CalcRoll(v_angle, pmove->velocity, pmove->movevars->rollangle, pmove->movevars->rollspeed) * 4;
-	// 	pmove->angles[PITCH] = v_angle[PITCH];
-	// 	pmove->angles[YAW] = v_angle[YAW];
-	// }
-	// else
-	// {
-	// 	VectorCopy(pmove->oldangles, pmove->angles);
-	// }
+		// Set up view angles.
+		pmove->angles[ROLL] = PM_CalcRoll(v_angle, pmove->velocity, pmove->movevars->rollangle, pmove->movevars->rollspeed) * 4;
+		pmove->angles[PITCH] = v_angle[PITCH];
+		pmove->angles[YAW] = v_angle[YAW];
+	}
+	else
+	{
+		VectorCopy(pmove->oldangles, pmove->angles);
+	}
 
-	// // Set dead player view_offset
-	// if (0 != pmove->dead)
-	// {
-	// 	pmove->view_ofs = VEC_DEAD_VIEW;
-	// }
+	// Set dead player view_offset
+	if (0 != pmove->dead)
+	{
+		pmove->view_ofs = VEC_DEAD_VIEW;
+	}
+#endif
 	// BSVR end
 
 	// Adjust client view angles to match values used on server.
@@ -3220,19 +3230,21 @@ void PM_PlayerMove(qboolean server)
 
 	// Always try and unstick us unless we are in NOCLIP mode
 	// BSVR start
-	// if (pmove->movetype != MOVETYPE_NOCLIP && pmove->movetype != MOVETYPE_NONE)
-	// {
-	// 	if (PM_CheckStuck())
-	// 	{
-	// 		// Let the user try to duck to get unstuck
-	// 		PM_Duck();
+#ifdef VR_SDK_ORIGINAL
+	if (pmove->movetype != MOVETYPE_NOCLIP && pmove->movetype != MOVETYPE_NONE)
+	{
+		if (PM_CheckStuck())
+		{
+			// Let the user try to duck to get unstuck
+			PM_Duck();
 
-	// 		if (PM_CheckStuck())
-	// 		{
-	// 			return; // Can't move, we're stuck
-	// 		}
-	// 	}
-	// }
+			if (PM_CheckStuck())
+			{
+				return; // Can't move, we're stuck
+			}
+		}
+	}
+#endif
 	if (PM_VRCheckStuck(server)) // vr/VRPMShared.cpp
 	{
 		return;
@@ -3273,18 +3285,19 @@ void PM_PlayerMove(qboolean server)
 	if (0 == pmove->dead && (pmove->flags & FL_ONTRAIN) == 0)
 	{
 		// BSVR start
-		// Old code
-		// if (pLadder)
-		// {
-		// 	PM_LadderMove(pLadder);
-		// }
-		// else if (pmove->movetype != MOVETYPE_WALK &&
-		// 		 pmove->movetype != MOVETYPE_NOCLIP)
-		// {
-		// 	// Clear ladder stuff unless player is noclipping
-		// 	//  it will be set immediately again next frame if necessary
-		// 	pmove->movetype = MOVETYPE_WALK;
-		// }
+#ifdef VR_SDK_ORIGINAL
+		if (pLadder)
+		{
+			PM_LadderMove(pLadder);
+		}
+		else if (pmove->movetype != MOVETYPE_WALK &&
+				 pmove->movetype != MOVETYPE_NOCLIP)
+		{
+			// Clear ladder stuff unless player is noclipping
+			//  it will be set immediately again next frame if necessary
+			pmove->movetype = MOVETYPE_WALK;
+		}
+#endif
 		// New code
 		if (pLadder && !VRGlobalGetNoclipMode())
 		{

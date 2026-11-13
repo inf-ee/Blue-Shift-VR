@@ -18,6 +18,7 @@
 #include "vr/VRControllerModel.h"
 #include "vr/VRCommons.h"
 #include "vr/VRGameServer.h"
+#include "client.h" // respawn
 #include "trains.h"
 
 // Train HUD states and TrainSpeed from player.cpp (SDK code local to that file), used by the VR train controls
@@ -1632,4 +1633,62 @@ Vector CBasePlayer::VRGetAutoaimVector()
 	}
 	UTIL_MakeAimVectors(GetWeaponAngles());
 	return gpGlobals->v_forward;
+}
+
+// PlayerDeathThink: VR auto-respawn instead of the vanilla "wait for buttons released, then for a button press"
+void CBasePlayer::VRPlayerDeathThinkRespawn()
+{
+	bool fAnyButtonDown = (pev->button & ~IN_SCORE) != 0;
+
+	// wait for all buttons released
+	if (pev->deadflag == DEAD_DEAD)
+	{
+		// clear attack/use commands
+		m_afButtonPressed = 0;
+		pev->button = 0;
+		m_afButtonReleased = 0;
+		m_fDeadTime = gpGlobals->time;
+		pev->deadflag = DEAD_RESPAWNABLE;
+		pmove->oldbuttons = 0;
+		pmove->cmd.buttons = 0;
+		pmove->cmd.buttons_ex = 0;
+		return;
+	}
+
+	// auto-respawn after 1 second in VR (respawn immediately if any button down)
+	if (fAnyButtonDown || gpGlobals->time > (m_fDeadTime + 1.f))
+	{
+		// clear attack/use commands
+		m_afButtonPressed = 0;
+		pev->button = 0;
+		m_afButtonReleased = 0;
+		m_flRespawnTimer = 0;
+		pmove->oldbuttons = 0;
+		pmove->cmd.buttons = 0;
+		pmove->cmd.buttons_ex = 0;
+
+		//ALERT(at_console, "Respawn\n");
+
+		respawn(pev, (m_afPhysicsFlags & PFLAG_OBSERVER) == 0); // don't copy a corpse if we're in deathcam.
+		pev->nextthink = -1;
+	}
+}
+
+// SelectItem: selects the bare hand (no active item)
+void CBasePlayer::VRSelectBareHand()
+{
+	if (nullptr == m_pActiveItem)
+		return;
+
+	ResetAutoaim();
+
+	// FIX, this needs to queue them up and delay
+	if (m_pActiveItem)
+		m_pActiveItem->Holster();
+
+	m_pLastItem = m_pActiveItem;
+	m_pActiveItem = nullptr;
+
+	pev->viewmodel = MAKE_STRING("models/v_hand.mdl");
+	pev->weaponmodel = iStringNull;
 }

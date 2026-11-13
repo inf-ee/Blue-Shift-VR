@@ -1626,16 +1626,7 @@ void CBasePlayer::Jump()
 	if ((pev->flags & FL_ONGROUND) == 0 || !pev->groundentity)
 	{
 		// BSVR start
-		if (m_fLongJump)
-		{
-			// Check for double jump if longjump module is equipped
-			float flMaxDoubleJumpDelay = 1.f;
-			if ((m_vrLastJumpTime + flMaxDoubleJumpDelay) > gpGlobals->time)
-			{
-				DoLongJump(false, true);
-				m_vrLastJumpTime = 0;
-			}
-		}
+		VRJumpInAir(); // vr/VRPlayer.cpp
 		// BSVR end
 
 		return;
@@ -2953,6 +2944,7 @@ void CBasePlayer::Spawn()
 	pev->armorvalue = 0;
 	pev->takedamage = DAMAGE_AIM;
 	pev->solid = SOLID_SLIDEBOX;
+	pev->movetype = MOVETYPE_WALK;
 	// BSVR start
 	// pev->movetype = MOVETYPE_WALK;
 	pev->movetype = MOVETYPE_NOCLIP;
@@ -2960,9 +2952,6 @@ void CBasePlayer::Spawn()
 	pev->max_health = pev->health;
 	pev->flags &= FL_PROXY | FL_FAKECLIENT; // keep proxy and fakeclient flags set by engine
 	pev->flags |= FL_CLIENT;
-	// BSVR start
-	pev->flags &= ~FL_BARNACLED;
-	// BSVR end
 	pev->air_finished = gpGlobals->time + 12;
 	pev->dmg = 2; // initial water damage
 	pev->effects = 0;
@@ -2970,6 +2959,10 @@ void CBasePlayer::Spawn()
 	pev->dmg_take = 0;
 	pev->dmg_save = 0;
 	pev->friction = 1.0;
+	pev->gravity = 1.0;
+	// BSVR start
+	VRSpawnOverrides(); // vr/VRPlayer.cpp
+	// BSVR end
 	// BSVR start
 	// pev->gravity = 1.0; - original
 	pev->gravity = 0.0;

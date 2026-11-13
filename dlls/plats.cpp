@@ -1574,23 +1574,6 @@ void CFuncTrackTrain::Precache()
 	m_usAdjustPitch = PRECACHE_EVENT(1, "events/train.sc");
 }
 
-// BSVR start
-Vector2D CFuncTrackTrain::GetVRControlsOffset()
-{
-	// TODO: Do some magic to calculate this better.
-	// For now this should be sufficient for most trains in Half-Life,
-	// but ideally we'd have some logic that can identify/detect either
-	//  - the floor of the train and calculate an appropriate offset for controls
-	//  - the visual/physical controls of the train
-	//  - something else?
-	if (m_vrControlsOffset.LengthSquared() == 0.f)
-	{
-		m_vrControlsOffset = Vector2D{-48.f, 20.f};
-	}
-	return m_vrControlsOffset;
-}
-// BSVR end
-
 // This class defines the volume of space that the player must stand in to control the train
 class CFuncTrainControls : public CBaseEntity
 {

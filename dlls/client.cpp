@@ -1300,7 +1300,7 @@ void SetupVisibility(edict_t* pViewEntity, edict_t* pClient, unsigned char** pvs
 		*pvs = NULL; // the spectator proxy sees
 		*pas = NULL; // and hears everything
 		// BSVR start
-		m_pvsCache = nullptr;
+		VRSetPVSCache(nullptr);
 		// BSVR end
 		return;
 	}
@@ -1317,7 +1317,7 @@ void SetupVisibility(edict_t* pViewEntity, edict_t* pClient, unsigned char** pvs
 	*pas = ENGINE_SET_PAS((float*)&org);
 
 	// BSVR start
-	m_pvsCache = *pvs;
+	VRSetPVSCache(*pvs);
 	// BSVR end
 }
 
@@ -1347,19 +1347,8 @@ int AddToFullPack(struct entity_state_s* state, int e, edict_t* ent, edict_t* ho
 		return 0;
 	}
 
-	// BSVR start
-	// If pSet is nullptr, then the test will always succeed and the entity will be added to the update
-	bool isInPVS = ENGINE_CHECK_VISIBILITY(ent, pSet);
-
-	// Remember if entity is in PVS
-	if (m_pvsCache == pSet)
-	{
-		EHandleT<CBaseEntity> hEnt = CBaseEntity::SafeInstance<CBaseEntity>(ent);
-		if (hEnt)
-		{
-			hEnt->m_isInPVS = isInPVS;
-		}
-	}
+	// BSVR start - one visibility check, also remembered for the VR code
+	const bool isInPVS = VRCheckAndRecordPVS(ent, pSet);
 	// BSVR end
 
 	int i;
@@ -1588,27 +1577,20 @@ void CreateBaseline(int player, int eindex, struct entity_state_s* baseline, str
 
 	if (0 != player)
 	{
-		// BSVR start
-		// baseline->mins = *player_mins; - original
-		// baseline->maxs = *player_maxs; - original
-		baseline->mins = entity->v.mins;
-		baseline->maxs = entity->v.maxs;
-		// BSVR end
+		baseline->mins = *player_mins;
+		baseline->maxs = *player_maxs;
 
 		baseline->colormap = eindex;
 		baseline->modelindex = playermodelindex;
 		baseline->friction = 1.0;
-		// BSVR start
-		// baseline->movetype = MOVETYPE_WALK; - original
-		baseline->movetype = MOVETYPE_NOCLIP;
-		// BSVR end
+		baseline->movetype = MOVETYPE_WALK;
 
 		baseline->scale = entity->v.scale;
 		baseline->solid = SOLID_SLIDEBOX;
 		baseline->framerate = 1.0;
+		baseline->gravity = 1.0;
 		// BSVR start
-		// baseline->gravity = 1.0; - original
-		baseline->gravity = 0.0;
+		VROverridePlayerBaseline(baseline, entity);
 		// BSVR end
 	}
 	else
@@ -1986,21 +1968,12 @@ void UpdateClientData(const edict_t* ent, int sendweapons, struct clientdata_s* 
 	cd->weapons = pev->weapons;
 
 	// Vectors
-	// BSVR start
-	if (pl != nullptr)
-	{
-		cd->origin = pl->GetClientOrigin();
-		cd->view_ofs = pl->GetClientViewOfs();
-	}
-	else
-	{
-		cd->origin = ent->v.origin;
-		cd->view_ofs = ent->v.view_ofs;
-	}
-	// cd->origin = pev->origin;
-	// cd->view_ofs = pev->view_ofs;
-	// BSVR end
+	cd->origin = pev->origin;
 	cd->velocity = pev->velocity;
+	cd->view_ofs = pev->view_ofs;
+	// BSVR start
+	VRSetClientDataOrigin(pl, cd);
+	// BSVR end
 	cd->punchangle = pev->punchangle;
 
 	cd->bInDuck = pev->bInDuck;
@@ -2161,36 +2134,9 @@ GetHullBounds
   Engine calls this to enumerate player collision hulls, for prediction.  Return 0 if the hullnumber doesn't exist.
 ================================
 */
-
-// BSVR start
-int InternalGetHullBounds(int hullnumber, float* mins, float* maxs)
-{
-	switch (hullnumber)
-	{
-	case 0: // Normal player
-		VEC_HULL_MIN.CopyToArray(mins);
-		VEC_HULL_MAX.CopyToArray(maxs);
-		return 1;
-	case 1: // Crouched player
-		VEC_DUCK_HULL_MIN.CopyToArray(mins);
-		VEC_DUCK_HULL_MAX.CopyToArray(maxs);
-		return 1;
-	case 2: // Point based hull
-		Vector{}.CopyToArray(mins);
-		Vector{}.CopyToArray(maxs);
-		return 1;
-	}
-
-	return 0;
-}
-// BSVR end
-
 int GetHullBounds(int hullnumber, float* mins, float* maxs)
 {
-	// BSVR start
-	// return static_cast<int>(PM_GetHullBounds(hullnumber, mins, maxs)); - original
-	return InternalGetHullBounds(hullnumber, mins, maxs);
-	// BSVR end
+	return static_cast<int>(PM_GetHullBounds(hullnumber, mins, maxs));
 }
 
 /*

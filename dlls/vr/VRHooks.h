@@ -8,7 +8,9 @@ class CBasePlayer;
 class CSave;
 class CRestore;
 class Vector;
+struct clientdata_s;
 struct edict_s;
+struct entity_state_s;
 
 // client.cpp
 bool VRClientCommand(edict_s* pEntity, CBasePlayer* player, const char* pcmd); // VRClientCommands.cpp
@@ -17,6 +19,13 @@ void VRServerDeactivate();
 // Returns false if the rest of the server frame must be skipped (after a failed restore).
 bool VRStartFrame();
 void VRClientPrecache();
+// SetupVisibility / AddToFullPack: remembers for every entity if it is in the player's PVS (used by the gib limit).
+void VRSetPVSCache(unsigned char* pvs);
+bool VRCheckAndRecordPVS(edict_s* ent, unsigned char* pSet);
+// CreateBaseline: the VR player is a noclip entity without gravity, with its real bounds.
+void VROverridePlayerBaseline(entity_state_s* baseline, edict_s* entity);
+// UpdateClientData: the client gets the origin and view offset of the headset.
+void VRSetClientDataOrigin(CBasePlayer* pl, clientdata_s* cd);
 
 // world.cpp, cbase.cpp, client.cpp: save version marker.
 // Savegames from the vanilla game or from another version of the mod are rejected. The engine can't cancel a load,
@@ -45,3 +54,5 @@ bool VRCheckXenJumpPad(CBaseEntity* pTriggerPush);
 bool VRIsXenJumpTrigger(CBaseEntity* pTrigger);
 bool VRBlockXenJumpTouch(CBaseEntity* pTrigger, CBaseEntity* pOther);
 void VRClearSpecialEntities();
+// Retina scanners (VRSpecialEntities.cpp): false if the wall's model isn't loaded yet and it must be checked again.
+bool VRCheckRetinaScanner(CBaseEntity* pWall);

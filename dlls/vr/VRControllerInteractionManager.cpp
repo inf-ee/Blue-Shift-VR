@@ -34,6 +34,15 @@
 // Read by UTIL_ShouldShowBlood; true only during a soft-weapon melee hit (see DoDamage)
 bool g_vrSuppressBlood = false;
 
+namespace
+{
+// True if nothing (monsters and glass included) is between the monster's eyes and the position
+bool VRHasClearSight(CBaseMonster* pMonster, const Vector& pos)
+{
+	return UTIL_CheckClearSight(pMonster->EyePosition(), pos, dont_ignore_monsters, dont_ignore_glass, pMonster->edict());
+}
+} // namespace
+
 constexpr const int VR_MAX_ANGRY_GUNPOINT_DIST = 128;
 constexpr const int VR_INITIAL_ANGRY_GUNPOINT_TIME = 2;
 constexpr const int VR_MIN_ANGRY_GUNPOINT_TIME = 2;
@@ -743,7 +752,7 @@ float VRControllerInteractionManager::DoDamage(CBasePlayer* pPlayer, CBaseEntity
 				hWeapon->PrimaryAttack();
 			}
 			// 5% chance that an explosive explodes when hitting something
-			else if (IsExplosiveWeapon(controller.GetWeaponId()) && RANDOM_LONG(0, 20) == 0 && pPlayer->m_rgAmmo[pPlayer->m_pActiveItem->PrimaryAmmoIndex()] > 0)
+			else if (VRGame::IsExplosiveWeapon(controller.GetWeaponId()) && RANDOM_LONG(0, 20) == 0 && pPlayer->m_rgAmmo[pPlayer->m_pActiveItem->PrimaryAmmoIndex()] > 0)
 			{
 				if (controller.GetWeaponId() == WEAPON_SNARK)
 				{
@@ -1214,7 +1223,7 @@ bool VRControllerInteractionManager::HandleAlliedMonsters(CBasePlayer* pPlayer, 
 			}
 
 			// Make scientists and barneys move away if holding weapons in their face, or we hit them
-			if (interaction.touching.isSet && (interaction.hitDamage > 0.f || IsWeapon(controller.GetWeaponId())))
+			if (interaction.touching.isSet && (interaction.hitDamage > 0.f || VRGame::IsWeapon(controller.GetWeaponId())))
 			{
 				pMonster->vr_flStopSignalTime = 0;
 				pMonster->SetConditions(bits_COND_CLIENT_PUSH);
@@ -1244,8 +1253,8 @@ void VRControllerInteractionManager::GetAngryIfAtGunpoint(CBasePlayer* pPlayer, 
 	if (pMonster->HasMemory(bits_MEMORY_PROVOKED) || pMonster->HasMemory(bits_MEMORY_GUNPOINT_ATTACK))
 		return;
 
-	if (nullptr == pMonster->m_hEnemy && controller.GetID() == VRControllerID::WEAPON && controller.IsValid() && IsWeaponWithRange(controller.GetWeaponId()) && controller.GetWeaponId() != WEAPON_HORNETGUN // hornetgun is too weird to react to
-		&& (pPlayer->GetGunPosition() - pMonster->EyePosition()).Length() < VR_MAX_ANGRY_GUNPOINT_DIST && UTIL_IsFacing(pPlayer->GetGunPosition(), pPlayer->GetWeaponViewAngles(), pMonster->pev->origin) && UTIL_IsFacing(pMonster->pev->origin, pMonster->pev->angles.ToViewAngles(), pPlayer->GetGunPosition()) && pMonster->HasClearSight(pPlayer->GetGunPosition()) && UTIL_CheckTraceIntersectsEntity(pPlayer->GetGunPosition(), pPlayer->GetGunPosition() + (pPlayer->GetAutoaimVector() * VR_MAX_ANGRY_GUNPOINT_DIST), pMonster))
+	if (nullptr == pMonster->m_hEnemy && controller.GetID() == VRControllerID::WEAPON && controller.IsValid() && VRGame::IsWeaponWithRange(controller.GetWeaponId()) && controller.GetWeaponId() != WEAPON_HORNETGUN // hornetgun is too weird to react to
+		&& (pPlayer->GetGunPosition() - pMonster->EyePosition()).Length() < VR_MAX_ANGRY_GUNPOINT_DIST && UTIL_IsFacing(pPlayer->GetGunPosition(), pPlayer->GetWeaponViewAngles(), pMonster->pev->origin) && UTIL_IsFacing(pMonster->pev->origin, pMonster->pev->angles.ToViewAngles(), pPlayer->GetGunPosition()) && VRHasClearSight(pMonster, pPlayer->GetGunPosition()) && UTIL_CheckTraceIntersectsEntity(pPlayer->GetGunPosition(), pPlayer->GetGunPosition() + (pPlayer->GetAutoaimVector() * VR_MAX_ANGRY_GUNPOINT_DIST), pMonster))
 	{
 		pMonster->vr_flStopSignalTime = 0;
 		if (pMonster->vr_flGunPointTime == 0)
@@ -1336,7 +1345,7 @@ void VRControllerInteractionManager::DoFollowUnfollowCommands(CBasePlayer* pPlay
 		pMonster->vr_flStopSignalTime = 0;
 
 		// check if we are grabbing the shoulder (follow me!)
-		if (interaction.dragging.isSet && interaction.dragging.didChange && !IsWeapon(controller.GetWeaponId()) && CheckShoulderTouch(pMonster, controller.GetPosition()))
+		if (interaction.dragging.isSet && interaction.dragging.didChange && !VRGame::IsWeapon(controller.GetWeaponId()) && CheckShoulderTouch(pMonster, controller.GetPosition()))
 		{
 			pMonster->ClearConditions(bits_COND_CLIENT_PUSH);
 			if (pMonster->IsFollowing(pPlayer))
@@ -1350,7 +1359,7 @@ void VRControllerInteractionManager::DoFollowUnfollowCommands(CBasePlayer* pPlay
 		}
 	}
 	// Tell allies to stop following by holding hand in front of their face
-	else if (pMonster->IsFollowing(pPlayer) && !IsWeapon(controller.GetWeaponId()) && CheckStopSignal(pMonster, controller.GetPosition(), controller.GetAngles()))
+	else if (pMonster->IsFollowing(pPlayer) && !VRGame::IsWeapon(controller.GetWeaponId()) && CheckStopSignal(pMonster, controller.GetPosition(), controller.GetAngles()))
 	{
 		if (pMonster->vr_flStopSignalTime == 0)
 		{

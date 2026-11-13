@@ -3454,10 +3454,3 @@ bool CBaseMonster::ShouldFadeOnDeath()
 
 	return false;
 }
-
-// BSVR start
-bool CBaseMonster::HasClearSight(const Vector& pos)
-{
-	return UTIL_CheckClearSight(EyePosition(), pos, dont_ignore_monsters, dont_ignore_glass, edict());
-}
-// BSVR end

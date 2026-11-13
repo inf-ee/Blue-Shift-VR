@@ -35,7 +35,6 @@ private:
 
 	std::unordered_map<std::string, Texture> m_textures;
 
-	static const std::unordered_map<std::string, std::string> m_mapSkyboxNames;
 	static const std::array<std::string, 6> m_vrMapSkyboxIndices;
 
 	bool m_isInitialized{false};

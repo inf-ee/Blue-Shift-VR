@@ -17,6 +17,7 @@
 #include "vr/VRMovementHandler.h"
 #include "vr/VRControllerModel.h"
 #include "vr/VRCommons.h"
+#include "vr/VRGameServer.h"
 #include "trains.h"
 
 // Train HUD states and TrainSpeed from player.cpp (SDK code local to that file), used by the VR train controls
@@ -1529,16 +1530,7 @@ void CBasePlayer::VRRestoreEnd()
 	vr_hasSentRestoreYawMsgToClient = false;
 	vr_hasSentSpawnYawToClient = false;
 
-	// ugly but easy hack to ensure damage visuals don't disturb the end scene with gman
-	// if player health is very low
-	if (pev->health < 100)
-	{
-		std::string mapname = STRING(INDEXENT(0)->v.model);
-		if (mapname == std::string{"maps/c5a1.bsp"})
-		{
-			pev->health = 100;
-		}
-	}
+	VRGame::OnPlayerRestored(this); // per-game map hacks
 }
 
 // FlashlightTurnOn: the VR flashlight is a light entity, not EF_DIMLIGHT on the player

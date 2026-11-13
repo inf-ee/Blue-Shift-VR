@@ -438,6 +438,9 @@
     <ClCompile Include="..\..\cl_dll\vr\VRTextureHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\cl_dll\vr\VRGameClient_bs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\cl_dll\vr\lodepng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -948,6 +951,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\cl_dll\vr\VRTextureHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cl_dll\vr\VRGameClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\cl_dll\vr\lodepng.h">

@@ -12,6 +12,8 @@ GAME_SHARED_OBJ_DIR=$(HLDLL_OBJ_DIR)/game_shared
 PUBLIC_OBJ_DIR=$(HLDLL_OBJ_DIR)/public
 COMMON_OBJ_DIR=$(HLDLL_OBJ_DIR)/common
 VR_OBJ_DIR=$(HLDLL_OBJ_DIR)/vr
+# Which per-game VR data file is compiled (dlls/vr/VRGameServer_<game>.cpp): hl, bs or op
+VR_GAME=bs
 
 CFLAGS=$(BASE_CFLAGS)  $(ARCH_CFLAGS)
 
@@ -167,7 +169,8 @@ VR_OBJS = \
 	$(VR_OBJ_DIR)/VRRotatableEnt.o \
 	$(VR_OBJ_DIR)/VRUtil.o \
 	$(VR_OBJ_DIR)/VRAnimation.o \
-	$(VR_OBJ_DIR)/VRBreakable.o
+	$(VR_OBJ_DIR)/VRBreakable.o \
+	$(VR_OBJ_DIR)/VRGameServer_$(VR_GAME).o
 
 all: dirs hl.$(SHLIBEXT)
 

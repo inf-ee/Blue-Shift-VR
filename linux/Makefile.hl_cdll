@@ -15,6 +15,8 @@ GAME_SHARED_OBJ_DIR=$(HL1_OBJ_DIR)/game_shared
 HL1_SERVER_OBJ_DIR=$(HL1_OBJ_DIR)/server
 PM_SHARED_OBJ_DIR=$(HL1_OBJ_DIR)/pm_shared
 VR_OBJ_DIR=$(HL1_OBJ_DIR)/vr
+# Which per-game VR data file is compiled (cl_dll/vr/VRGameClient_<game>.cpp): hl, bs or op
+VR_GAME=bs
 
 # VGUI2 SDK subset for the VR Options dialog (external/hl1_source_sdk/README_BSVR.md). Its files and VRClientVGUI.cpp
 # are built with the SDK's include paths and defines instead of the game's (both have interface.h, FileSystem.h, ...).
@@ -126,6 +128,7 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/vr/VRWeaponAnimation.o \
 	$(HL1_OBJ_DIR)/vr/VRRenderer.o \
 	$(HL1_OBJ_DIR)/vr/VRTextureHelper.o \
+	$(HL1_OBJ_DIR)/vr/VRGameClient_$(VR_GAME).o \
 	$(HL1_OBJ_DIR)/vr/lodepng.o \
 	$(HL1_OBJ_DIR)/vr/vr_gl.o \
 

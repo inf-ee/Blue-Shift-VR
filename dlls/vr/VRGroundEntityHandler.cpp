@@ -12,6 +12,7 @@
 #include "UserMessages.h" // BSVR: gmsgVR* are declared here instead of via local externs
 
 #include "VRGroundEntityHandler.h"
+#include "VRGameServer.h"
 #include "VRPhysicsHelper.h"
 
 namespace
@@ -25,35 +26,14 @@ const std::unordered_set<std::string> ValidGroundEntityClassnames =
 		"func_door_rotating",
 		//"func_rotating"
 };
-const std::unordered_map<std::string, const char*> IntroTrainRideMapNames = {};
-// {
-// 	{ "maps/ba_tram1.bsp", "barney_tram" },
-// 	{ "maps/ba_tram2.bsp", "barney_tram" },
-// 	{ "maps/ba_tram3.bsp", "barney_tram" },
-// 	{ "maps/ba_elevator.bsp", "elevator" } };
-
-// BSVR start
-// Brush entities that must never be used as ground entity on specific maps.
-// ba_elevator: "fake_elevator" is a stationary func_train the player stands in before the ride; when the button is pressed
-// the map teleports the player into the real "elevator" and resets/removes fake_elevator, which would otherwise be read
-// as a huge move and drag the player away.
-const std::unordered_map<std::string, std::unordered_set<std::string>> MapSpecificExcludedGroundEntities =
-	{
-		{"maps/ba_elevator.bsp", {"fake_elevator"}},
-};
-
+// True if the map has a rule (per-game data) that this brush entity must never be used as ground entity.
 bool IsExcludedByMapSpecificRule(edict_t* pent)
 {
 	if (FNullEnt(pent) || 0 == pent->v.targetname)
 		return false;
 
-	auto mapEntry = MapSpecificExcludedGroundEntities.find(STRING(INDEXENT(0)->v.model));
-	if (mapEntry == MapSpecificExcludedGroundEntities.end())
-		return false;
-
-	return mapEntry->second.count(STRING(pent->v.targetname)) != 0;
+	return VRGame::IsExcludedGroundEntity(STRING(INDEXENT(0)->v.model), STRING(pent->v.targetname));
 }
-// BSVR end
 } // namespace
 
 // Out of line, so the header doesn't need the full CBasePlayer class
@@ -84,11 +64,10 @@ void VRGroundEntityHandler::DetectAndSetGroundEntity()
 	edict_t* pentground = nullptr;
 
 	// Take train if conditions are met
-	std::string mapName{STRING(INDEXENT(0)->v.model)};
-	auto introTrain = IntroTrainRideMapNames.find(mapName);
-	if (introTrain != IntroTrainRideMapNames.end())
+	const char* introTrain = VRGame::GetIntroTrainRideTargetName(STRING(INDEXENT(0)->v.model));
+	if (introTrain != nullptr)
 	{
-		pentground = FIND_ENTITY_BY_STRING(nullptr, "targetname", introTrain->second);
+		pentground = FIND_ENTITY_BY_STRING(nullptr, "targetname", introTrain);
 		if (!FNullEnt(pentground) && (FClassnameIs(pentground, "func_tracktrain") || FClassnameIs(pentground, "func_train")))
 		{
 			CFuncTrackTrain* pTrain = CBaseEntity::SafeInstance<CFuncTrackTrain>(pentground);

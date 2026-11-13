@@ -201,6 +201,8 @@ private:
 	EHandleT<CBaseEntity> m_hThrower;
 
 	static void LimitNumberOfGibs();
+	void VRGibSpawning(const char* szGibModel);
+	bool VRThrownGibTouch(CBaseEntity* pOther);
 	static int m_numGibs;
 	// BSVR end
 };

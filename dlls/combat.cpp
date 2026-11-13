@@ -36,10 +36,6 @@ extern Vector VecBModelOrigin(entvars_t* pevBModel);
 #define HUMAN_GIB_COUNT 6
 #define ALIEN_GIB_COUNT 4
 
-// BSVR start
-int CGib::m_numGibs = 0;
-// BSVR end
-
 
 // HACKHACK -- The gib velocity equations don't work
 void CGib::LimitVelocity()
@@ -719,21 +715,7 @@ void CGib::BounceGibTouch(CBaseEntity* pOther)
 	//	return;// don't bleed everytime
 
 	// BSVR start
-	bool playsound = false;
-	float volume = 0.f;
-	int material = 0;
-
-	if (m_hThrower)
-	{
-		pOther->GibAttack(m_hThrower, pev->origin, m_bloodColor);
-		m_hThrower = nullptr;
-
-		// play a satisfying sound if we throw a gib
-		float vel = pev->velocity.Length();
-		volume = std::min(1.f, vel / 450.f);
-		material = (pOther->BloodColor() == DONT_BLEED) ? m_material : Materials::matFlesh;
-		playsound = true;
-	}
+	const bool vrWasThrown = VRThrownGibTouch(pOther); // vr/VRGibs.cpp
 	// BSVR end
 
 	if ((pev->flags & FL_ONGROUND) != 0)
@@ -756,33 +738,19 @@ void CGib::BounceGibTouch(CBaseEntity* pOther)
 			m_cBloodDecals--;
 		}
 
-		// BSVR start - additional condition
-		if (!playsound)
-		{
-			// BSVR end
-			if (m_material != matNone && RANDOM_LONG(0, 2) == 0)
-			{
-				// float volume; BSVR moved up
-				float zvel = fabs(pev->velocity.z);
-
-				volume = 0.8 * V_min(1.0, ((float)zvel) / 450.0);
-				// BSVR start
-				material = m_material;
-				playsound = true;
-				// BSVR end
-			}
-			// BSVR start
-		}
+		// BSVR start - no bounce sound after the hit sound of a thrown gib
+		// if (m_material != matNone && RANDOM_LONG(0, 2) == 0) - original
+		if (!vrWasThrown && m_material != matNone && RANDOM_LONG(0, 2) == 0)
 		// BSVR end
-	}
+		{
+			float volume;
+			float zvel = fabs(pev->velocity.z);
 
-	// BSVR start
-	if (playsound && material != matNone)
-	{
-		// CBreakable::MaterialSoundRandom(edict(), (Materials)m_material, volume); - original
-		CBreakable::MaterialSoundRandom(edict(), (Materials)material, volume);
+			volume = 0.8 * V_min(1.0, ((float)zvel) / 450.0);
+
+			CBreakable::MaterialSoundRandom(edict(), (Materials)m_material, volume);
+		}
 	}
-	// BSVR end
 }
 
 //
@@ -797,17 +765,7 @@ void CGib::StickyGibTouch(CBaseEntity* pOther)
 	pev->nextthink = gpGlobals->time + 10;
 
 	// BSVR start
-	if (m_hThrower)
-	{
-		pOther->GibAttack(m_hThrower, pev->origin, m_bloodColor);
-		m_hThrower = nullptr;
-
-		// play a satisfying sound if we throw a gib
-		float vel = pev->velocity.Length();
-		float volume = std::min(1.f, vel / 450.f);
-		int material = (pOther->BloodColor() == DONT_BLEED) ? m_material : Materials::matFlesh;
-		CBreakable::MaterialSoundRandom(edict(), static_cast<Materials>(material), volume);
-	}
+	VRThrownGibTouch(pOther); // vr/VRGibs.cpp
 	// BSVR end
 
 	if (!FClassnameIs(pOther->pev, "worldspawn"))
@@ -833,9 +791,7 @@ void CGib::StickyGibTouch(CBaseEntity* pOther)
 void CGib::Spawn(const char* szGibModel)
 {
 	// BSVR start
-	ASSERT(szGibModel && strlen(szGibModel) > 0);
-
-	LimitNumberOfGibs();
+	VRGibSpawning(szGibModel); // vr/VRGibs.cpp
 	// BSVR end
 
 	pev->movetype = MOVETYPE_BOUNCE;
@@ -861,10 +817,6 @@ void CGib::Spawn(const char* szGibModel)
 
 	m_material = matNone;
 	m_cBloodDecals = 5; // how many blood decals this gib can place (1 per bounce until none remain).
-
-	// BSVR start
-	m_numGibs++;
-	// BSVR end
 }
 
 // take health

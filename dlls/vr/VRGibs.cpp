@@ -1,10 +1,43 @@
 // VR gib limit and NPC reaction to thrown gibs, moved from combat.cpp and talkmonster.cpp
 
+#include <algorithm>
+
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
 #include "monsters.h"
 #include "talkmonster.h"
+#include "func_break.h"
+
+int CGib::m_numGibs = 0;
+
+// CGib::Spawn: called first, removes old gibs if there are too many and counts the new one
+void CGib::VRGibSpawning(const char* szGibModel)
+{
+	ASSERT(szGibModel && strlen(szGibModel) > 0);
+
+	LimitNumberOfGibs();
+
+	m_numGibs++;
+}
+
+// BounceGibTouch, StickyGibTouch: the first touch of a gib the player has thrown.
+// Returns true if the gib was thrown (its hit sound replaces the bounce sound).
+bool CGib::VRThrownGibTouch(CBaseEntity* pOther)
+{
+	if (!m_hThrower)
+		return false;
+
+	pOther->GibAttack(m_hThrower, pev->origin, m_bloodColor);
+	m_hThrower = nullptr;
+
+	// play a satisfying sound if we throw a gib
+	float vel = pev->velocity.Length();
+	float volume = std::min(1.f, vel / 450.f);
+	int material = (pOther->BloodColor() == DONT_BLEED) ? m_material : Materials::matFlesh;
+	CBreakable::MaterialSoundRandom(edict(), static_cast<Materials>(material), volume);
+	return true;
+}
 
 void CGib::UpdateOnRemove()
 {

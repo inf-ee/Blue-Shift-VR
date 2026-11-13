@@ -24,6 +24,9 @@
 #include "eventscripts.h"
 #include "event_api.h"
 #include "pm_shared.h"
+// BSVR start
+#include "vr/VRClientHooks.h"
+// BSVR end
 
 #define IS_FIRSTPERSON_SPEC (g_iUser1 == OBS_IN_EYE || (g_iUser1 && (gHUD.m_Spectator.m_pip->value == INSET_IN_EYE)))
 /*
@@ -102,6 +105,11 @@ Figure out the height of the gun
 */
 void EV_GetGunPosition(event_args_t* args, float* pos, float* origin)
 {
+	// BSVR start - the gun is in the player's hand, not at the eyes
+	VRGlobalGetGunPosition().CopyToArray(pos);
+	return;
+	// BSVR end
+
 	int idx;
 
 	idx = args->entindex;
@@ -126,8 +134,6 @@ void EV_GetGunPosition(event_args_t* args, float* pos, float* origin)
 }
 
 // BSVR start
-#include "vr/VRClientHooks.h"
-
 // Gun position and aim vector in VR is given by special model attachments - Max Makes Mods, 2019-03-30 / 2019-04-07
 void EV_GetGunPosition(float* pos)
 {

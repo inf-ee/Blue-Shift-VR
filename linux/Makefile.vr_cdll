@@ -57,6 +57,7 @@ VR_OBJS = \
 	$(HL1_OBJ_DIR)/vr/VRHudMessages.o \
 	$(HL1_OBJ_DIR)/vr/VRWeaponWheel.o \
 	$(HL1_OBJ_DIR)/vr/VRWeaponAnimation.o \
+	$(HL1_OBJ_DIR)/vr/VRWeaponEvents.o \
 	$(HL1_OBJ_DIR)/vr/VRRenderer.o \
 	$(HL1_OBJ_DIR)/vr/VRTextureHelper.o \
 	$(HL1_OBJ_DIR)/vr/VRGameClient_$(VR_GAME).o \

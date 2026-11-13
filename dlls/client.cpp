@@ -49,10 +49,8 @@
 #include "UserMessages.h"
 
 // BSVR start
-#include "vr/VRPhysicsHelper.h"
-bool VRClientCommand(edict_t* pEntity, CBasePlayer* player, const char* pcmd); // vr/VRClientCommands.cpp
-// #include "VRNetworkManager.h"
-#include "vr/VRShared.h"
+#include "vr/VRHooks.h"
+#include "vr/VRGameServer.h"
 // BSVR end
 
 DLL_GLOBAL unsigned int g_ulFrameCount;
@@ -93,9 +91,7 @@ called when a player connects to a server
 qboolean ClientConnect(edict_t* pEntity, const char* pszName, const char* pszAddress, char szRejectReason[128])
 {
 	// BSVR start
-	// Don't restore entities in game loaded from invalid savegame (see world.cpp RestoreGlobalState)
-	extern bool g_didRestoreSaveGameFail;
-	if (g_didRestoreSaveGameFail)
+	if (VRIsRestoreFailed()) // no clients in a game loaded from an invalid savegame
 		return 0;
 
 	if (!pEntity)
@@ -775,7 +771,7 @@ void ServerDeactivate()
 	//
 
 	// BSVR start
-	VRPhysicsHelper::DestroyInstance();
+	VRServerDeactivate();
 	// BSVR end
 }
 
@@ -785,14 +781,10 @@ void ServerActivate(edict_t* pEdictList, int edictCount, int clientMax)
 	CBaseEntity* pClass;
 
 	// BSVR start
-	// Don't activate the server if we loaded from invalid savegame (see world.cpp RestoreGlobalState)
-	extern bool g_didRestoreSaveGameFail;
-	if (g_didRestoreSaveGameFail)
+	if (VRIsRestoreFailed()) // don't activate the server after loading an invalid savegame
 		return;
 
-	// VRNetworkManager::InitNetwork();
-
-	VRPhysicsHelper::CreateInstance();
+	VRServerActivate();
 	// BSVR end
 
 	// Every call to ServerActivate should be matched by a call to ServerDeactivate
@@ -987,25 +979,8 @@ static bool g_LastAllowBunnyHoppingState = false;
 void StartFrame()
 {
 	// BSVR start
-	extern void VRClearCvarCache();
-	VRClearCvarCache();
-
-	// Don't think in game loaded from invalid savegame (see world.cpp RestoreGlobalState)
-	extern bool g_didRestoreSaveGameFail;
-	if (g_didRestoreSaveGameFail)
-	{
-		// We cannot shut down a server, but we can switch to crossfire
-		extern bool g_didRestoreSaveGameFail_MapChangedToSafety;
-		if (!g_didRestoreSaveGameFail_MapChangedToSafety)
-		{
-			CHANGE_LEVEL("crossfire", nullptr);
-			g_didRestoreSaveGameFail_MapChangedToSafety = true;
-		}
+	if (!VRStartFrame())
 		return;
-	}
-
-	VRPhysicsHelper::Instance().StartFrame();
-
 	// BSVR end
 
 	if (g_pGameRules)
@@ -1116,9 +1091,6 @@ void ClientPrecache()
 	PRECACHE_SOUND("debris/wood3.wav");
 
 	PRECACHE_SOUND("plats/train_use1.wav"); // use a train
-	// BSVR start
-	PRECACHE_SOUND("plats/train_use2.wav"); // use a train in VR
-	// BSVR end
 
 	PRECACHE_SOUND("buttons/spark5.wav"); // hit computer texture
 	PRECACHE_SOUND("buttons/spark6.wav");
@@ -1163,17 +1135,7 @@ void ClientPrecache()
 		UTIL_PrecacheOther("monster_human_grunt");
 
 	// BSVR start
-	PRECACHE_MODEL("sprites/black.spr");
-
-	// Clear global VR stuff here - Max Makes Mods, 2018-04-02
-	extern GlobalXenMounds gGlobalXenMounds;
-	extern std::unordered_map<EHandleT<CBaseEntity>, EHandleT<CBaseEntity>, EHandleT<CBaseEntity>::Hash, EHandleT<CBaseEntity>::Equal> g_vrRetinaScanners;
-	extern std::unordered_set<EHandleT<CBaseEntity>, EHandleT<CBaseEntity>::Hash, EHandleT<CBaseEntity>::Equal> g_vrRetinaScannerButtons;
-	extern bool g_vrNeedRecheckForSpecialEntities;
-	gGlobalXenMounds.Clear();
-	g_vrRetinaScanners.clear();
-	g_vrRetinaScannerButtons.clear();
-	g_vrNeedRecheckForSpecialEntities = true;
+	VRClientPrecache();
 	// BSVR end
 }
 
@@ -1191,7 +1153,7 @@ const char* GetGameDescription()
 	else
 		// BSVR start
 		// return "Half-Life"; - original
-		return "Half-Life: Blue Shift VR";
+		return VRGame::GetGameDescription();
 	// BSVR end
 }
 

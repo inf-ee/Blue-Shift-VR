@@ -254,6 +254,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClCompile Include="..\..\dlls\vr\VRUtil.cpp" />
     <ClCompile Include="..\..\dlls\vr\VRAnimation.cpp" />
     <ClCompile Include="..\..\dlls\vr\VRBreakable.cpp" />
+    <ClCompile Include="..\..\dlls\vr\VRServerHooks.cpp" />
     <ClCompile Include="..\..\dlls\vr\VRGameServer_bs.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -261,6 +262,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClInclude Include="..\..\dlls\vr\VRAnimation.h" />
     <ClInclude Include="..\..\dlls\vr\VRCommons.h" />
     <ClInclude Include="..\..\dlls\vr\VRGameServer.h" />
+    <ClInclude Include="..\..\dlls\vr\VRHooks.h" />
     <ClInclude Include="..\..\dlls\vr\VREHandle.h" />
     <ClInclude Include="..\..\dlls\vr\VRController.h" />
     <ClInclude Include="..\..\dlls\vr\VRControllerInteractionManager.h" />

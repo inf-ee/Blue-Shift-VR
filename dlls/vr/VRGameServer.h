@@ -31,4 +31,16 @@ bool IsExcludedGroundEntity(const char* mapName, const char* targetName);
 
 // Called at the end of the player's restore from a savegame.
 void OnPlayerRestored(CBasePlayer* pPlayer);
+
+// Game name the server reports before the game rules exist (GetGameDescription in client.cpp).
+const char* GetGameDescription();
+
+// Save version marker (VRServerHooks.cpp): a savegame loads only if its magic and version match.
+// Increment the version every time the savedata of entities is changed.
+int GetSaveMagic();
+int GetSaveVersion();
+// Console message for a savegame that was rejected, with a newline at the end.
+const char* GetSaveIncompatibleMessage();
+// Map the server changes to after a savegame was rejected (the engine can't cancel a load).
+const char* GetRestoreFailedFallbackMap();
 } // namespace VRGame

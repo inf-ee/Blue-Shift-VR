@@ -33,6 +33,9 @@
 #include "weapons.h"
 #include "gamerules.h"
 #include "teamplay_gamerules.h"
+// BSVR start
+#include "vr/VRHooks.h"
+// BSVR end
 
 CGlobalState gGlobalState;
 
@@ -364,33 +367,13 @@ TYPEDESCRIPTION gGlobalEntitySaveData[] =
 		DEFINE_FIELD(globalentity_t, state, FIELD_INTEGER),
 };
 
-// BSVR start
-// Marks the current save version of the mod. Prevents loading incompatible savegames.
-// Not to be confused with the mod version itself.
-// Incremented every time the savedata of entities is changed.
-// The mod is not compatible with savegames from vanilla HL, so this protects us from that as well.
-struct HLVRSaveVersionMarker
-{
-public:
-	int magic = 'BSVR'; // Blue Shift VR specific, so saves from Half-Life: VR are rejected as well
-	int version = 1;
-};
-
-HLVRSaveVersionMarker g_hlvrSaveVersionMarker; // not const: CSave::WriteFields takes void* in the Blue Shift SDK
-
-TYPEDESCRIPTION g_hlvrSaveVersionMarkerSaveData[] =
-	{
-		DEFINE_FIELD(HLVRSaveVersionMarker, magic, FIELD_INTEGER),
-		DEFINE_FIELD(HLVRSaveVersionMarker, version, FIELD_INTEGER),
-};
-// BSVR end
 bool CGlobalState::Save(CSave& save)
 {
 	int i;
 	globalentity_t* pEntity;
 
 	// BSVR start
-	if (!save.WriteFields("HLVRSaveVersionMarker", &g_hlvrSaveVersionMarker, g_hlvrSaveVersionMarkerSaveData, (int)std::size(g_hlvrSaveVersionMarkerSaveData)))
+	if (!VRWriteSaveMarker(save))
 		return false;
 	// BSVR end
 
@@ -415,12 +398,8 @@ bool CGlobalState::Restore(CRestore& restore)
 	globalentity_t tmpEntity;
 
 	// BSVR start
-	HLVRSaveVersionMarker hlvrSaveVersionMarker;
-	bool status = restore.ReadFields("HLVRSaveVersionMarker", &hlvrSaveVersionMarker, g_hlvrSaveVersionMarkerSaveData, (int)std::size(g_hlvrSaveVersionMarkerSaveData));
-	if (!status || hlvrSaveVersionMarker.magic != g_hlvrSaveVersionMarker.magic || hlvrSaveVersionMarker.version != g_hlvrSaveVersionMarker.version)
-	{
+	if (!VRReadSaveMarker(restore))
 		return false;
-	}
 	// BSVR end
 
 
@@ -473,10 +452,6 @@ void SaveGlobalState(SAVERESTOREDATA* pSaveData)
 	gGlobalState.Save(saveHelper);
 }
 
-// BSVR start
-bool g_didRestoreSaveGameFail = false; // Initially false
-bool g_didRestoreSaveGameFail_MapChangedToSafety = false;
-// BSVR end
 
 void RestoreGlobalState(SAVERESTOREDATA* pSaveData)
 {
@@ -488,29 +463,8 @@ void RestoreGlobalState(SAVERESTOREDATA* pSaveData)
 	CRestore restoreHelper(*pSaveData);
 
 	// BSVR start
-	bool result = gGlobalState.Restore(restoreHelper);
-
-	if (!result)
-	{
-		// if result is negative, we couldn't load the savegame.
-		// the engine doesn't support canceling loads, so we do it in a bit of a hacky way:
-		// we set this global flag and check it in several places:
-		//  - cbase.cpp DispatchSpawn
-		//  - cbase.cpp DispatchRestore
-		//  - client.cpp ClientConnect
-		//  - client.cpp StartFrame
-		g_didRestoreSaveGameFail = true;
-		g_didRestoreSaveGameFail_MapChangedToSafety = false;
-
-		// Inform user
-		g_engfuncs.pfnServerPrint("COULDN'T LOAD SAVEGAME, SAVE FILE IS INCOMPATIBLE WITH HALF-LIFE: BLUE SHIFT VR!\n");
-		ALERT(at_error, "COULDN'T LOAD SAVEGAME, SAVE FILE IS INCOMPATIBLE WITH HALF-LIFE: BLUE SHIFT VR!\n");
-	}
-	else
-	{
-		g_didRestoreSaveGameFail = false;
-		g_didRestoreSaveGameFail_MapChangedToSafety = false;
-	}
+	// gGlobalState.Restore(restoreHelper); - original
+	VROnGlobalStateRestored(gGlobalState.Restore(restoreHelper));
 	// BSVR end
 }
 
@@ -521,10 +475,7 @@ void ResetGlobalState()
 	gInitHUD = true; // Init the HUD on a new game / load game
 
 	// BSVR start
-	// Engine calls this on every new game. Clear the failed-restore flag set by
-	// RestoreGlobalState, otherwise ClientConnect keeps rejecting the player.
-	g_didRestoreSaveGameFail = false;
-	g_didRestoreSaveGameFail_MapChangedToSafety = false;
+	VROnGlobalStateReset();
 	// BSVR end
 }
 

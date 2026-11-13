@@ -31,3 +31,28 @@ bool VRGame::IsExcludedGroundEntity(const char* mapName, const char* targetName)
 void VRGame::OnPlayerRestored(CBasePlayer* pPlayer)
 {
 }
+
+const char* VRGame::GetGameDescription()
+{
+	return "Half-Life: Blue Shift VR";
+}
+
+int VRGame::GetSaveMagic()
+{
+	return 'BSVR';
+}
+
+int VRGame::GetSaveVersion()
+{
+	return 1;
+}
+
+const char* VRGame::GetSaveIncompatibleMessage()
+{
+	return "COULDN'T LOAD SAVEGAME, SAVE FILE IS INCOMPATIBLE WITH HALF-LIFE: BLUE SHIFT VR!\n";
+}
+
+const char* VRGame::GetRestoreFailedFallbackMap()
+{
+	return "crossfire";
+}

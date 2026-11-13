@@ -996,7 +996,7 @@ void CRotButton::Spawn()
 	// BSVR start - added condition
 	// if ((pev->spawnflags & SF_ROTBUTTON_NOTSOLID) != 0) - original
 	if ((pev->spawnflags & SF_ROTBUTTON_NOTSOLID) != 0 || (CVAR_GET_FLOAT("vr_make_levers_nonsolid") != 0.f && pev->takedamage == DAMAGE_NO))
-	// BSVR end
+		// BSVR end
 		pev->solid = SOLID_NOT;
 	else
 		pev->solid = SOLID_BSP;

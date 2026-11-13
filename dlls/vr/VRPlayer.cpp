@@ -1255,11 +1255,11 @@ void CBasePlayer::VRPreThinkControllersAndTrain()
 		}
 	}
 
-	// Set FL_STUCK_ONTRAIN only if legacy train controls are enabled (this flag prevents movement in pm_shared)
+	// Set FL_ONTRAIN only if legacy train controls are enabled (this flag prevents movement in pm_shared)
 	if (CVAR_GET_FLOAT("vr_train_controls") != 0.f && (m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)
-		pev->flags |= FL_STUCK_ONTRAIN;
+		pev->flags |= FL_ONTRAIN;
 	else
-		pev->flags &= ~FL_STUCK_ONTRAIN;
+		pev->flags &= ~FL_ONTRAIN;
 
 	// Check if we are still on a train
 	if ((m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)

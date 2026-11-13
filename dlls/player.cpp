@@ -158,8 +158,6 @@ TYPEDESCRIPTION CBasePlayer::m_playerSaveData[] =
 
 };
 
-
-
 LINK_ENTITY_TO_CLASS(player, CBasePlayer);
 
 
@@ -1726,6 +1724,7 @@ void CBasePlayer::Jump()
 }
 
 
+
 // This is a glorious hack to find free space when you've crouched into some solid space
 // Our crouching collisions do not work correctly for some reason and this is easier
 // than fixing the problem :(
@@ -3267,6 +3266,7 @@ bool CBasePlayer::Restore(CRestore& restore)
 
 	return status;
 }
+
 
 
 void CBasePlayer::SelectNextItem(int iItem)

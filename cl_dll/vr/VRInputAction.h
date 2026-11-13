@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <string>
 
-#include "openvr.h"
+#include "openvr/openvr.h"
 
 class VRInputAction
 {

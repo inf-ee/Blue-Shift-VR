@@ -16,7 +16,7 @@ if [ "${version%%.*}" -lt 20 ]; then
 fi
 
 mapfile -t files < <(grep -ohP 'Include="\.\.\\\.\.\\\K[^"]+\.(cpp|h|hpp)(?=")' projects/vs2019/hldll.vcxproj projects/vs2019/hl_cdll.vcxproj |
-	tr '\\' '/' | grep -vE '^external/|lodepng|openvr\.h|Matrices|Vectors\.h' | sort -u |
+	tr '\\' '/' | grep -vE '^external/' | sort -u |
 	while read -r f; do [ -f "$f" ] && echo "$f"; done)
 
 if [ "$1" = "--check" ]; then

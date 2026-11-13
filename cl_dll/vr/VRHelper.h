@@ -2,10 +2,10 @@
 
 #include <array>
 
-#include "openvr.h"
+#include "openvr/openvr.h"
 
 #include "cl_dll.h"
-#include "Matrices.h"
+#include "songho/Matrices.h"
 
 #include "vr/VRShared.h"
 

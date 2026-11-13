@@ -375,7 +375,7 @@
     <ClCompile Include="..\..\public\interface.cpp">
       <Filter>Source Files\public</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dlls\vr\hlmv_mathlib.cpp">
+    <ClCompile Include="..\..\external\hlmv\hlmv_mathlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dlls\vr\VRClientCommands.cpp">
@@ -716,7 +716,7 @@
     <ClInclude Include="..\..\public\interface.h">
       <Filter>Header Files\public</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dlls\vr\hlmv_mathlib.h">
+    <ClInclude Include="..\..\external\hlmv\hlmv_mathlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\vr\VRAnimation.h">

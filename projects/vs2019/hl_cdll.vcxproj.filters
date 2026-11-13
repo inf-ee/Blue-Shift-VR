@@ -300,7 +300,7 @@
     <ClCompile Include="..\..\cl_dll\voice_status.cpp">
       <Filter>Source Files\cl_dll</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\cl_dll\vr\Matrices.cpp">
+    <ClCompile Include="..\..\external\songho\Matrices.cpp">
       <Filter>VR\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\cl_dll\vr\VRCommon.cpp">
@@ -444,7 +444,7 @@
     <ClCompile Include="..\..\cl_dll\vr\VRGameClient_bs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\cl_dll\vr\lodepng.cpp">
+    <ClCompile Include="..\..\external\lodepng\lodepng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\cl_dll\vr\VRClientVGUI.cpp">
@@ -740,10 +740,10 @@
     <ClInclude Include="..\..\cl_dll\view.h">
       <Filter>Header Files\cl_dll</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\cl_dll\vr\Matrices.h">
+    <ClInclude Include="..\..\external\songho\Matrices.h">
       <Filter>VR\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\cl_dll\vr\openvr.h">
+    <ClInclude Include="..\..\external\openvr\openvr.h">
       <Filter>VR\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\cl_dll\vr\VRCommon.h">
@@ -767,7 +767,7 @@
     <ClInclude Include="..\..\cl_dll\vr\VRWeaponWheel.h">
       <Filter>VR\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\cl_dll\vr\Vectors.h">
+    <ClInclude Include="..\..\external\songho\Vectors.h">
       <Filter>VR\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\cl_dll\vr\vr_gl.h">
@@ -968,7 +968,7 @@
     <ClInclude Include="..\..\cl_dll\vr\VRHudAmmo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\cl_dll\vr\lodepng.h">
+    <ClInclude Include="..\..\external\lodepng\lodepng.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\cl_dll\vr\VRInput.h">

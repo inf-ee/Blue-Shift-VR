@@ -3,7 +3,7 @@
 
 #include "hud.h"
 #include "cl_util.h"
-#include "openvr.h"
+#include "openvr/openvr.h"
 #include "VRInput.h"
 
 #include "VRWeaponWheel.h"

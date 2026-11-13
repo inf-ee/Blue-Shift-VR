@@ -13,6 +13,7 @@
 #include "weapons.h"
 
 #include "VRGameServer.h"
+#include "vr/VRShared.h"
 
 namespace
 {

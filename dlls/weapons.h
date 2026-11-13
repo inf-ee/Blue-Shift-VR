@@ -85,10 +85,6 @@ private:
 #define ITEM_SECURITY 3
 #define ITEM_BATTERY 4
 
-// BSVR start
-#define WEAPON_BAREHAND    16
-// BSVR end
-
 #define MAX_NORMAL_BATTERY 100
 
 

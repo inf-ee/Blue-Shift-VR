@@ -14,6 +14,8 @@
 #include "VRController.h"
 #include "VRModelHelper.h"
 
+static_assert(WEAPON_BAREHAND >= MAX_WEAPONS, "WEAPON_BAREHAND must not be the id of a real weapon");
+
 namespace
 {
 enum HandModelSequences

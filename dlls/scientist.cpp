@@ -681,7 +681,7 @@ void CScientist::Spawn()
 	m_bloodColor = BLOOD_COLOR_RED;
 	pev->health = gSkillData.scientistHealth;
 	// BSVR start
-	// pev->view_ofs = Vector(0, 0, 50);  // position of the eyes relative to monster's origin - original
+	// pev->view_ofs = Vector(0, 0, 50);  // position of the eyes relative to monster's origin. - original
 	pev->view_ofs = Vector(0, 0, 50 * pev->scale); // position of the eyes relative to monster's origin.
 	// BSVR end
 	m_flFieldOfView = VIEW_FIELD_WIDE; // NOTE: we need a wide field of view so scientists will notice player and say hello

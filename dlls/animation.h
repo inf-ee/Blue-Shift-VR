@@ -36,6 +36,7 @@ void SetBodygroup(void* pmodel, entvars_t* pev, int iGroup, int iValue);
 int GetBodygroup(void* pmodel, entvars_t* pev, int iGroup);
 
 // BSVR start
+// int GetAnimationEvent(void* pmodel, entvars_t* pev, MonsterEvent_t* pMonsterEvent, float flStart, float flEnd, int index); - original
 int GetAnimationEvent(void* pmodel, entvars_t* pev, MonsterEvent_t* pMonsterEvent, float flStart, float flEnd, int index, ClientAnimEvent_t* pClientAnimEvent = nullptr);
 // BSVR end
 bool ExtractBbox(void* pmodel, int sequence, float* mins, float* maxs);

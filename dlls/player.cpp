@@ -1528,6 +1528,26 @@ void CBasePlayer::PlayerUse()
 		else
 		{
 			// BSVR start - wrapped into VR train controls
+			// original:
+			// if ((m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)
+			// {
+			// 	m_afPhysicsFlags &= ~PFLAG_ONTRAIN;
+			// 	m_iTrain = TRAIN_NEW | TRAIN_OFF;
+			// 	return;
+			// }
+			// else
+			// { // Start controlling the train!
+			// 	CBaseEntity* pTrain = CBaseEntity::Instance(pev->groundentity);
+			//
+			// 	if (pTrain && (pev->button & IN_JUMP) == 0 && FBitSet(pev->flags, FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) != 0 && pTrain->OnControls(pev))
+			// 	{
+			// 		m_afPhysicsFlags |= PFLAG_ONTRAIN;
+			// 		m_iTrain = TrainSpeed(pTrain->pev->speed, pTrain->pev->impulse);
+			// 		m_iTrain |= TRAIN_NEW;
+			// 		EMIT_SOUND(ENT(pev), CHAN_ITEM, "plats/train_use1.wav", 0.8, ATTN_NORM);
+			// 		return;
+			// 	}
+			// }
 			if (CVAR_GET_FLOAT("vr_train_controls") != 0.f)
 			{
 				if ((m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)

@@ -13,6 +13,7 @@
 #define STUDIO_EVENTS 2
 
 // BSVR start
+// #define MAX_EDICTS 2048 - original
 #define MAX_EDICTS 3072
 // BSVR end
 

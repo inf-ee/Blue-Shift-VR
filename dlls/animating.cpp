@@ -162,6 +162,10 @@ void CBaseAnimating::DispatchAnimEvents(float flInterval)
 	int index = 0;
 
 	// BSVR start
+	// while ((index = GetAnimationEvent(pmodel, pev, &event, flStart, flEnd, index)) != 0) - original
+	// {
+	// 	HandleAnimEvent(&event);
+	// }
 	MonsterEvent_t event;
 	ClientAnimEvent_t clientevent{};
 	while ((index = GetAnimationEvent(pmodel, pev, &event, flStart, flEnd, index, &clientevent)) != 0)

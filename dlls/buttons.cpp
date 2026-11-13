@@ -947,6 +947,7 @@ void CBaseButton::ButtonBackHome()
 // Rotating button (aka "lever")
 //
 // BSVR start
+// class CRotButton : public CBaseButton - original
 class CRotButton : public CBaseButton, VRRotatableEnt
 {
 public:
@@ -992,8 +993,10 @@ void CRotButton::Spawn()
 	}
 	// BSVR end
 
-	// BSVR added condition
+	// BSVR start - added condition
+	// if ((pev->spawnflags & SF_ROTBUTTON_NOTSOLID) != 0) - original
 	if ((pev->spawnflags & SF_ROTBUTTON_NOTSOLID) != 0 || (CVAR_GET_FLOAT("vr_make_levers_nonsolid") != 0.f && pev->takedamage == DAMAGE_NO))
+	// BSVR end
 		pev->solid = SOLID_NOT;
 	else
 		pev->solid = SOLID_BSP;
@@ -1121,8 +1124,10 @@ void CRotButton::StopVRDragRotation()
 // collision problems with them...
 #define SF_MOMENTARY_DOOR 0x0001
 
-// BSVR changed class
+// BSVR start - changed class
+// class CMomentaryRotButton : public CBaseToggle - original
 class CMomentaryRotButton : public CBaseToggle, VRRotatableEnt
+// BSVR end
 {
 public:
 	void Spawn() override;
@@ -1259,7 +1264,10 @@ void CMomentaryRotButton::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE
 
 	pev->ideal_yaw = CBaseToggle::AxisDelta(pev->spawnflags, pev->angles, m_start) / m_flMoveDistance;
 
-	UpdateAllButtons(pev->ideal_yaw, 1); // BSVR: start is a mode now (0 = return, 1 = use, 2 = VR drag), was true
+	// BSVR start - start is a mode now (0 = return, 1 = use, 2 = VR drag)
+	// UpdateAllButtons(pev->ideal_yaw, true); - original
+	UpdateAllButtons(pev->ideal_yaw, 1);
+	// BSVR end
 
 	// BSVR start - commented out upstream
 	// // Calculate destination angle and use it to predict value, this prevents sending target in wrong direction on retriggering
@@ -1449,7 +1457,10 @@ void CMomentaryRotButton::Return()
 {
 	float value = CBaseToggle::AxisDelta(pev->spawnflags, pev->angles, m_start) / m_flMoveDistance;
 
-	UpdateAllButtons(value, 0); // BSVR: 0 = return, was false. This will end up calling UpdateSelfReturn() n times, but it still works right
+	// BSVR start - start is a mode now (0 = return, 1 = use, 2 = VR drag)
+	// UpdateAllButtons(value, false); // This will end up calling UpdateSelfReturn() n times, but it still works right - original
+	UpdateAllButtons(value, 0); // This will end up calling UpdateSelfReturn() n times, but it still works right
+	// BSVR end
 	if (value > 0)
 		UpdateTarget(value);
 }

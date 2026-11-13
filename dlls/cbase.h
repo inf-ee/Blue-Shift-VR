@@ -512,9 +512,6 @@ public:
 #endif
 	};
 
-	// Currently overriden by func_wall for gordon's coffee cup and retina scanners, and trigger_multiple for xen jump thingies
-	virtual bool CheckIsSpecialVREntity() { return true; }
-
 	// For real rotation of rotating buttons in VR - Max Makes Mods, 2019-05-26
 	virtual VRRotatableEnt* MyRotatableEntPtr() { return nullptr; }
 

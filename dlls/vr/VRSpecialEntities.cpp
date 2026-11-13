@@ -2,16 +2,29 @@
 
 #include "VRHooks.h"
 
+#include <algorithm>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
 #include "player.h"
+#include "pm_defs.h"
+#include "plane.h"
+#include "com_model.h"
+#include "vr/VRComModelHL25.h"
 
 #include "VRCommons.h"
 #include "VRGameServer.h"
+
+extern const model_t* VRGetBSPModel(CBaseEntity* pEntity);
+
+// VRPlayer.cpp
+extern std::unordered_map<EHandleT<CBaseEntity>, EHandleT<CBaseEntity>, EHandleT<CBaseEntity>::Hash, EHandleT<CBaseEntity>::Equal> g_vrRetinaScanners;
+extern std::unordered_set<EHandleT<CBaseEntity>, EHandleT<CBaseEntity>::Hash, EHandleT<CBaseEntity>::Equal> g_vrRetinaScannerButtons;
 
 namespace
 {
@@ -155,4 +168,67 @@ void VRClearSpecialEntities()
 {
 	g_vrXenJumpTriggers.clear();
 	g_vrTriggerPushSpawnAngles.clear();
+}
+
+// Retina scanners: a func_wall (or a class derived from it) with the scanner texture, and the invisible func_button behind it.
+// Called for every such wall after a map was loaded (VRPreThinkStart in VRPlayer.cpp), until it returns true.
+bool VRCheckRetinaScanner(CBaseEntity* pWall)
+{
+	const model_t* model = VRGetBSPModel(pWall);
+	if (model == nullptr)
+	{
+		// Repeat until GetBSPModel returns a value
+		return false;
+	}
+	else
+	{
+		pWall->SetThink(nullptr);
+
+		if (VRGame::ReplaceSpecialWall(pWall))
+			return true;
+
+		for (int i = 0; i < model->nummodelsurfaces; ++i)
+		{
+			const msurface_hl25_t& surface = *VRGetSurface(model, model->firstmodelsurface + i);
+			if (surface.texinfo != nullptr && surface.texinfo->texture != nullptr && surface.texinfo->texture->name != nullptr)
+			{
+				std::string textureName = surface.texinfo->texture->name;
+				std::transform(textureName.begin(), textureName.end(), textureName.begin(), ::tolower);
+				if (textureName.find(VRGame::GetRetinaScannerTextureName()) != std::string::npos)
+				{
+					// We are a retina scanner!
+
+					// Find our button! (func_button with rendermode kRenderTransTexture, renderamt 0 and model center not further away than 16 units away from our center)
+					Vector retinaScannerCenter = (pWall->pev->absmin + pWall->pev->absmax) / 2.f;
+					edict_t* pentButton = FIND_ENTITY_BY_CLASSNAME(nullptr, "func_button");
+					while (!FNullEnt(pentButton))
+					{
+						// Don't add broken retina scanner after resonance cascade to list,
+						// it must not react to eyes, but to use and controller touch
+						bool isBrokenRetinaScannerAfterResonanceCascade = VRGame::IsDisabledRetinaScannerButton(pentButton);
+						if (!isBrokenRetinaScannerAfterResonanceCascade)
+						{
+							// Add retina scanner and button to global list
+							if (pentButton->v.renderamt == 0 && pentButton->v.rendermode == kRenderTransTexture)
+							{
+								Vector buttonScannerCenter = (pentButton->v.absmin + pentButton->v.absmax) * 0.5f;
+								if ((buttonScannerCenter - retinaScannerCenter).Length() <= 16.f)
+								{
+									EHandleT<CBaseEntity> hButton = CBaseEntity::SafeInstance<CBaseEntity>(pentButton);
+									g_vrRetinaScanners[EHandleT<CBaseEntity>{pWall}] = hButton;
+									g_vrRetinaScannerButtons.insert(hButton);
+									break;
+								}
+							}
+						}
+
+						pentButton = FIND_ENTITY_BY_CLASSNAME(pentButton, "func_button");
+					}
+					return true;
+				}
+			}
+		}
+	}
+
+	return true;
 }

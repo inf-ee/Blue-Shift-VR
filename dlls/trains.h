@@ -120,14 +120,6 @@ public:
 	float m_flBank;
 	float m_oldSpeed;
 
-	// BSVR start
-	Vector2D GetVRControlsOffset();
-	// BSVR end
-
 private:
 	unsigned short m_usAdjustPitch;
-
-	// BSVR start
-	Vector2D m_vrControlsOffset;
-	// BSVR end
 };

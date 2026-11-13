@@ -511,6 +511,8 @@ private:
 	void VRSelectLastItem();
 	void VRPlayerDeathThinkRespawn();
 	void VRSelectBareHand();
+	void VRJumpInAir();
+	void VRSpawnOverrides();
 
 	// public VR methods:
 public:

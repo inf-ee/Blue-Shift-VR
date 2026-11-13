@@ -230,28 +230,6 @@ inline int giAmmoIndex = 0;
 
 void AddAmmoNameToAmmoRegistry(const char* szAmmoname, const char* weaponName);
 
-// BSVR start
-inline bool IsWeaponWithRange(int iId)
-{
-	return iId == WEAPON_GLOCK || iId == WEAPON_PYTHON || iId == WEAPON_MP5 || iId == WEAPON_CROSSBOW || iId == WEAPON_SHOTGUN || iId == WEAPON_RPG || iId == WEAPON_GAUSS || iId == WEAPON_EGON || iId == WEAPON_HORNETGUN;
-}
-
-inline bool IsWeapon(int iId)
-{
-	return iId == WEAPON_CROWBAR || iId == WEAPON_GLOCK || iId == WEAPON_PYTHON || iId == WEAPON_MP5 || iId == WEAPON_CROSSBOW || iId == WEAPON_SHOTGUN || iId == WEAPON_RPG || iId == WEAPON_GAUSS || iId == WEAPON_EGON || iId == WEAPON_HANDGRENADE || iId == WEAPON_TRIPMINE || iId == WEAPON_SATCHEL || iId == WEAPON_SNARK;
-}
-
-inline bool IsExplosiveWeapon(int iId)
-{
-	return iId == WEAPON_SNARK || iId == WEAPON_HANDGRENADE || iId == WEAPON_TRIPMINE || iId == WEAPON_SATCHEL;
-}
-
-inline bool IsWeaponWithVRLaserSpot(int iId)
-{
-	return IsWeaponWithRange(iId) && iId != WEAPON_RPG && iId != WEAPON_HORNETGUN;
-}
-// BSVR end
-
 // Items that the player has in their inventory that they can use
 class CBasePlayerItem : public CBaseAnimating
 {

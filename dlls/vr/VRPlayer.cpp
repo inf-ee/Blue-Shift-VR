@@ -1054,7 +1054,7 @@ void CBasePlayer::UpdateVRLaserSpot()
 	}
 
 	// No laser dot while a camera controls the view (trigger_camera): the hands and weapon aren't drawn then
-	if (IsAlive() && IsWeaponWithVRLaserSpot(weaponId) && CVAR_GET_FLOAT("vr_enable_aim_laser") != 0.f && !m_hViewEntity)
+	if (IsAlive() && VRGame::IsWeaponWithVRLaserSpot(weaponId) && CVAR_GET_FLOAT("vr_enable_aim_laser") != 0.f && !m_hViewEntity)
 	{
 		if (!m_hLaserSpot)
 		{
@@ -1200,7 +1200,7 @@ void CBasePlayer::VRPreThinkStart()
 				{
 					VRCheckXenJumpPad(hEntity);
 				}
-				else if (!hEntity->CheckIsSpecialVREntity())
+				else if ((FClassnameIs(hEntity->pev, "func_wall") || FClassnameIs(hEntity->pev, "func_wall_toggle") || FClassnameIs(hEntity->pev, "func_conveyor") || FClassnameIs(hEntity->pev, "func_monsterclip")) && !VRCheckRetinaScanner(hEntity))
 				{
 					g_vrNeedRecheckForSpecialEntities = true;
 				}
@@ -1289,7 +1289,13 @@ void CBasePlayer::VRPreThinkControllersAndTrain()
 			auto pTrackTrain = dynamic_cast<CFuncTrackTrain*>(pTrain);
 			if (pTrackTrain)
 			{
-				controlsOffset = pTrackTrain->GetVRControlsOffset();
+				// TODO: Do some magic to calculate this better.
+				// For now this should be sufficient for most trains in Half-Life,
+				// but ideally we'd have some logic that can identify/detect either
+				//  - the floor of the train and calculate an appropriate offset for controls
+				//  - the visual/physical controls of the train
+				//  - something else?
+				controlsOffset = Vector2D{-48.f, 20.f};
 			}
 			else
 			{
@@ -1671,4 +1677,29 @@ void CBasePlayer::VRSelectBareHand()
 
 	pev->viewmodel = MAKE_STRING("models/v_hand.mdl");
 	pev->weaponmodel = iStringNull;
+}
+
+// Jump: the player pressed jump in the air
+void CBasePlayer::VRJumpInAir()
+{
+	if (m_fLongJump)
+	{
+		// Check for double jump if longjump module is equipped
+		float flMaxDoubleJumpDelay = 1.f;
+		if ((m_vrLastJumpTime + flMaxDoubleJumpDelay) > gpGlobals->time)
+		{
+			DoLongJump(false, true);
+			m_vrLastJumpTime = 0;
+		}
+	}
+}
+
+// Spawn: called after the SDK code has set the player's entvars.
+// The VR player is a noclip entity without gravity (pm_shared.cpp moves it), holding the empty hand.
+void CBasePlayer::VRSpawnOverrides()
+{
+	pev->movetype = MOVETYPE_NOCLIP;
+	pev->flags &= ~FL_BARNACLED;
+	pev->gravity = 0.0;
+	pev->viewmodel = MAKE_STRING("models/v_hand.mdl");
 }

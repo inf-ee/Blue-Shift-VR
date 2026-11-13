@@ -8,6 +8,7 @@
 class CBaseEntity;
 class CBaseMonster;
 class CBasePlayer;
+struct edict_s;
 struct entvars_s;
 
 // How a brush entity crushes a player who is stuck in it (VRCrushEntityHandler.cpp)
@@ -35,6 +36,14 @@ bool IsExcludedGroundEntity(const char* mapName, const char* targetName);
 // Called at the end of the player's restore from a savegame.
 void OnPlayerRestored(CBasePlayer* pPlayer);
 
+// Retina scanners (VRSpecialEntities.cpp)
+// Part of the name of the texture that marks a func_wall as a retina scanner.
+const char* GetRetinaScannerTextureName();
+// True if this func_button behind a retina scanner must not be usable by looking into the scanner.
+bool IsDisabledRetinaScannerButton(edict_s* pentButton);
+// Chance to replace a func_wall by something else when a map was loaded. Returns true if it did.
+bool ReplaceSpecialWall(CBaseEntity* pWall);
+
 // Texture under a trigger_push that marks it as a xen jump pad (VRSpecialEntities.cpp), also used by the VR teleporter.
 const char* GetXenMoundTextureName();
 
@@ -43,6 +52,14 @@ void OnTriggerPushTouched(CBaseEntity* pTriggerPush, CBaseEntity* pOther);
 
 // Called after a trigger_teleport teleported the player.
 void OnPlayerTeleported(CBasePlayer* pPlayer, CBaseEntity* pTrigger);
+
+// Weapon sets, by weapon id (WEAPON_*)
+// Weapons that shoot: NPCs react when one is pointed at them
+bool IsWeaponWithRange(int iId);
+// Any real weapon, as opposed to the bare hand
+bool IsWeapon(int iId);
+bool IsExplosiveWeapon(int iId);
+bool IsWeaponWithVRLaserSpot(int iId);
 
 // True for brush entities that look like a controllable train but must not be usable as one
 // (the trash compactors in Half-Life, which the vanilla game lets the player "drive").

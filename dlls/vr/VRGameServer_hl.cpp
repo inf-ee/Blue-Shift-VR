@@ -10,6 +10,7 @@
 #include "util.h"
 #include "cbase.h"
 #include "player.h"
+#include "weapons.h"
 
 #include "VRGameServer.h"
 
@@ -505,4 +506,56 @@ void VRGame::OnPlayerKilled(CBasePlayer* pPlayer, entvars_s* pevAttacker)
 	// {
 	// 	UTIL_VRGiveAchievement(this, VRAchievement::GEN_SNIPED);
 	// }
+}
+
+bool VRGame::IsWeaponWithRange(int iId)
+{
+	return iId == WEAPON_GLOCK || iId == WEAPON_PYTHON || iId == WEAPON_MP5 || iId == WEAPON_CROSSBOW || iId == WEAPON_SHOTGUN || iId == WEAPON_RPG || iId == WEAPON_GAUSS || iId == WEAPON_EGON || iId == WEAPON_HORNETGUN;
+}
+
+bool VRGame::IsWeapon(int iId)
+{
+	return iId == WEAPON_CROWBAR || iId == WEAPON_GLOCK || iId == WEAPON_PYTHON || iId == WEAPON_MP5 || iId == WEAPON_CROSSBOW || iId == WEAPON_SHOTGUN || iId == WEAPON_RPG || iId == WEAPON_GAUSS || iId == WEAPON_EGON || iId == WEAPON_HANDGRENADE || iId == WEAPON_TRIPMINE || iId == WEAPON_SATCHEL || iId == WEAPON_SNARK;
+}
+
+bool VRGame::IsExplosiveWeapon(int iId)
+{
+	return iId == WEAPON_SNARK || iId == WEAPON_HANDGRENADE || iId == WEAPON_TRIPMINE || iId == WEAPON_SATCHEL;
+}
+
+bool VRGame::IsWeaponWithVRLaserSpot(int iId)
+{
+	return IsWeaponWithRange(iId) && iId != WEAPON_RPG && iId != WEAPON_HORNETGUN;
+}
+
+const char* VRGame::GetRetinaScannerTextureName()
+{
+	return "generic_113";
+}
+
+// From CFuncWall::CheckIsSpecialVREntity in bmodels.cpp
+bool VRGame::IsDisabledRetinaScannerButton(edict_s* pentButton)
+{
+	// The retina scanner that is broken after the resonance cascade
+	return FStrEq(STRING(pentButton->v.target), "broken_airlockmm") && FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a0c.bsp");
+}
+
+// From CFuncWall::CheckIsSpecialVREntity in bmodels.cpp (there: pev is the wall's)
+bool VRGame::ReplaceSpecialWall(CBaseEntity* pWall)
+{
+	// If we are the coffee cup and flask in gordon's locker, replace us with the Worlds Smallest Cup (easter egg)
+	// see https://www.youtube.com/watch?v=M_AnIizeH1Q
+	if (strcmp(STRING(pWall->pev->model), "*67") == 0 && FStrEq(STRING(INDEXENT(0)->v.model), "maps/c1a0d.bsp"))
+	{
+		edict_t* pentCup = CREATE_NAMED_ENTITY(MAKE_STRING("vr_easteregg"));
+		if (!FNullEnt(pentCup))
+		{
+			pentCup->v.origin = (pWall->pev->absmin + pWall->pev->absmax) * 0.5f;
+			DispatchSpawn(pentCup);
+		}
+		pWall->SetThink(&CBaseEntity::SUB_Remove);
+		pWall->pev->nextthink = gpGlobals->time;
+		return true;
+	}
+	return false;
 }

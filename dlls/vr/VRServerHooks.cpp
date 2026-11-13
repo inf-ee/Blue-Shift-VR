@@ -10,6 +10,8 @@
 #include "util.h"
 #include "cbase.h"
 #include "saverestore.h"
+#include "player.h"
+#include "entity_state.h"
 
 #include "VRCommons.h"
 #include "VRGameServer.h"
@@ -43,6 +45,9 @@ TYPEDESCRIPTION g_hlvrSaveVersionMarkerSaveData[] =
 
 bool g_didRestoreSaveGameFail = false; // Initially false
 bool g_didRestoreSaveGameFail_MapChangedToSafety = false;
+
+// The PVS the engine built for the player in SetupVisibility
+unsigned char* m_pvsCache = nullptr;
 } // namespace
 
 bool VRWriteSaveMarker(CSave& save)
@@ -139,4 +144,43 @@ void VRClientPrecache()
 	g_vrRetinaScannerButtons.clear();
 	VRClearSpecialEntities();
 	g_vrNeedRecheckForSpecialEntities = true;
+}
+
+void VRSetPVSCache(unsigned char* pvs)
+{
+	m_pvsCache = pvs;
+}
+
+bool VRCheckAndRecordPVS(edict_t* ent, unsigned char* pSet)
+{
+	// If pSet is nullptr, then the test will always succeed and the entity will be added to the update
+	bool isInPVS = ENGINE_CHECK_VISIBILITY(ent, pSet);
+
+	// Remember if entity is in PVS
+	if (m_pvsCache == pSet)
+	{
+		EHandleT<CBaseEntity> hEnt = CBaseEntity::SafeInstance<CBaseEntity>(ent);
+		if (hEnt)
+		{
+			hEnt->m_isInPVS = isInPVS;
+		}
+	}
+	return isInPVS;
+}
+
+void VROverridePlayerBaseline(entity_state_s* baseline, edict_t* entity)
+{
+	baseline->mins = entity->v.mins;
+	baseline->maxs = entity->v.maxs;
+	baseline->movetype = MOVETYPE_NOCLIP;
+	baseline->gravity = 0.0;
+}
+
+void VRSetClientDataOrigin(CBasePlayer* pl, clientdata_s* cd)
+{
+	if (pl != nullptr)
+	{
+		cd->origin = pl->GetClientOrigin();
+		cd->view_ofs = pl->GetClientViewOfs();
+	}
 }

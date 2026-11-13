@@ -2,6 +2,11 @@
 
 #include <cstring>
 
+#include "extdll.h"
+#include "util.h"
+#include "cbase.h"
+#include "weapons.h"
+
 #include "VRGameServer.h"
 
 VRCrushMode VRGame::GetCrushMode(const char* mapName, const char* brushModelName)
@@ -135,4 +140,39 @@ void VRGame::OnPlayerOutsideIntroTrain(CBasePlayer* pPlayer)
 
 void VRGame::OnPlayerKilled(CBasePlayer* pPlayer, entvars_s* pevAttacker)
 {
+}
+
+bool VRGame::IsWeaponWithRange(int iId)
+{
+	return iId == WEAPON_GLOCK || iId == WEAPON_PYTHON || iId == WEAPON_MP5 || iId == WEAPON_CROSSBOW || iId == WEAPON_SHOTGUN || iId == WEAPON_RPG || iId == WEAPON_GAUSS || iId == WEAPON_EGON || iId == WEAPON_HORNETGUN;
+}
+
+bool VRGame::IsWeapon(int iId)
+{
+	return iId == WEAPON_CROWBAR || iId == WEAPON_GLOCK || iId == WEAPON_PYTHON || iId == WEAPON_MP5 || iId == WEAPON_CROSSBOW || iId == WEAPON_SHOTGUN || iId == WEAPON_RPG || iId == WEAPON_GAUSS || iId == WEAPON_EGON || iId == WEAPON_HANDGRENADE || iId == WEAPON_TRIPMINE || iId == WEAPON_SATCHEL || iId == WEAPON_SNARK;
+}
+
+bool VRGame::IsExplosiveWeapon(int iId)
+{
+	return iId == WEAPON_SNARK || iId == WEAPON_HANDGRENADE || iId == WEAPON_TRIPMINE || iId == WEAPON_SATCHEL;
+}
+
+bool VRGame::IsWeaponWithVRLaserSpot(int iId)
+{
+	return IsWeaponWithRange(iId) && iId != WEAPON_RPG && iId != WEAPON_HORNETGUN;
+}
+
+const char* VRGame::GetRetinaScannerTextureName()
+{
+	return "generic_113";
+}
+
+bool VRGame::IsDisabledRetinaScannerButton(edict_s* pentButton)
+{
+	return false;
+}
+
+bool VRGame::ReplaceSpecialWall(CBaseEntity* pWall)
+{
+	return false;
 }

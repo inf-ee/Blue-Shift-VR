@@ -1282,83 +1282,51 @@ void CBasePlayer::PlayerDeathThink()
 	pev->effects |= EF_NOINTERP;
 	pev->framerate = 0.0;
 
-	// BSVR start
-	// Vanilla "wait for buttons released, then for a button press" respawn replaced by VR auto-respawn
-	// bool fAnyButtonDown = (pev->button & ~IN_SCORE) != 0;
-
-	// // wait for all buttons released
-	// if (pev->deadflag == DEAD_DEAD)
-	// {
-	// 	if (fAnyButtonDown)
-	// 		return;
-
-	// 	if (g_pGameRules->FPlayerCanRespawn(this))
-	// 	{
-	// 		m_fDeadTime = gpGlobals->time;
-	// 		pev->deadflag = DEAD_RESPAWNABLE;
-	// 	}
-
-	// 	return;
-	// }
-
-	// // if the player has been dead for one second longer than allowed by forcerespawn,
-	// // forcerespawn isn't on. Send the player off to an intermission camera until they
-	// // choose to respawn.
-	// if (g_pGameRules->IsMultiplayer() && (gpGlobals->time > (m_fDeadTime + 6)) && (m_afPhysicsFlags & PFLAG_OBSERVER) == 0)
-	// {
-	// 	// go to dead camera.
-	// 	StartDeathCam();
-	// }
-
-	// if (0 != pev->iuser1) // player is in spectator mode
-	// 	return;
-
-	// // wait for any button down,  or mp_forcerespawn is set and the respawn time is up
-	// if (!fAnyButtonDown && !(g_pGameRules->IsMultiplayer() && forcerespawn.value > 0 && (gpGlobals->time > (m_fDeadTime + 5))))
-	// 	return;
-
-	// pev->button = 0;
-	// m_flRespawnTimer = 0.0f;
+	// BSVR start - VR auto-respawn replaces the vanilla "wait for buttons released, then for a button press" below
+	VRPlayerDeathThinkRespawn(); // vr/VRPlayer.cpp
+	return;
+	// BSVR end
 
 	bool fAnyButtonDown = (pev->button & ~IN_SCORE) != 0;
 
 	// wait for all buttons released
 	if (pev->deadflag == DEAD_DEAD)
 	{
-		// clear attack/use commands
-		m_afButtonPressed = 0;
-		pev->button = 0;
-		m_afButtonReleased = 0;
-		m_fDeadTime = gpGlobals->time;
-		pev->deadflag = DEAD_RESPAWNABLE;
-		pmove->oldbuttons = 0;
-		pmove->cmd.buttons = 0;
-		pmove->cmd.buttons_ex = 0;
+		if (fAnyButtonDown)
+			return;
+
+		if (g_pGameRules->FPlayerCanRespawn(this))
+		{
+			m_fDeadTime = gpGlobals->time;
+			pev->deadflag = DEAD_RESPAWNABLE;
+		}
+
 		return;
 	}
 
-	// auto-respawn after 1 second in VR (respawn immediately if any button down)
-	if (fAnyButtonDown || gpGlobals->time > (m_fDeadTime + 1.f))
+	// if the player has been dead for one second longer than allowed by forcerespawn,
+	// forcerespawn isn't on. Send the player off to an intermission camera until they
+	// choose to respawn.
+	if (g_pGameRules->IsMultiplayer() && (gpGlobals->time > (m_fDeadTime + 6)) && (m_afPhysicsFlags & PFLAG_OBSERVER) == 0)
 	{
-		// clear attack/use commands
-		m_afButtonPressed = 0;
-		pev->button = 0;
-		m_afButtonReleased = 0;
-		m_flRespawnTimer = 0;
-		pmove->oldbuttons = 0;
-		pmove->cmd.buttons = 0;
-		pmove->cmd.buttons_ex = 0;
-
-		//ALERT(at_console, "Respawn\n");
-
-		respawn(pev, (m_afPhysicsFlags & PFLAG_OBSERVER) == 0); // don't copy a corpse if we're in deathcam.
-		pev->nextthink = -1;
+		// go to dead camera.
+		StartDeathCam();
 	}
-	// //ALERT(at_console, "Respawn\n");
 
-	// respawn(pev, (m_afPhysicsFlags & PFLAG_OBSERVER) == 0); // don't copy a corpse if we're in deathcam.
-	// pev->nextthink = -1;
-	// BSVR end
+	if (0 != pev->iuser1) // player is in spectator mode
+		return;
+
+	// wait for any button down,  or mp_forcerespawn is set and the respawn time is up
+	if (!fAnyButtonDown && !(g_pGameRules->IsMultiplayer() && forcerespawn.value > 0 && (gpGlobals->time > (m_fDeadTime + 5))))
+		return;
+
+	pev->button = 0;
+	m_flRespawnTimer = 0.0f;
+
+	//ALERT(at_console, "Respawn\n");
+
+	respawn(pev, (m_afPhysicsFlags & PFLAG_OBSERVER) == 0); // don't copy a corpse if we're in deathcam.
+	pev->nextthink = -1;
 }
 
 //=========================================================
@@ -3322,35 +3290,34 @@ void CBasePlayer::SelectItem(const char* pstr)
 
 	CBasePlayerItem* pItem = NULL;
 
-	// BSVR start - additional condition
-	if (FStrEq("weapon_barehand", pstr))
+	for (int i = 0; i < MAX_ITEM_TYPES; i++)
 	{
-		pItem = nullptr;
-	}
-	else
-	{
-		for (int i = 0; i < MAX_ITEM_TYPES; i++)
+		if (m_rgpPlayerItems[i])
 		{
-			if (m_rgpPlayerItems[i])
+			pItem = m_rgpPlayerItems[i];
+
+			while (pItem)
 			{
-				pItem = m_rgpPlayerItems[i];
-
-				while (pItem)
-				{
-					if (FClassnameIs(pItem->pev, pstr))
-						break;
-					pItem = pItem->m_pNext;
-				}
+				if (FClassnameIs(pItem->pev, pstr))
+					break;
+				pItem = pItem->m_pNext;
 			}
-
-			if (pItem)
-				break;
 		}
+
+		if (pItem)
+			break;
 	}
 
-	// if (!pItem)
-	// 	return;
+	// BSVR start - without the item (or with "weapon_barehand") the bare hand is selected in VR
+	if (!pItem)
+	{
+		VRSelectBareHand(); // vr/VRPlayer.cpp
+		return;
+	}
 	// BSVR end
+
+	if (!pItem)
+		return;
 
 
 	if (pItem == m_pActiveItem)
@@ -3372,15 +3339,7 @@ void CBasePlayer::SelectItem(const char* pstr)
 		m_pActiveItem->m_ForceSendAnimations = false;
 		m_pActiveItem->UpdateItemInfo();
 	}
-	// BSVR start
-	else
-	{
-		pev->viewmodel = MAKE_STRING("models/v_hand.mdl");
-		pev->weaponmodel = iStringNull;
-	}
 }
-// BSVR end
-
 
 //==============================================
 // HasWeapons - do I have any weapons at all?

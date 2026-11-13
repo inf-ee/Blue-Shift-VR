@@ -509,6 +509,8 @@ private:
 	Vector VRGetGunPosition();
 	Vector VRGetAutoaimVector();
 	void VRSelectLastItem();
+	void VRPlayerDeathThinkRespawn();
+	void VRSelectBareHand();
 
 	// public VR methods:
 public:

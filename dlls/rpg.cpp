@@ -470,12 +470,6 @@ void CRpg::PrimaryAttack()
 
 		m_flNextPrimaryAttack = GetNextAttackDelay(1.5);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5;
-
-// BSVR start
-#ifdef CLIENT_DLL
-		VRRegisterRecoil(1.f);
-#endif
-		// BSVR end
 	}
 	else
 	{

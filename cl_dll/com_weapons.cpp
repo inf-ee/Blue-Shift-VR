@@ -23,6 +23,9 @@
 #include "const.h"
 #include "entity_state.h"
 #include "r_efx.h"
+// BSVR start
+#include "vr/VRClientHooks.h"
+// BSVR end
 
 // g_runfuncs is true if this is the first time we've "predicated" a particular movement/firing
 //  command.  If it is 1, then we should play events/sounds etc., otherwise, we just will be
@@ -135,6 +138,10 @@ void HUD_PlaybackEvent(int flags, const edict_t* pInvoker, unsigned short eventi
 {
 	Vector org;
 	Vector ang;
+
+	// BSVR start
+	VROnClientWeaponEvent(eventindex, fparam1, bparam2);
+	// BSVR end
 
 	if (!g_runfuncs || !g_finalstate)
 		return;

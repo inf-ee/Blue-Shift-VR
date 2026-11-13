@@ -20,6 +20,10 @@ bool GetHUDWeaponBlocked();
 // Weapon code: controller recoil feedback (VRInput.cpp)
 void VRRegisterRecoil(float intensity);
 
+// com_weapons.cpp: the client weapon code plays an event. Called in every prediction pass,
+// like the weapon code itself (VRWeaponEvents.cpp)
+void VROnClientWeaponEvent(unsigned short eventindex, float fparam1, int bparam2);
+
 // ev_common.cpp: position and aim of the VR weapon (VRRenderer.cpp)
 Vector VRGlobalGetGunPosition();
 void VRGlobalGetGunAim(Vector& forward, Vector& right, Vector& up, Vector& angles);

@@ -43,7 +43,6 @@ public:
 	void PrepareVRScene(VRSceneMode sceneMode);
 	void FinishVRScene(float width, float height);
 
-	unsigned int GetVRTexture(vr::EVREye eEye);
 	unsigned int GetHLMenuTexture();
 	// The game's menu from GetHLMenuTexture() with its black background made transparent, 0 if that isn't possible
 	unsigned int UpdateHLMenuTransparentTexture();

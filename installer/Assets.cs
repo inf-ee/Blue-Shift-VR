@@ -2,43 +2,52 @@ using System.Reflection;
 
 namespace BsvrInstaller;
 
-// Everything that goes into the bsvr mod folder: the embedded payload, VR assets copied from the Steam
-// install of Half-Life: VR (where the repository's art/ and game/ folders land under valve/), and the
-// converted Blue Shift maps.
-//
-// A source ending in "/" copies a whole folder tree. A "*" copies matching files from one folder.
-// Targets are folders relative to the mod folder; a target not ending in "/" is a file path, which
-// renames a single source file.
+// Everything that goes into the bsvr mod folder: the embedded payload (including the VR assets that came from
+// Half-Life: VR), the converted Blue Shift maps and the player's own files patched for VR.
 static class Assets
 {
-    static readonly (string From, string To)[] FromHalfLifeVr =
-    [
-        ("valve/actions/",                   "actions/"),          // SteamVR input manifest and bindings
-        ("valve/textures/hud/",              "textures/hud/"),     // HUD sprite sheets as PNG
-        ("valve/textures/background.png",    "textures/"),
-        ("valve/textures/skybox/",           "textures/skybox/"),  // VR sky for maps whose sky name matches
-        ("valve/sprites/black.spr",          "sprites/"),
-        ("valve/sound/plats/train_use2.wav", "sound/plats/"),
-    ];
+    // Half-Life: VR's HUD PNGs, copied by earlier versions. The game draws only the 640 sheets and the train
+    // frames, which are in the payload now; the 320 sheets and the HD/ copies were never drawn.
+    static readonly string[] HalfLifeVrHud =
+        [.. new[] { "320hud1", "320hud2", "320hud3", "320hud4" }
+            .Concat(Enumerable.Range(1, 9).Select(i => $"640hud{i}"))
+            .Concat(Enumerable.Range(0, 5).Select(i => $"640_train_frame_{i}"))];
 
-    // Files earlier versions installed that are no longer used (the old VR menu), removed on update
+    // Half-Life: VR's skybox sets, copied by earlier versions. The VR code uses only desert, 2desert and alien1, which are
+    // in the payload now. hd/ held 1024px copies of all of them that nothing loads.
+    static readonly string[] HalfLifeVrSkyboxes =
+    [
+        "2desert", "alien1", "alien2", "alien3", "black", "city", "cliff", "desert", "dusk", "morning",
+        "neb1", "neb2b", "neb6", "neb7", "night", "space", "xen10", "xen8", "xen9",
+    ];
+    static readonly string[] SkyboxSides = ["rt", "lf", "bk", "ft", "up", "dn"];
+
+    // Files earlier versions installed that are no longer used, removed on update
     static readonly string[] Obsolete =
     [
+        // the old VR menu
         "fonts/Roboto-Regular.ttf",
         "textures/null.png",
         "THIRD_PARTY_LICENSES/Nuklear.txt",
+        // Half-Life: VR's menu background, only drawn by the removed vr_display_game debug view
+        "textures/background.png",
+        // HUD PNGs never drawn
+        .. HalfLifeVrHud.Take(4).Select(n => $"textures/hud/{n}.png"),
+        .. HalfLifeVrHud.Select(n => $"textures/hud/HD/{n}.png"),
+        // skyboxes the VR code never shows
+        .. HalfLifeVrSkyboxes.Where(n => n is not ("desert" or "2desert" or "alien1"))
+            .SelectMany(n => SkyboxSides.Select(side => $"textures/skybox/{n}{side}.png")),
+        .. HalfLifeVrSkyboxes.SelectMany(n => SkyboxSides.Select(side => $"textures/skybox/hd/{n}{side}.png")),
+        .. SkyboxSides.Select(side => $"textures/skybox/hd/desert{side}_rlt.png"),
     ];
 
-    public static void Install(string halfLifeDir, string halfLifeVrDir, string modDir)
+    public static void Install(string halfLifeDir, string modDir)
     {
         Directory.CreateDirectory(modDir);
         RemoveObsolete(modDir);
 
         Console.WriteLine("Mod files");
         ExtractPayload(modDir, halfLifeDir);
-
-        Console.WriteLine("VR assets from Half-Life: VR");
-        CopyAll(halfLifeVrDir, FromHalfLifeVr, modDir);
 
         Console.WriteLine("Maps from Blue Shift");
         Maps.Install(halfLifeDir, modDir);
@@ -121,6 +130,7 @@ static class Assets
 
     static void RemoveObsolete(string modDir)
     {
+        var count = 0;
         foreach (var relative in Obsolete)
         {
             var path = Path.Combine(modDir, relative);
@@ -128,8 +138,8 @@ static class Assets
             {
                 continue;
             }
-            Console.WriteLine($"Removing old {relative}");
             File.Delete(path);
+            count++;
 
             var dir = Path.GetDirectoryName(path)!;
             if (!Directory.EnumerateFileSystemEntries(dir).Any())
@@ -137,71 +147,9 @@ static class Assets
                 Directory.Delete(dir);
             }
         }
-    }
-
-    static void CopyAll(string sourceRoot, IEnumerable<(string From, string To)> items, string modDir)
-    {
-        foreach (var item in items)
+        if (count > 0)
         {
-            var count = Copy(sourceRoot, item, modDir);
-            Console.WriteLine(count > 0
-                ? $"  {item.From} ({count} files)"
-                : $"  warning: nothing found for {item.From}");
+            Console.WriteLine($"Removed {count} files earlier versions installed that are no longer used");
         }
-    }
-
-    static int Copy(string sourceRoot, (string From, string To) item, string modDir)
-    {
-        var source = Path.Combine(sourceRoot, item.From);
-        var targetDir = Path.Combine(modDir, item.To);
-
-        if (item.From.EndsWith('/'))
-        {
-            return Directory.Exists(source) ? CopyTree(source, targetDir) : 0;
-        }
-
-        if (!item.To.EndsWith('/'))
-        {
-            if (!File.Exists(source))
-            {
-                return 0;
-            }
-            Directory.CreateDirectory(Path.GetDirectoryName(targetDir)!);
-            File.Copy(source, targetDir, overwrite: true);
-            return 1;
-        }
-
-        var sourceDir = Path.GetDirectoryName(source)!;
-        if (!Directory.Exists(sourceDir))
-        {
-            return 0;
-        }
-
-        var files = Directory.GetFiles(sourceDir, Path.GetFileName(source));
-        if (files.Length > 0)
-        {
-            Directory.CreateDirectory(targetDir);
-        }
-        foreach (var file in files)
-        {
-            File.Copy(file, Path.Combine(targetDir, Path.GetFileName(file)), overwrite: true);
-        }
-        return files.Length;
-    }
-
-    static int CopyTree(string sourceDir, string targetDir)
-    {
-        Directory.CreateDirectory(targetDir);
-        var count = 0;
-        foreach (var file in Directory.GetFiles(sourceDir))
-        {
-            File.Copy(file, Path.Combine(targetDir, Path.GetFileName(file)), overwrite: true);
-            count++;
-        }
-        foreach (var dir in Directory.GetDirectories(sourceDir))
-        {
-            count += CopyTree(dir, Path.Combine(targetDir, Path.GetFileName(dir)));
-        }
-        return count;
     }
 }

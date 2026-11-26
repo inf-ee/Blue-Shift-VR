@@ -41,6 +41,11 @@ HSPRITE LoadSprite(const char* pszName)
 	else
 		i = 640;
 
+	// BSVR start
+	// The VR HUD draws only the 640 sheets (textures/hud/640*.png), whatever the window size
+	i = 640;
+	// BSVR end
+
 	sprintf(sz, pszName, i);
 
 	return SPR_Load(sz);

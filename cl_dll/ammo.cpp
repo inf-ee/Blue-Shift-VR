@@ -80,6 +80,11 @@ void WeaponsResource::LoadWeaponSprites(WEAPON* pWeapon)
 	else
 		iRes = 640;
 
+	// BSVR start
+	// The VR HUD and weapon wheel draw only the 640 sheets (textures/hud/640*.png), whatever the window size
+	iRes = 640;
+	// BSVR end
+
 	char sz[256];
 
 	if (!pWeapon)

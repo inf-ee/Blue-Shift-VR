@@ -75,7 +75,7 @@ Beta. Most of the code is ported from Half-Life: VR Mod onto the latest SDK. For
 ## In this mod
 
 - Hand models on weapons are mess.
-- Linux support is experimental and not part of a release yet.
+- Linux support is experimental, see [Linux](#linux-experimental).
 
 ## Inherited from Half-Life: VR Mod
 
@@ -86,17 +86,41 @@ Beta. Most of the code is ported from Half-Life: VR Mod onto the latest SDK. For
 
 # Installation
 
-1. Make sure you have [Half-Life](https://store.steampowered.com/app/70/HalfLife/), [Half-Life: Blue Shift](https://store.steampowered.com/app/130/HalfLife_Blue_Shift/) and [Half-Life: VR Mod](https://store.steampowered.com/app/1908720/HalfLife_VR_Mod/) installed on Steam. The mod runs on the Half-Life engine, so Steam lists it under Half-Life, which you need even if you only play Blue Shift.
-2. Download the latest `bsvr-install.exe` from the [Releases](https://github.com/inf-ee/Blue-Shift-VR/releases) page.
-3. Launch the installer. It looks for your Steam installations and installs the mod.
+1. Make sure you have [Half-Life](https://store.steampowered.com/app/70/HalfLife/) and [Half-Life: Blue Shift](https://store.steampowered.com/app/130/HalfLife_Blue_Shift/) installed on Steam. The mod runs on the Half-Life engine, so Steam lists it under Half-Life, which you need even if you only play Blue Shift.
+2. Download the installer from the latest release on the [Releases](https://github.com/inf-ee/Blue-Shift-VR/releases) page: `bsvr-install-<version>.exe` for Windows, `bsvr-install-<version>-linux` for Linux.
+3. Launch the installer. It looks for your Steam installations and installs the mod. On Linux, run it from a terminal, see below.
 4. Restart the Steam client (tray icon right click → Exit Steam, or Steam → Exit in the top menu).
 5. The mod appears in your Steam library as **Half-Life: VR Mod - Blue Shift**.
+
+To update, run the installer of a newer release. It updates the installed mod in place; Steam can keep running.
+
+## Linux (experimental)
+
+The mod runs natively on Linux with SteamVR for Linux. It should work, but has only been tested on one setup so far (Intel graphics, KDE Plasma on Wayland, Quest 2 over Steam Link). Reports from other setups are welcome.
+
+Requirements:
+
+- **SteamVR** for Linux.
+- **Half-Life running natively** (the default). If you force Proton on Half-Life instead, the installer installs the Windows version of the mod, which then runs under Proton.
+- **32-bit OpenGL drivers**, normally installed together with Steam.
+
+Running the installer: browsers don't keep the executable flag of downloads, so set it first. In a terminal, in the folder you downloaded it to:
+
+```
+chmod +x bsvr-install-<version>-linux
+./bsvr-install-<version>-linux
+```
+
+Known issues on Linux:
+
+- On Wayland, pointing at the in-game menu only works while the desktop mouse cursor is over the game window.
+- Changing the HD models option (Options → Advanced) during a game crashes the game.
 
 # Credits
 
 ## Half-Life: VR Mod
 
-The VR code in this mod (`dlls/vr`, `cl_dll/vr`, `game_shared/vr` and the `BSVR` sections) comes from [Half-Life: VR Mod](https://github.com/maxmakesmods/Half-Life-VR), (c) 2017-2022 Max Makes Mods, reused with the authors' permission. Contributors to its repository:
+The VR code in this mod (`dlls/vr`, `cl_dll/vr`, `game_shared/vr` and the `BSVR` sections) and the VR assets the installer ships (controller bindings, HUD textures, skyboxes, the flashlight sprite and the train button sound) come from [Half-Life: VR Mod](https://github.com/maxmakesmods/Half-Life-VR), (c) 2017-2022 Max Makes Mods, reused with the authors' permission. Contributors to its repository:
 
 - Max Makes Mods
 - Devin (formicsapien)
@@ -126,5 +150,6 @@ Third-party code and licenses are listed in [THIRD_PARTY_LICENSES](THIRD_PARTY_L
 For building and installing follow the upstream [Blue Shift Updated](https://github.com/twhl-community/halflife-bs-updated#readme) documentation.
 
 - **Windows:** `projects/vs2019/hldll.vcxproj` and `hl_cdll.vcxproj`.
-- **Linux (32-bit, experimental):** `cd linux && make` builds `release/hl.so` and `release/client.so`.
+- **Linux (32-bit, experimental):** `linux/build-steamrt.sh` builds `release/hl.so` and `release/client.so` in the Steam Runtime container (needs docker); this is how releases are built. A plain `cd linux && make` works for testing, but only on systems with the same or a newer glibc.
 - **Installer:** see [installer/README.md](installer/README.md).
+- **Releases:** pushing a `v*` tag runs [.github/workflows/release.yml](.github/workflows/release.yml), which builds both platforms and both installers and creates a draft release.

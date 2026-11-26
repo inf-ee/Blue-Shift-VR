@@ -136,8 +136,6 @@ void VRSettings::Init()
 	RegisterCVAR("vr_blastpit_fan_nonsolid", "1");
 	RegisterCVAR("vr_blastpit_fan_delay", "1");
 
-	RegisterCVAR("vr_display_game", "0");
-
 	RegisterCVAR("vr_menu_scale", "1");
 	RegisterCVAR("vr_menu_height", "-0.3"); // meters relative to eye level
 	RegisterCVAR("vr_menu_opacity", "1");	// BSVR changed to fully opaque

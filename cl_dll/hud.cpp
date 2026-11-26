@@ -561,6 +561,11 @@ void CHud::VidInit()
 	else
 		m_iRes = 640;
 
+	// BSVR start
+	// The VR HUD and weapon wheel draw only the 640 sheets (textures/hud/640*.png), whatever the window size
+	m_iRes = 640;
+	// BSVR end
+
 	// Only load this once
 	if (!m_pSpriteList)
 	{

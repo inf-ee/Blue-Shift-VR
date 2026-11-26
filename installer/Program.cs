@@ -32,12 +32,6 @@ if (!installed)
     WaitForHalfLife(steam);
 }
 
-var halfLifeVrDir = FindFolder(steam, Steam.HalfLifeVrAppId, Steam.IsHalfLifeVr, "Half-Life: VR Mod folder");
-if (halfLifeVrDir is null)
-{
-    return Quit("Half-Life: VR Mod was not found in Steam. It is free and provides the VR assets; install it and run the installer again.");
-}
-
 Console.WriteLine();
 if (installed)
 {
@@ -62,7 +56,7 @@ WaitForGameToExit(halfLifeDir);
 Console.WriteLine();
 try
 {
-    Assets.Install(halfLifeDir, halfLifeVrDir, modDir);
+    Assets.Install(halfLifeDir, modDir);
 }
 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
 {

@@ -11,9 +11,6 @@ static class Steam
     // Half-Life: Blue Shift. Lives inside the shared "Half-Life" folder as bshift\.
     public const int BlueShiftAppId = 130;
 
-    // Half-Life: VR Mod. A standalone copy of Half-Life with the VR assets under valve\.
-    public const int HalfLifeVrAppId = 1908720;
-
     public static string? FindRoot()
     {
         if (!OperatingSystem.IsWindows())
@@ -112,7 +109,4 @@ static class Steam
     public static bool IsHalfLifeWithBlueShift(string folder) =>
         (File.Exists(Path.Combine(folder, "hl.exe")) || File.Exists(Path.Combine(folder, "hl_linux"))) &&
         Directory.Exists(Path.Combine(folder, "bshift"));
-
-    public static bool IsHalfLifeVr(string folder) =>
-        File.Exists(Path.Combine(folder, "hl.exe")) && File.Exists(Path.Combine(folder, "valve", "actions", "actions.manifest"));
 }

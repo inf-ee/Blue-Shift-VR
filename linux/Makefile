@@ -31,7 +31,18 @@ ifeq "$(COMPILER)" ""
 endif
 
 CPLUS="$(COMPILER) -m32"
-CPP_LIB:=-L$(shell g++ -m32 -print-file-name=libstdc++.so | xargs dirname) -lstdc++ -ldl -lpthread -static-libstdc++ -static-libgcc
+# BSVR start
+# libstdc++ linked statically with any compiler: the explicit -lstdc++ made it a dynamic dependency on the build machine's
+# version, and the -L dir was the default g++'s, not $(COMPILER)'s. Released builds come from build-steamrt.sh.
+# The static libstdc++.a is also named here, ahead of the shared libraries on client.so's link line: libopenvr_api.so
+# exports the C++ runtime (__cxa_*), and otherwise the linker takes it from there, leaving those symbols to be bound
+# at run time to the system's libstdc++, which doesn't match this copy (crash in std::locale on load).
+# --exclude-libs,ALL keeps the static libraries' symbols private. Exported, the GNU unique ones (the locale facet ids)
+# are merged with the same symbols of the system's libstdc++, which the engine has already loaded, and the locale
+# setup of this copy corrupts memory (free(): invalid size on load). -Bsymbolic doesn't apply to unique symbols.
+# CPP_LIB:=-L$(shell g++ -m32 -print-file-name=libstdc++.so | xargs dirname) -lstdc++ -ldl -lpthread -static-libstdc++ -static-libgcc - original
+CPP_LIB:=-Wl,--exclude-libs,ALL -Wl,-Bstatic -lstdc++ -Wl,-Bdynamic -ldl -lpthread -static-libstdc++ -static-libgcc
+# BSVR end
 
 ARCH_CFLAGS=-march=pentium-m -mfpmath=387 -mno-sse
 
@@ -49,7 +60,11 @@ BASE_CFLAGS+=-DNDEBUG -DPOSIX -D_POSIX -DLINUX -D_LINUX -DGNUC -DNO_MALLOC_OVERR
 # fno-gnu-unique is needed to disable a compiler optimization that prevents dlclose from unloading mod dlls,
 # causing them to retain state and crash when the engine tries to access memory in an invalid way
 # See https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html#index-fno-gnu-unique for more information about this flag
-ifeq "$(COMPILER)" "g++"
+# BSVR start
+# Also for versioned names like g++-9, which would otherwise build without these flags
+# ifeq "$(COMPILER)" "g++" - original
+ifneq "$(filter g++%,$(COMPILER))" ""
+# BSVR end
 	BASE_CFLAGS+=-flifetime-dse=1 -fno-gnu-unique
 endif
 
@@ -99,12 +114,16 @@ installer_payload: hl hl_cdll
 	cp -f $(BUILD_DIR)/hl.$(SHLIBEXT) $(INSTALLER_PAYLOAD_DIR)/dlls/
 	cp -f $(BUILD_DIR)/client.$(SHLIBEXT) $(INSTALLER_PAYLOAD_DIR)/cl_dlls/
 
+# ReactPhysics3D is prebuilt and tracked (external/reactphysics3d/lib/Linux/libreactphysics3d.a). Rebuild it only when
+# its sources change, with build-steamrt.sh rp3d, and commit the result.
 rp3d: build_dir
 	$(MAKE_RP3D) $(RP3D_COMMON_VARS)
 
-hl: rp3d
+clean_rp3d:
+	$(MAKE_RP3D) $(RP3D_COMMON_VARS) clean
+
+hl: build_dir
 	$(MAKE_HL_LIB) CPLUS=$(CPLUS) ARCH=$(ARCH) ARCH_CFLAGS="$(ARCH_CFLAGS)" SHLIBEXT=$(SHLIBEXT) SHLIBCFLAGS=$(SHLIBCFLAGS) SHLIBLDFLAGS=$(SHLIBLDFLAGS) CPP_LIB="$(CPP_LIB)" CFG=$(CFG) OS=$(OS) BASE_CFLAGS="$(BASE_CFLAGS)" BUILD_DIR=$(BUILD_DIR) BUILD_OBJ_DIR=$(BUILD_OBJ_DIR) SOURCE_DIR=$(SOURCE_DIR) ENGINE_SRC_DIR=$(ENGINE_SRC_DIR) COMMON_SRC_DIR=$(COMMON_SRC_DIR) PUBLIC_SRC_DIR=$(PUBLIC_SRC_DIR) GAME_SHARED_SRC_DIR=$(GAME_SHARED_SRC_DIR) PM_SRC_DIR=$(PM_SRC_DIR)
 
 clean:
 	-rm -rf $(BUILD_OBJ_DIR)
-	$(MAKE_RP3D) $(RP3D_COMMON_VARS) clean

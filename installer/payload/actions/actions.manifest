@@ -1,0 +1,199 @@
+{
+    "supports_dominant_hand_setting": true,
+    "action_sets": [
+        {
+            "name": "/actions/haptic",
+            "usage": "leftright"
+        },
+        {
+            "name": "/actions/poses",
+            "usage": "leftright"
+        },
+        {
+            "name": "/actions/move",
+            "usage": "leftright"
+        },
+        {
+            "name": "/actions/interact",
+            "usage": "leftright"
+        },
+        {
+            "name": "/actions/weapon",
+            "usage": "leftright"
+        },
+        {
+            "name": "/actions/menu",
+            "usage": "leftright"
+        },
+        {
+            "name": "/actions/custom",
+            "usage": "leftright"
+        }
+    ],
+    "actions": [
+        {
+            "name": "/actions/haptic/in/HapticVibration",
+            "type": "vibration"
+        },
+        {
+            "name": "/actions/poses/in/HandPoseLeft",
+            "requirement": "mandatory",
+            "type": "pose"
+        },
+		
+        {
+            "name": "/actions/poses/in/HandPoseRight",
+            "requirement": "mandatory",
+            "type": "pose"
+        },
+        {
+            "name": "/actions/poses/in/HandPointerLeft",
+            "requirement": "mandatory",
+            "type": "pose"
+        },
+        {
+            "name": "/actions/poses/in/HandPointerRight",
+            "requirement": "mandatory",
+            "type": "pose"
+        },
+        {
+            "name": "/actions/poses/in/HandSkeletonLeft",
+            "skeleton": "/skeleton/hand/left",
+            "type": "skeleton"
+        },
+        {
+            "name": "/actions/poses/in/HandSkeletonRight",
+            "skeleton": "/skeleton/hand/right",
+            "type": "skeleton"
+        },
+        {
+            "name": "/actions/poses/in/HandCurl",
+            "type": "vector1"
+        },
+        {
+            "name": "/actions/poses/in/TriggerPull",
+            "type": "vector1"
+        },
+		
+        {
+            "name": "/actions/move/in/Move",
+            "requirement": "mandatory",
+            "type": "vector2"
+        },
+        {
+            "name": "/actions/move/in/ContinuousTurn",
+            "type": "vector2"
+        },
+        {
+            "name": "/actions/move/in/TurnLeft",
+            "type": "boolean"
+        },
+        {
+            "name": "/actions/move/in/TurnRight",
+            "type": "boolean"
+        },
+        {
+            "name": "/actions/move/in/Walk",
+            "type": "boolean"
+        },
+        {
+            "name": "/actions/move/in/Jump",
+            "requirement": "mandatory",
+            "type": "boolean"
+        },
+        {
+            "name": "/actions/move/in/Crouch",
+            "type": "boolean"
+        },
+		
+        {
+            "name": "/actions/interact/in/LegacyUse",
+            "requirement": "mandatory",
+            "type": "boolean"
+        },
+        {
+            "name": "/actions/interact/in/Grab",
+            "requirement": "mandatory",
+            "type": "boolean"
+        },
+        {
+            "name": "/actions/interact/in/Teleport",
+            "type": "boolean"
+        },
+        {
+            "name": "/actions/interact/in/Flashlight",
+            "type": "boolean"
+        },
+		
+        {
+            "name": "/actions/weapon/in/Attack",
+            "requirement": "mandatory",
+            "type": "boolean"
+        },
+        {
+            "name": "/actions/weapon/in/Attack2",
+            "requirement": "mandatory",
+            "type": "boolean"
+        },
+        {
+            "name": "/actions/weapon/in/Next",
+            "type": "boolean"
+        },
+        {
+            "name": "/actions/weapon/in/Previous",
+            "type": "boolean"
+        },
+        {
+            "name": "/actions/weapon/in/Select",
+            "type": "boolean"
+        },
+        {
+            "name": "/actions/weapon/in/Reload",
+            "requirement": "mandatory",
+            "type": "boolean"
+        },
+        {
+            "name": "/actions/weapon/in/Holster",
+            "type": "boolean"
+        },
+		
+        {
+            "name": "/actions/menu/in/ToggleVRMenu",
+            "requirement": "mandatory",
+            "type": "boolean"
+        },
+        {
+            "name": "/actions/menu/in/ClickVRMenu",
+            "requirement": "mandatory",
+            "type": "boolean"
+        },
+		
+        {
+            "name": "/actions/custom/in/ExampleCustomAction",
+            "type": "boolean"
+        }
+    ],
+    "default_bindings": [
+        {
+            "binding_url": "default_oculus_touch.json",
+            "controller_type": "oculus_touch"
+        },
+        {
+            "binding_url": "default_knuckles.json",
+            "controller_type": "knuckles"
+        },
+        {
+            "binding_url": "default_vive_controller.json",
+            "controller_type": "vive_controller"
+        },
+        {
+            "binding_url": "default_holographic_controller.json",
+            "controller_type": "holographic_controller"
+        }
+    ],
+    "localization_files": {
+        "en_US": "actions_en_US.json"
+    },
+    "version": 2,
+    "minimum_required_version": 2
+}

@@ -7,7 +7,9 @@ RP3D_SRC_DIR=$(SOURCE_DIR)/external/reactphysics3d/include
 RP3D_LIB_DIR=$(SOURCE_DIR)/external/reactphysics3d/lib/Linux
 RP3D_OBJ_DIR=$(BUILD_OBJ_DIR)/rp3d
 
-RP3D_CFLAGS=-std=c++17 -O3 -fexceptions -include cstdint -m32 \
+# NDEBUG like the Windows Release build of this library: its asserts are debug checks, and the VR code trips
+# DynamicAABBTree::updateObject's (abort in game)
+RP3D_CFLAGS=-std=c++17 -O3 -DNDEBUG -fexceptions -include cstdint -m32 \
 	-march=pentium-m -mfpmath=387 -mno-sse \
 	-fno-strict-aliasing -w \
 	-DIS_DOUBLE_PRECISION_ENABLED \
@@ -18,27 +20,18 @@ RP3D_OBJS=$(patsubst $(RP3D_SRC_DIR)/%.cpp,$(RP3D_OBJ_DIR)/%.o,$(RP3D_SRCS))
 
 RP3D_LIB=$(RP3D_LIB_DIR)/libreactphysics3d.a
 
-all: dirs $(RP3D_LIB)
+all: $(RP3D_LIB)
 
-dirs:
-	-mkdir -p $(RP3D_OBJ_DIR)/body
-	-mkdir -p $(RP3D_OBJ_DIR)/collision/broadphase
-	-mkdir -p $(RP3D_OBJ_DIR)/collision/narrowphase/GJK
-	-mkdir -p $(RP3D_OBJ_DIR)/collision/narrowphase/SAT
-	-mkdir -p $(RP3D_OBJ_DIR)/collision/shapes
-	-mkdir -p $(RP3D_OBJ_DIR)/constraint
-	-mkdir -p $(RP3D_OBJ_DIR)/containers
-	-mkdir -p $(RP3D_OBJ_DIR)/engine
-	-mkdir -p $(RP3D_OBJ_DIR)/mathematics
-	-mkdir -p $(RP3D_OBJ_DIR)/memory
-	-mkdir -p $(RP3D_OBJ_DIR)/utils
-	-mkdir -p $(RP3D_LIB_DIR)
-
+# Each rule creates its object folder: with make -j a separate folder step ran alongside the compiles
 $(RP3D_OBJ_DIR)/%.o: $(RP3D_SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
 	$(CPLUS) $(RP3D_CFLAGS) -o $@ -c $<
 
 $(RP3D_LIB): $(RP3D_OBJS)
-	$(AR) rcs $@ $^
+	@mkdir -p $(dir $@)
+	-rm -f $@
+	# D: no timestamps or owner ids in the archive, so a rebuild in build-steamrt.sh is byte-identical
+	$(AR) rcsD $@ $^
 
 clean:
 	-rm -rf $(RP3D_OBJ_DIR)

@@ -33,7 +33,8 @@ INCLUDEDIRS=-I$(HL_SRC_DIR) -I$(HL_PARTICLEMAN_DIR) -I../dlls -I/usr/include/mal
 # -Bsymbolic: client.so uses its own globals even when a library loaded earlier exports the same name.
 # vr_gl.cpp has GL function pointers named like the functions libGL exports (glGenerateMipmap, ...); without it
 # they bind to libGL's code, which then gets overwritten.
-LDFLAGS=$(SHLIBLDFLAGS) -Wl,-Bsymbolic $(CPP_LIB) -L$(CFG) vgui.so -L. libSDL2-2.0.so.0 libopenvr_api.so -lGL $(SDK_DIR)/lib/public/libtier0.so $(SDK_DIR)/lib/public/libvstdlib.so
+# -lopenvr_api: the OpenVR SDK's libopenvr_api.so has no SONAME, so it is linked by name for client.so to need plain libopenvr_api.so.
+LDFLAGS=$(SHLIBLDFLAGS) -Wl,-Bsymbolic $(CPP_LIB) -L$(CFG) vgui.so -L. libSDL2-2.0.so.0 -L$(SOURCE_DIR)/lib/public -lopenvr_api -lGL $(SDK_DIR)/lib/public/libtier0.so $(SDK_DIR)/lib/public/libvstdlib.so
 
 DO_CC=$(CPLUS) $(INCLUDEDIRS) $(CFLAGS) -o $@ -c $<
 

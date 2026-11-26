@@ -756,11 +756,6 @@ void VRHelper::SubmitImages(VREyeMode eyeMode)
 	InternalSubmitImages(eyeMode);
 }
 
-unsigned int VRHelper::GetVRTexture(vr::EVREye eEye)
-{
-	return eEye == vr::EVREye::Eye_Left ? vrGLLeftEyeTexture : vrGLRightEyeTexture;
-}
-
 unsigned int VRHelper::GetHLMenuTexture()
 {
 	int viewport[4];

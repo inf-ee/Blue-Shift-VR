@@ -1,0 +1,151 @@
+# Builds the game libraries for Linux and Windows and both installers, and creates a draft release.
+# Pushing a tag like v1.2.0 creates the draft "v1.2.0" with bsvr-install-v1.2.0.exe, bsvr-install-v1.2.0-linux and SHA256SUMS.
+# Running it by hand (Actions > Release > Run workflow) builds everything and keeps the installers as workflow
+# artifacts, without creating a release.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: Linux libraries (Steam Runtime)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      # The same pinned container and command as a local release build
+      - name: Build hl.so and client.so
+        run: linux/build-steamrt.sh
+
+      # Fails when a library would not load on older distros or SteamOS
+      - name: Check library requirements
+        run: |
+          for f in linux/release/hl.so linux/release/client.so; do
+            glibc=$(objdump -T "$f" | grep -o 'GLIBC_[0-9.]*' | sort -uV | tail -1)
+            echo "$f needs $glibc"
+            if [ "$(printf '%s\n' "$glibc" GLIBC_2.15 | sort -V | tail -1)" != GLIBC_2.15 ]; then
+              echo "::error file=$f::needs $glibc, newer than the Steam Runtime's GLIBC_2.15"
+              exit 1
+            fi
+            if readelf -d "$f" | grep -q 'NEEDED.*libstdc++'; then
+              echo "::error file=$f::links libstdc++ dynamically"
+              exit 1
+            fi
+          done
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: linux-libraries
+          path: |
+            linux/release/hl.so
+            linux/release/client.so
+          if-no-files-found: error
+
+  windows:
+    name: Windows libraries
+    # The projects use the v145 toolset (Visual Studio 2026); windows-2025 still has Visual Studio 2022
+    runs-on: windows-2025-vs2026
+    steps:
+      - uses: actions/checkout@v7
+
+      # The post-build steps are turned off: filecopy.bat copies into a local Steam folder. The DLLs are taken
+      # from the build output instead.
+      - name: Build hl.dll and client.dll
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
+          if (-not $msbuild) { throw 'MSBuild not found' }
+          & $msbuild projects/vs2019/projects.sln /m /nologo /v:minimal '/t:hldll;hl_cdll' `
+            /p:Configuration=Release /p:Platform=Win32 /p:PostBuildEventUseInBuild=false
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          # One folder, so the artifact holds both DLLs side by side (upload-artifact keeps the paths below the
+          # files' common folder, here hldll/ and hl_cdll/)
+          New-Item -ItemType Directory -Force out | Out-Null
+          Copy-Item projects/vs2019/Release/hldll/hl.dll, projects/vs2019/Release/hl_cdll/client.dll out/
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows-libraries
+          path: |
+            out/hl.dll
+            out/client.dll
+          if-no-files-found: error
+
+  installers:
+    name: Installers
+    needs: [linux, windows]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - uses: actions/download-artifact@v8
+        with:
+          path: libraries
+
+      # Each installer carries both sets and installs the one for the player's Half-Life:
+      # .dll for hl.exe (Windows, Proton), .so for hl_linux
+      - name: Put the libraries into the payload
+        run: |
+          mkdir -p installer/payload/dlls installer/payload/cl_dlls
+          cp libraries/linux-libraries/hl.so libraries/windows-libraries/hl.dll installer/payload/dlls/
+          cp libraries/linux-libraries/client.so libraries/windows-libraries/client.dll installer/payload/cl_dlls/
+          ls -l installer/payload/dlls installer/payload/cl_dlls
+
+      - name: Build the installers
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            tag=$GITHUB_REF_NAME version=${GITHUB_REF_NAME#v}
+          else
+            tag=dev-${GITHUB_SHA::7} version=0.0.0-dev
+          fi
+          cd installer
+          dotnet publish -c Release -r win-x64 -p:Version=$version
+          dotnet publish -c Release -r linux-x64 -p:Version=$version
+          mkdir -p ../dist
+          cp bin/Release/net10.0/win-x64/publish/bsvr-install.exe ../dist/bsvr-install-$tag.exe
+          cp bin/Release/net10.0/linux-x64/publish/bsvr-install ../dist/bsvr-install-$tag-linux
+          chmod +x ../dist/bsvr-install-$tag-linux
+          cd ../dist && sha256sum bsvr-install-$tag.exe bsvr-install-$tag-linux > SHA256SUMS && cat SHA256SUMS
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: installers
+          path: dist/
+          if-no-files-found: error
+
+      - name: Create the draft release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # The install steps go above GitHub's generated list of changes
+        run: |
+          tag=$GITHUB_REF_NAME
+          cat > notes.md <<EOF
+          ## Installation
+
+          See [Installation](https://github.com/$GITHUB_REPOSITORY#installation) for what you need first.
+
+          - **Windows:** download \`bsvr-install-$tag.exe\` and run it.
+          - **Linux (experimental):** download \`bsvr-install-$tag-linux\`, then in a terminal, in the download folder:
+            \`\`\`
+            chmod +x bsvr-install-$tag-linux
+            ./bsvr-install-$tag-linux
+            \`\`\`
+            See [Linux](https://github.com/$GITHUB_REPOSITORY#linux-experimental) for requirements and known issues.
+
+          EOF
+          gh release create "$tag" dist/bsvr-install-"$tag".exe dist/bsvr-install-"$tag"-linux dist/SHA256SUMS \
+            --draft --title "Half-Life: VR Mod - Blue Shift $tag" --notes-file notes.md --generate-notes --verify-tag
